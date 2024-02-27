@@ -9,7 +9,7 @@ use rand::Rng;
 
 use crate::Deserialize;
 use crate::Serialize;
-
+use core::fmt;
 fn above_average(b_trait: impl PlayerTrait) -> bool {
     b_trait.to_int() > 0
 }
@@ -50,16 +50,16 @@ impl BTraits {
             toughness: above_average(self.toughness),
         }
     }
-    pub fn to_string(&self) -> String {
+    /*pub fn to_string(&self) -> String {
         format!(
             "{}{}{}{}{}",
-            self.contact.to_string(),
-            self.defense.to_string(),
-            self.power.to_string(),
-            self.speed.to_string(),
-            self.toughness.to_string()
+            self.contact,
+            self.defense,
+            self.power,
+            self.speed,
+            self.toughness
         )
-    }
+    }*/
 
     pub fn default() -> BTraits {
         BTraits {
@@ -143,6 +143,23 @@ impl BTraits {
 
     }
     */
+}
+
+
+impl fmt::Display for BTraits {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = format!(
+            "{}{}{}{}{}",
+            self.contact,
+            self.defense,
+            self.power,
+            self.speed,
+            self.toughness
+        );
+    
+
+        write!(f,"{}", chars)
+    }
 }
 
 fn trait_stack<T: PlayerTrait>(original: T, new: T) -> T {

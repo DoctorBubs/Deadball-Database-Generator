@@ -3,7 +3,7 @@ use crate::b_traits::BTraits;
 
 use crate::player_quality::PlayerQuality;
 use crate::traits::PitcherTrait;
-use crate::traits::PlayerTrait;
+
 use crate::BattingStats;
 use crate::Deserialize;
 use crate::Era;
@@ -17,7 +17,7 @@ use name_maker::Gender;
 use name_maker::RandomNameGenerator;
 use rand::rngs::ThreadRng;
 use rand::Rng;
-
+use std::fmt;
 // Players can be either left handed or right hander, however batters may also be switch hitters. We use an enum to keep track.
 #[derive(Serialize, Deserialize)]
 pub enum Hand {
@@ -27,13 +27,13 @@ pub enum Hand {
 }
 
 impl Hand {
-    pub fn to_string(&self) -> String {
+    /*pub fn to_string(&self) -> String {
         match self {
             Self::R => "R".to_string(),
             Self::L => "L".to_string(),
             Self::S => "S".to_string(),
         }
-    }
+    }*/
 
     pub fn new(thread: &mut ThreadRng, quality: &impl PlayerQuality) -> Hand {
         let roll = thread.gen_range(1..=10);
@@ -46,6 +46,21 @@ impl Hand {
             },
             _ => Self::R,
         }
+    }
+}
+
+
+impl fmt::Display for Hand {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+        let chars = match self {
+            Self::R => "R",
+            Self::L => "L",
+            Self::S => "S",
+        };
+    
+
+        write!(f,"{}", chars)
     }
 }
 
@@ -169,7 +184,7 @@ impl Player {
 
     fn get_pitcher_trait_string(&self) -> String {
         match self.pitcher_trait {
-            Some(pitcher_trait) => format!("{},", pitcher_trait.to_string()),
+            Some(pitcher_trait) => format!("{},", pitcher_trait),
             None => "".to_string(),
         }
     }
@@ -181,7 +196,7 @@ impl Player {
         }
     }
 
-    pub fn to_string(&self) -> String {
+    /*pub fn to_string(&self) -> String {
         match self.is_pitcher() {
             false => {
                 let base = format!(
@@ -207,14 +222,14 @@ impl Player {
                     self.pos,
                     self.age,
                     self.hand.to_string(),
-                    self.get_base_pd().to_string(),
+                    self.get_base_pd(),
                     self.get_pitcher_trait_string(),
                     self.bt,
                     self.obt
                 )
             }
         }
-    }
+    }*/
 
     pub fn get_pitcher_rank_info(&self) -> PitcherRankInfo {
         let pd_num = self.get_base_pd().to_int();
@@ -232,7 +247,7 @@ impl Player {
         pos: String,
         gender: PlayerGender,
         quality: impl PlayerQuality,
-        mut thread: &mut ThreadRng,
+        thread: &mut ThreadRng,
         era: Era,
     ) -> Player {
         let b_stats = BattingStats {
@@ -240,20 +255,20 @@ impl Player {
         };
 
         let name = gender.new_name();
-        let new_bt = quality.get_bt(&mut thread);
-        let new_obt_mod = quality.get_obt_mod(&mut thread);
+        let new_bt = quality.get_bt(thread);
+        let new_obt_mod = quality.get_obt_mod(thread);
         let new_obt = new_bt + new_obt_mod;
         let mut b_traits = BTraits::default();
-        quality.calc_traits(&mut b_traits, &mut thread);
+        quality.calc_traits(&mut b_traits, thread);
         /*let pd = match quality{
         BatterQuality::Pitcher => Some(PD::D8),
         _ => None
         }*/
-        let pd = quality.get_pd(&mut thread, era);
-        let pitcher_trait = quality.get_pitcher_trait(&mut thread);
-        let hand = Hand::new(&mut thread, &quality);
-        let age_cat = AgeCat::random(&mut thread);
-        let age = age_cat.new_age(&mut thread);
+        let pd = quality.get_pd(thread, era);
+        let pitcher_trait = quality.get_pitcher_trait(thread);
+        let hand = Hand::new(thread, &quality);
+        let age_cat = AgeCat::random(thread);
+        let age = age_cat.new_age(thread);
 
         Player {
             name,
@@ -270,6 +285,48 @@ impl Player {
         }
     }
 }
+
+
+
+impl fmt::Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self.is_pitcher() {
+            false => {
+                let base = format!(
+                    "{},{},{},{},{},{}",
+                    self.name,
+                    self.pos,
+                    self.age,
+                    self.hand,
+                    self.bt,
+                    self.obt
+                );
+                let trait_string = self.b_traits.to_string();
+                match trait_string.trim().is_empty() {
+                    true => base,
+                    false => format!("{},{}", base, trait_string),
+                }
+            }
+
+            true => {
+                format!(
+                    "{},{},{},{},{},{} {},{}",
+                    self.name,
+                    self.pos,
+                    self.age,
+                    self.hand,
+                    self.get_base_pd(),
+                    self.get_pitcher_trait_string(),
+                    self.bt,
+                    self.obt
+                )
+            }
+        };
+
+        write!(f,"{}", chars)
+    }
+}
+
 
 pub trait PlayerWrapper {
     fn unwrap(&mut self) -> &mut Player;

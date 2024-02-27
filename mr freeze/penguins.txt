@@ -1,0 +1,34 @@
+Name:penguins , Team Score: 89
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Georges Kayle,RF,22,S,31,38
+Brad Anya,1B,27,R,32,37
+Sonnie Cariotta,CF,23,R,31,37,C+P-
+Justis Alina,SS,30,R,30,34,D-P+
+Wald Candi,LF,26,R,24,30
+Saxe Lorine,3B,19,R,24,30,P-
+Harland Gus,2B,24,R,23,30,C-P--
+Elvis Sean,C,24,R,21,25,D+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Pennie Judie,INF,20,R,26,30,S+
+Mic Samuella,OF,27,R,24,32,D+
+Benjy Lian,INF,29,R,24,28
+Lloyd Isabel,OF,24,R,22,25
+Winn Leah,C,32,L,20,24
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Floyd Benedikta,SP,34,R,d12, 16,23
+Jefferson Candide,SP,28,L,d8,CN+, 17,20
+Wilson Terra,SP,24,L,d8, 20,24
+Lay Alex,SP,24,R,d4,K+, 14,19
+Rodrique Brita,SP,28,L,d4, 16,17
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Phip Corinne,RP,23,L,d12, 15,21
+Wait Opalina,RP,30,R,d8, 19,25
+Archibald Guillemette,RP,24,L,d8, 20,26
+Edsel Reeba,RP,26,L,d4,St+, 23,28
+Averil Charmane,RP,34,L,d4, 19,20
+Woochang Kevina,RP,33,R,d4, 18,19
+Harv Magna,RP,23,R,d4, 24,26

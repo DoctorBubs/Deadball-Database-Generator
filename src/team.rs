@@ -9,6 +9,7 @@ use crate::PlayerGender;
 use crate::PlayerQuality;
 use crate::Serialize;
 use crate::ThreadRng;
+use core::fmt;
 // This function is used to create vectors of players, based off a vector of strings.
 fn new_player_vec<T: Copy + PlayerQuality>(
     vec: Vec<&str>,
@@ -104,7 +105,7 @@ fn sorted_pitcher_pool(vec: &Vec<Player>) -> String {
         .unwrap_or_else(|| "\n".to_string())
 }
 
-fn get_sorted_batter_strings(vec: &Vec<Player>) -> String {
+fn get_sorted_batter_strings(vec: &[Player]) -> String {
     let mut scores: Vec<LineupScore> = vec.iter().map(|player| player.get_lineup_score()).collect();
     scores.sort();
     scores
@@ -181,7 +182,7 @@ impl Team {
         self.team_score = (batter_score + pitcher_score) / 10;
     }
 
-    pub fn to_string(&self) -> String {
+    /*pub fn to_string(&self) -> String {
         let base_info = format!("Name:{} , Team Score: {}\n", self.name, self.team_score);
         let lineup_string = get_batter_info_string("Lineup".to_string(), &self.lineup);
         let bench_string = get_batter_info_string("Bench".to_string(), &self.bench);
@@ -199,5 +200,30 @@ impl Team {
             ),
             None => non_bullpen_string,
         }
+    }*/
+}
+
+
+impl fmt::Display for Team {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let base_info = format!("Name:{} , Team Score: {}\n", self.name, self.team_score);
+        let lineup_string = get_batter_info_string("Lineup".to_string(), &self.lineup);
+        let bench_string = get_batter_info_string("Bench".to_string(), &self.bench);
+        let rotation_string =
+            get_pitcher_info_string("Rotation".to_string(), &self.starting_pitching);
+        let non_bullpen_string = format!(
+            "{}{}{}{}",
+            base_info, lineup_string, bench_string, rotation_string
+        );
+        let chars = match &self.bullpen {
+            Some(bullpen) => format!(
+                "{}{}",
+                non_bullpen_string,
+                get_pitcher_info_string("Bullpen".to_string(), bullpen)
+            ),
+            None => non_bullpen_string,
+        };
+
+        write!(f,"{}", chars)
     }
 }

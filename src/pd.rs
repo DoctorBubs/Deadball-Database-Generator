@@ -1,6 +1,7 @@
 use crate::Deserialize;
 
 use crate::Serialize;
+use core::fmt;
 
 struct PDInfo(i32, bool);
 
@@ -20,7 +21,7 @@ pub enum PD {
 }
 
 impl PD {
-    pub fn to_int(&self) -> i32 {
+    pub fn to_int(self) -> i32 {
         match self {
             Self::D20 => 20,
             Self::D12 => 12,
@@ -41,12 +42,26 @@ impl PD {
         let is_positive = num > 0;
         PDInfo(num, is_positive)
     }
-    pub fn to_string(&self) -> String {
+    /*pub fn to_string(self) -> String {
         let PDInfo(num, is_positive) = self.get_info();
         let num_string = num.abs().to_string();
         match is_positive {
             true => format!("d{}", num_string),
             false => format!("-d{}", num_string),
         }
+    }*/
+}
+
+
+impl fmt::Display for PD {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let PDInfo(num, is_positive) = self.get_info();
+        let num_string = num.abs().to_string();
+        let chars = match is_positive {
+            true => format!("d{}", num_string),
+            false => format!("-d{}", num_string),
+        };
+
+        write!(f,"{}", chars)
     }
 }

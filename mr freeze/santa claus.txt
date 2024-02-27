@@ -1,0 +1,34 @@
+Name:santa claus , Team Score: 65
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Alic Phyllis,1B,19,R,28,33
+Raymond Regan,SS,22,R,26,31,D+T+
+Tommy Therine,LF,32,S,23,30
+Templeton Angelia,3B,22,L,27,31,D+P+
+Joel Simone,2B,31,R,26,29
+Sheridan Honoria,CF,24,L,22,28
+Fonsie Raven,RF,19,L,23,27
+Boyce Dolores,C,25,R,22,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Bailey Bel,OF,23,L,30,38,C+
+Alberto Avrit,INF,23,R,27,32
+Lawton Catherina,INF,23,S,24,29
+Shamus Davina,OF,25,L,20,25
+Vaughn Sophie,C,28,S,20,23,T+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Salman Gwendolyn,SP,22,L,d8,GB, 20,26
+Rikki Daryl,SP,27,R,d8, 21,26
+Sebastien Jacquenetta,SP,27,L,d4, 22,30
+Shaughn Florry,SP,29,L,-d4,CN-, 15,23
+Emmett Merrili,SP,27,L,-d4,K+, 21,26
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Ludwig Priscella,RP,19,L,d12, 19,21
+Reed Alene,RP,20,L,d8,St+, 22,27
+Giavani Stevena,RP,25,L,d8, 20,25
+Shem Dee,RP,26,R,d4, 18,22
+Tiebout Jeannette,RP,23,R,d4, 20,28
+Barron Verna,RP,23,R,d4, 18,26
+Baillie Odessa,RP,23,R,-d4, 21,27

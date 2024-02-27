@@ -3,15 +3,19 @@
 use crate::Deserialize;
 
 use crate::Serialize;
-
-pub trait PlayerTrait {
+use crate::fmt;
+pub trait PlayerTrait{
     fn to_int(&self) -> i32;
-    fn to_string(&self) -> String;
+   
     fn get_rbi_score(&self) -> i32 {
         0
     }
-    //fn upgrade<T>(&self) -> Option<T>;
+    
+    
 }
+
+
+
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum Power {
@@ -30,26 +34,7 @@ pub enum Power {
 //}
 
 impl PlayerTrait for Power {
-    // fn upgrade<Power>(&self) -> Option<Power>{
-
-    //match self{
-
-    // Self::P1 => Some(Self::P2),
-    // _ => None
-
-    //  }
-
-    //}
-
-    fn to_string(&self) -> String {
-        match self {
-            Self::P2 => "P++".to_string(),
-            Self::P1 => "P+".to_string(),
-            Self::P0 => "".to_string(),
-            Self::PM1 => "P-".to_string(),
-            Self::PM2 => "P--".to_string(),
-        }
-    }
+    
 
     fn to_int(&self) -> i32 {
         match self {
@@ -65,6 +50,24 @@ impl PlayerTrait for Power {
         self.to_int() * 3
     }
 }
+
+
+impl fmt::Display for Power {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::P2 => "P++",
+            Self::P1 => "P+",
+            Self::P0 => "",
+            Self::PM1 => "P-",
+            Self::PM2 => "P--",
+        };
+
+        write!(f,"{}", chars)
+    }
+}
+
+
+
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum Speed {
     S2,
@@ -74,14 +77,7 @@ pub enum Speed {
 }
 
 impl PlayerTrait for Speed {
-    fn to_string(&self) -> String {
-        match self {
-            Self::S2 => "S++".to_string(),
-            Self::S1 => "S+".to_string(),
-            Self::S0 => "".to_string(),
-            Self::SM1 => "S-".to_string(),
-        }
-    }
+   
 
     fn to_int(&self) -> i32 {
         match self {
@@ -93,8 +89,23 @@ impl PlayerTrait for Speed {
     }
 }
 
+
+impl fmt::Display for Speed {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::S2 => "S++",
+            Self::S1 => "S+",
+            Self::S0 => "",
+            Self::SM1 => "S-"
+        };
+
+        write!(f,"{}", chars)
+    }
+}
+
+
 #[derive(Copy, Clone, Serialize, Deserialize)]
-pub enum Contact {
+pub enum Contact{
     C1,
     C0,
     CM1,
@@ -109,18 +120,26 @@ impl PlayerTrait for Contact {
         }
     }
 
-    fn to_string(&self) -> String {
-        match self {
-            Self::C1 => "C+".to_string(),
-            Self::C0 => "".to_string(),
-            Self::CM1 => "C-".to_string(),
-        }
-    }
 
     fn get_rbi_score(&self) -> i32 {
         self.to_int() * 2
     }
 }
+
+impl fmt::Display for Contact {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::C1 => "C+",
+            Self::C0 => "",
+            Self::CM1 => "C-"
+        };
+
+        write!(f,"{}", chars)
+    }
+}
+
+
+
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum Defense {
     D1,
@@ -129,13 +148,7 @@ pub enum Defense {
 }
 
 impl PlayerTrait for Defense {
-    fn to_string(&self) -> String {
-        match self {
-            Self::D1 => "D+".to_string(),
-            Self::D0 => "".to_string(),
-            Self::DM1 => "D-".to_string(),
-        }
-    }
+    
 
     fn to_int(&self) -> i32 {
         match self {
@@ -143,6 +156,19 @@ impl PlayerTrait for Defense {
             Self::D0 => 0,
             Self::DM1 => -1,
         }
+    }
+}
+
+
+impl fmt::Display for Defense {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::D1 => "D+",
+            Self::D0 => "",
+            Self::DM1 => "D-"
+        };
+
+        write!(f,"{}", chars)
     }
 }
 
@@ -154,18 +180,25 @@ pub enum Toughness {
 }
 
 impl PlayerTrait for Toughness {
-    fn to_string(&self) -> String {
-        match self {
-            Self::T1 => "T+".to_string(),
-            Self::T0 => "".to_string(),
-        }
-    }
+    
 
     fn to_int(&self) -> i32 {
         match self {
             Self::T1 => 1,
             Self::T0 => 0,
         }
+    }
+}
+
+
+impl fmt::Display for Toughness {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::T1 => "T+",
+            Self::T0 => ""
+        };
+
+        write!(f,"{}", chars)
     }
 }
 
@@ -179,17 +212,24 @@ pub enum PitcherTrait {
 }
 
 impl PlayerTrait for PitcherTrait {
+    
     fn to_int(&self) -> i32 {
         5
     }
 
-    fn to_string(&self) -> String {
-        match self {
-            Self::CNM => "CN-".to_string(),
-            Self::K => "K+".to_string(),
-            Self::GB => "GB".to_string(),
-            Self::CN => "CN+".to_string(),
-            Self::ST => "St+".to_string(),
-        }
+    
+}
+
+impl fmt::Display for PitcherTrait {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::CNM => "CN-",
+            Self::K => "K+",
+            Self::GB => "GB",
+            Self::CN => "CN+",
+            Self::ST => "St+"
+        };
+
+        write!(f,"{}", chars)
     }
 }
