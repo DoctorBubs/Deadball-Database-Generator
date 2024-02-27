@@ -10,36 +10,25 @@ use rand::Rng;
 use crate::Deserialize;
 use crate::Serialize;
 
-
-
-fn above_average(b_trait: impl PlayerTrait) -> bool{
-
+fn above_average(b_trait: impl PlayerTrait) -> bool {
     b_trait.to_int() > 0
-
-
 }
 
 //Creates a struct that lists if a trait is above average
 
-pub struct BTraitAboveAverage{
-
+pub struct BTraitAboveAverage {
     pub contact: bool,
     pub defense: bool,
     pub power: bool,
     pub speed: bool,
-    pub toughness: bool
-
+    pub toughness: bool,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
-#[derive(Copy, Clone)]
-pub struct LineupInts{
-
+#[derive(PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
+pub struct LineupInts {
     power: i32,
     contact: i32,
-    speed: i32
-
-
+    speed: i32,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -52,45 +41,14 @@ pub struct BTraits {
 }
 
 impl BTraits {
-    pub fn to_int(&self) -> i32 {
-        self.contact.to_int()
-            + self.defense.to_int()
-            + self.power.to_int()
-            + self.speed.to_int()
-            + self.toughness.to_int()
-    }
-
-    pub fn get_lineup_ints(&self) -> LineupInts{
-        LineupInts{
-        
-            power: self.power.to_int(),
-            contact: self.contact.to_int(),
-            speed: self.speed.to_int()
-        
-        }
-    
-    }
-    /*pub fn trait_roll(&mut self, thread: &mut ThreadRng) {
-        let roll = thread.gen_range(1..=10);
-        match roll {
-            1 => self.power = greater_trait(self.power, Power::P1),
-            _ => (),
-        }
-    }*/
-
-    pub fn get_above_average(&self) -> BTraitAboveAverage{
-    
-        BTraitAboveAverage{
-
+    pub fn get_above_average(&self) -> BTraitAboveAverage {
+        BTraitAboveAverage {
             contact: above_average(self.contact),
             defense: above_average(self.defense),
             power: above_average(self.power),
             speed: above_average(self.speed),
-            toughness: above_average(self.toughness)
-        
+            toughness: above_average(self.toughness),
         }
-    
-    
     }
     pub fn to_string(&self) -> String {
         format!(
@@ -113,10 +71,8 @@ impl BTraits {
         }
     }
 
-
-    pub fn get_rbi_score(&self) -> i32{
+    pub fn get_rbi_score(&self) -> i32 {
         self.contact.get_rbi_score() + self.power.get_rbi_score()
-    
     }
 
     pub fn generate(&mut self, thread: &mut ThreadRng) -> bool {
@@ -187,27 +143,6 @@ impl BTraits {
 
     }
     */
-}
-
-pub fn new_b_traits(thread: &mut ThreadRng) -> BTraits {
-    let mut result = BTraits {
-        contact: Contact::C0,
-        defense: Defense::D0,
-        power: Power::P0,
-        speed: Speed::S0,
-        toughness: Toughness::T0,
-    };
-    let roll = thread.gen_range(1..=10) + thread.gen_range(1..=10);
-
-    match roll {
-        2 => result.power = Power::PM2,
-        3 => result.power = Power::PM1,
-        4 => result.speed = Speed::SM1,
-        5 => result.contact = Contact::CM1,
-        _ => (),
-    };
-
-    result
 }
 
 fn trait_stack<T: PlayerTrait>(original: T, new: T) -> T {

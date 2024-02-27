@@ -1,12 +1,8 @@
-use crate::ThreadRng;
-use rand::Rng;
-
 use crate::Deserialize;
 
 use crate::Serialize;
 
 struct PDInfo(i32, bool);
-
 
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum PD {
@@ -40,35 +36,17 @@ impl PD {
         }
     }
 
-    fn get_info(&self) -> PDInfo{
-    
+    fn get_info(&self) -> PDInfo {
         let num = self.to_int();
         let is_positive = num > 0;
-        PDInfo(num,is_positive)
-    
+        PDInfo(num, is_positive)
     }
     pub fn to_string(&self) -> String {
-        let PDInfo(num,is_positive) = self.get_info();
+        let PDInfo(num, is_positive) = self.get_info();
         let num_string = num.abs().to_string();
-        match is_positive{
-        
-            true => format!("d{}",num_string),
-            false => format!("-d{}",num_string)
-        
-        }
-    }
-
-    pub fn roll(&self, thread: &mut ThreadRng) -> i32 {
-        match self {
-            Self::D0 => 0,
-            Self::DM20 => -20,
-            _ => {
-                let i = self.to_int();
-                match self.to_int() > 0 {
-                    true => thread.gen_range(1..=i),
-                    false => thread.gen_range(i..=-1),
-                }
-            }
+        match is_positive {
+            true => format!("d{}", num_string),
+            false => format!("-d{}", num_string),
         }
     }
 }

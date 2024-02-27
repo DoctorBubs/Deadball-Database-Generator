@@ -7,7 +7,7 @@ use crate::Serialize;
 pub trait PlayerTrait {
     fn to_int(&self) -> i32;
     fn to_string(&self) -> String;
-    fn get_rbi_score(&self) -> i32{
+    fn get_rbi_score(&self) -> i32 {
         0
     }
     //fn upgrade<T>(&self) -> Option<T>;
@@ -22,42 +22,12 @@ pub enum Power {
     PM2,
 }
 
-// Returns true if a newer trait can replace an older trai during trait generation
-// For exampple, P++ can replace P+
-pub fn replace_trait<T: PlayerTrait>(older: &T, newer: &T) -> bool {
-    match older.to_int() == 0 {
-        true => true,
-        false => {
-            match (
-                older.to_int() >= 0,
-                newer.to_int() >= 0,
-                newer.to_int() > older.to_int(),
-            ) {
-                (true, true, true) => true,
-                (false, false, false) => true,
-                _ => false,
-            }
-        }
-    }
-}
-
-pub fn trait_plus(a: impl PlayerTrait, b: impl PlayerTrait) -> i32 {
-    a.to_int() + b.to_int()
-}
-
 //pub fn greater_trait<T: B_Trait>(a: T, b: T) -> T {
 //match a.to_int() > b.to_int() {
 //  true => a,
 // false => b,
 //}
 //}
-
-pub fn trait_swap<T: PlayerTrait>(a: T, b: T) -> T {
-    match a.to_int() >= b.to_int() {
-        true => a,
-        false => b
-    }
-}
 
 impl PlayerTrait for Power {
     // fn upgrade<Power>(&self) -> Option<Power>{
@@ -91,11 +61,9 @@ impl PlayerTrait for Power {
         }
     }
 
-    fn get_rbi_score(&self) -> i32{
+    fn get_rbi_score(&self) -> i32 {
         self.to_int() * 3
-    
     }
-    
 }
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum Speed {
@@ -149,10 +117,8 @@ impl PlayerTrait for Contact {
         }
     }
 
-    fn get_rbi_score(&self) -> i32{
-    
+    fn get_rbi_score(&self) -> i32 {
         self.to_int() * 2
-    
     }
 }
 #[derive(Copy, Clone, Serialize, Deserialize)]
