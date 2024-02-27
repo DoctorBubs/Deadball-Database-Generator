@@ -296,20 +296,20 @@ impl Player {
         };
 
         let name = gender.new_name();
-        let new_bt = quality.get_bt(&mut thread);
-        let new_obt_mod = quality.get_obt_mod(&mut thread);
+        let new_bt = quality.get_bt(thread);
+        let new_obt_mod = quality.get_obt_mod(thread);
         let new_obt = new_bt + new_obt_mod;
         let mut b_traits = BTraits::default();
-        quality.calc_traits(&mut b_traits, &mut thread);
+        quality.calc_traits(&mut b_traits, thread);
         /*let pd = match quality{
         BatterQuality::Pitcher => Some(PD::D8),
         _ => None
         }*/
-        let pd = quality.get_pd(&mut thread, era);
-        let pitcher_trait = quality.get_pitcher_trait(&mut thread);
-        let hand = Hand::new(&mut thread, &quality);
-        let age_cat = AgeCat::random(&mut thread);
-        let age = age_cat.new_age(&mut thread);
+        let pd = quality.get_pd(thread, era);
+        let pitcher_trait = quality.get_pitcher_trait(thread);
+        let hand = Hand::new(thread, &quality);
+        let age_cat = AgeCat::random(thread);
+        let age = age_cat.new_age(thread);
 
         Player {
             name,

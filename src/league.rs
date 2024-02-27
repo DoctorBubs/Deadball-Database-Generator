@@ -25,8 +25,8 @@ impl League {
         League {
             name: name.to_string(),
             teams: Vec::new(),
-            gender: gender,
-            era: era,
+            gender,
+            era,
         }
     }
 

@@ -31,7 +31,7 @@ use crate::team::Team;
 mod league;
 use crate::league::League;
 
-use std::env;
+
 use std::io;
 use std::fs;
 use std::fs::File;
@@ -39,7 +39,7 @@ use std::io::prelude::*;
 use std::path::Path;
 
 use serde::{Deserialize, Serialize};
-use serde_json;
+
 
 
 use tailcall::tailcall;
@@ -202,7 +202,7 @@ fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
     let folder_path = Path::new(&league_name);
   
 
-    fs::create_dir(&folder_path)?;
+    fs::create_dir(folder_path)?;
 
 
 
@@ -216,7 +216,7 @@ fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
    
 
 
-    add_new_team(&mut new_league,&folder_path,thread,true)
+    add_new_team(&mut new_league,folder_path,thread,true)
     
 }
 
@@ -248,7 +248,7 @@ fn add_new_team(league: &mut League, path: &Path, thread: &mut  ThreadRng, first
                 let mut team_info = File::create(team_path)?;
                 team_info.write_all(team.to_string().as_bytes())?;
                 league.add_team(team);
-                result = add_team_check(league, &path, thread);
+                result = add_team_check(league, path, thread);
                 break
             }
         
@@ -271,8 +271,8 @@ fn add_team_check(league: &mut League, path: &Path, thread: &mut  ThreadRng) -> 
 
      match get_y_n(){
         
-         true =>  add_new_team(league, &path, thread,false),
-         false => save_league(&league, &path)
+         true =>  add_new_team(league, path, thread,false),
+         false => save_league(league, path)
             
         
       }
@@ -295,7 +295,7 @@ fn save_league(league: &League, path: &Path) -> std::io::Result<()>{
 }
 
 #[tailcall]
-fn tail_safety(thread: &mut ThreadRng) ->  std::io::Result<()>{
+fn tail_safety(_thread: &mut ThreadRng) ->  std::io::Result<()>{
 
     Ok(())
 
@@ -324,7 +324,7 @@ fn league_check(thread: &mut ThreadRng) -> std::io::Result<()> {
         match path.exists(){
         
             true => {
-                result = load_league(thread,&path);
+                result = load_league(thread,path);
                 break;
             },
             false => {
@@ -376,7 +376,7 @@ fn load_league(thread: &mut ThreadRng, path: &Path) -> std::io::Result<()>{
     };
     
     println!("League Loaded");
-    add_team_check(&mut league, &path,  thread)
+    add_team_check(&mut league, path,  thread)
 }
 
 
