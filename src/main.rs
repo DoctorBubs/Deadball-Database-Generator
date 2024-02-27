@@ -31,15 +31,13 @@ use crate::team::Team;
 mod league;
 use crate::league::League;
 
+use serde::{Deserialize, Serialize};
+use std::fmt;
 use std::fs;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
 use std::path::Path;
-use std::fmt;
-use serde::{Deserialize, Serialize};
-
-
 
 /* Deadball has 2 sets of rules to simulate 2 different era's of baseball.
 The Ancient Era simulates the low scoring style of basbeall playedf in the early 1900's, while the modern is used to simulate baseball since.
@@ -249,8 +247,6 @@ fn save_league(league: &League, path: &Path) -> std::io::Result<()> {
     league_info.write_all(serial.as_bytes())?;
     Ok(())
 }
-
-
 
 fn get_league_name() -> String {
     println!("Enter the name of the league you would like to add a team to.");

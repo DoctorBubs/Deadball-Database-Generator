@@ -49,18 +49,15 @@ impl Hand {
     }
 }
 
-
 impl fmt::Display for Hand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
         let chars = match self {
             Self::R => "R",
             Self::L => "L",
             Self::S => "S",
         };
-    
 
-        write!(f,"{}", chars)
+        write!(f, "{}", chars)
     }
 }
 
@@ -138,10 +135,8 @@ impl Player {
 
     // Determine's if a player is a pitcher based off if it has a pitch die or not.'
     pub fn is_pitcher(&self) -> bool {
-        match self {
-            Player { pd: Some(_), .. } => true,
-            _ => false,
-        }
+        matches!(self, Player { pd: Some(_), .. })
+
         /*match self.pd {
             Some(pd) => true,
             None => false,
@@ -286,20 +281,13 @@ impl Player {
     }
 }
 
-
-
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = match self.is_pitcher() {
             false => {
                 let base = format!(
                     "{},{},{},{},{},{}",
-                    self.name,
-                    self.pos,
-                    self.age,
-                    self.hand,
-                    self.bt,
-                    self.obt
+                    self.name, self.pos, self.age, self.hand, self.bt, self.obt
                 );
                 let trait_string = self.b_traits.to_string();
                 match trait_string.trim().is_empty() {
@@ -323,10 +311,9 @@ impl fmt::Display for Player {
             }
         };
 
-        write!(f,"{}", chars)
+        write!(f, "{}", chars)
     }
 }
-
 
 pub trait PlayerWrapper {
     fn unwrap(&mut self) -> &mut Player;

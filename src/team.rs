@@ -84,14 +84,14 @@ pub struct Team {
 
 // Takea vector of players, and reduces it to the sum of how much they contribute to a team score.
 // Batters contribution is based off their BT, while pitchers is based off their pitch dice.
-fn team_score_from_vec(vec: &Vec<Player>) -> i32 {
+fn team_score_from_vec(vec: &[Player]) -> i32 {
     vec.iter()
         .map(|player| player.get_team_score_contribution())
         .reduce(|acc, e| acc + e)
         .unwrap_or(0)
 }
 
-fn sorted_pitcher_pool(vec: &Vec<Player>) -> String {
+fn sorted_pitcher_pool(vec: &[Player]) -> String {
     let mut ranks: Vec<PitcherRankInfo> = vec
         .iter()
         .map(|player| player.get_pitcher_rank_info())
@@ -118,12 +118,12 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
     //.collect()
 }
 
-fn get_batter_info_string(desc: String, vec: &Vec<Player>) -> String {
+fn get_batter_info_string(desc: String, vec: &[Player]) -> String {
     let header = format!("{}:\nName Pos Age Hand BT OBT Traits", desc);
     format!("{}{}\n", header, get_sorted_batter_strings(vec))
 }
 
-fn get_pitcher_info_string(desc: String, vec: &Vec<Player>) -> String {
+fn get_pitcher_info_string(desc: String, vec: &[Player]) -> String {
     let header = format!("{}:\nName Pos Age Hand PD Trait BT OBT", desc);
     format!("{}{}\n", header, sorted_pitcher_pool(vec))
 }
@@ -203,7 +203,6 @@ impl Team {
     }*/
 }
 
-
 impl fmt::Display for Team {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let base_info = format!("Name:{} , Team Score: {}\n", self.name, self.team_score);
@@ -224,6 +223,6 @@ impl fmt::Display for Team {
             None => non_bullpen_string,
         };
 
-        write!(f,"{}", chars)
+        write!(f, "{}", chars)
     }
 }

@@ -52,7 +52,6 @@ impl PD {
     }*/
 }
 
-
 impl fmt::Display for PD {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let PDInfo(num, is_positive) = self.get_info();
@@ -62,6 +61,6 @@ impl fmt::Display for PD {
             false => format!("-d{}", num_string),
         };
 
-        write!(f,"{}", chars)
+        write!(f, "{}", chars)
     }
 }

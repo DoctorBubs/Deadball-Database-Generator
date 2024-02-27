@@ -145,20 +145,14 @@ impl BTraits {
     */
 }
 
-
 impl fmt::Display for BTraits {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = format!(
             "{}{}{}{}{}",
-            self.contact,
-            self.defense,
-            self.power,
-            self.speed,
-            self.toughness
+            self.contact, self.defense, self.power, self.speed, self.toughness
         );
-    
 
-        write!(f,"{}", chars)
+        write!(f, "{}", chars)
     }
 }
 
