@@ -1,6 +1,6 @@
 use crate::b_traits::BTraits;
 use crate::b_traits::BTraitAboveAverage;
-use crate::last_digit;
+
 use crate::player_quality::PlayerQuality;
 use crate::traits::PitcherTrait;
 use crate::traits::PlayerTrait;
@@ -61,7 +61,7 @@ impl AgeCat {
         let roll = thread.gen_range(1..=6);
         match roll {
             1..=2 => Self::Prospect,
-            3..=5 => Self::Rookie,
+            3..=4 => Self::Rookie,
             5 => Self::Veteran,
             6 => Self::OldTimer,
             _ => Self::Rookie,

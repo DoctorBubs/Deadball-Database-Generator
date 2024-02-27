@@ -11,7 +11,7 @@ pub trait PlayerQuality {
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32;
     fn get_pd(&self, thread: &mut ThreadRng, era: Era) -> Option<PD>;
     fn for_pitcher(&self) -> bool;
-    fn calc_traits(&self, trait_struct: &mut BTraits, thread: &mut ThreadRng) {}
+    fn calc_traits(&self, _trait_struct: &mut BTraits, _thread: &mut ThreadRng) {}
     fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait>;
 }
 
@@ -27,8 +27,8 @@ pub enum BatterQuality {
 fn new_bt(die: i32, base: i32, thread: &mut ThreadRng) -> i32 {
     let mut result = base;
 
-    for i in 1..=2 {
-        result = result + thread.gen_range(1..=die);
+    for _i in 1..=2 {
+        result += thread.gen_range(1..=die);
     }
     result
 }
@@ -40,16 +40,14 @@ impl PlayerQuality for BatterQuality {
             Self::Farmhand => new_bt(10, 12, thread),
         }
     }
-    fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait> {
+    fn get_pitcher_trait(&self, _thread: &mut ThreadRng) -> Option<PitcherTrait> {
         None
     }
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32 {
-        match self {
-            _ => thread.gen_range(1..=4) + thread.gen_range(1..=4),
-        }
+        thread.gen_range(1..=4) + thread.gen_range(1..=4)
     }
 
-    fn get_pd(&self, threat: &mut ThreadRng, era: Era) -> Option<PD> {
+    fn get_pd(&self, _threat: &mut ThreadRng, _era: Era) -> Option<PD> {
         None
     }
 
@@ -59,7 +57,7 @@ impl PlayerQuality for BatterQuality {
 
     fn calc_traits(&self, trait_struct: &mut BTraits, thread: &mut ThreadRng) {
         let first_calc = trait_struct.generate(thread);
-        if first_calc == true {
+        if first_calc {
             if let BatterQuality::TopProspect = self {
                 trait_struct.generate(thread);
             }
@@ -84,7 +82,7 @@ impl PlayerQuality for PitcherQuality {
     }
     // A players PD is generated based off the current eta
     fn get_pd(&self, thread: &mut ThreadRng, era: Era) -> Option<PD> {
-        let new_pd = era.new_pd(thread, &self);
+        let new_pd = era.new_pd(thread, self);
         Some(new_pd)
     }
 

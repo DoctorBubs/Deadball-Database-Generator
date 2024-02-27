@@ -1,7 +1,5 @@
 use crate::Era;
-use crate::Player;
 use crate::PlayerGender;
-use crate::PlayerQuality;
 use crate::Team;
 use crate::ThreadRng;
 
@@ -42,21 +40,7 @@ impl League {
         self.teams.push(team)
     }
 
-    fn new_player(
-        &self,
-        pos: String,
-        quality: impl PlayerQuality,
-        mut thread: &mut ThreadRng,
-        era: Era,
-    ) -> Player {
-        Player::new(pos, self.gender, quality, &mut thread, era)
-    }
+    
 
-    pub fn to_string(&self) -> String{
     
-        let header_string = format!("Name:{} Era:{} Gender:{} \n",self.name,self.era.to_string(),self.gender.to_string());
-        let team_string = self.teams.iter().map(|team| team.to_string()).reduce(|acc,e| format!("{}\n{}",acc,e)).unwrap_or_else(||"No Teams Created".to_string());
-        format!("{}{}",header_string, team_string)
-    
-    }
 }

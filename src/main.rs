@@ -54,13 +54,7 @@ fn match_check(num: i32) -> bool {
     }
 }
 
-fn last_digit(num: i32) -> i32 {
-    let ab_num = num.abs();
-    match ab_num < 10 {
-        true => ab_num,
-        false => ab_num % 10,
-    }
-}
+
 
 /* Deadball has 2 sets of rules to simulate 2 different era's of baseball. 
 The Ancient Era simulates the low scoring style of basbeall playedf in the early 1900's, while the modern is used to simulate baseball since.

@@ -13,25 +13,25 @@ use crate::Serialize;
 fn new_player_vec<T: Copy + PlayerQuality>(
     vec: Vec<&str>,
     gender: PlayerGender,
-    mut thread: &mut ThreadRng,
+    thread: &mut ThreadRng,
     quality: T,
     era: Era,
 ) -> Vec<Player> {
     vec.into_iter()
-        .map(|x| Player::new(x.to_string(), gender, quality, &mut thread, era))
+        .map(|x| Player::new(x.to_string(), gender, quality, thread, era))
         .collect()
 }
 
 // A starting lineup consists of 8 players, one for each position on the field
 //Todo: option to have a DH?
-fn new_starting_lineup(gender: PlayerGender, mut thread: &mut ThreadRng, era: Era) -> Vec<Player> {
+fn new_starting_lineup(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = vec!["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
-    new_player_vec(base, gender, &mut thread, BatterQuality::TopProspect, era)
+    new_player_vec(base, gender, thread, BatterQuality::TopProspect, era)
   
 }
 
 // The bench consist of all non starters. The Ancient and Modern era's have different quantities and posiions on the bech, so we use the Era enum to keep track.
-fn new_bench(gender: PlayerGender, mut thread: &mut ThreadRng, era: Era) -> Vec<Player> {
+fn new_bench(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = match era {
         Era::Ancient => vec!["C", "INF", "OF", "UT"],
         Era::Modern => vec!["C", "INF", "INF", "OF", "OF"],
@@ -39,22 +39,22 @@ fn new_bench(gender: PlayerGender, mut thread: &mut ThreadRng, era: Era) -> Vec<
 
 
 
-    new_player_vec(base, gender, &mut thread, BatterQuality::Farmhand, era)
+    new_player_vec(base, gender, thread, BatterQuality::Farmhand, era)
 }
 
 // The ancienct and modern era have different definitions of what a pitcher is. Modern era pitchers can be either starters or relievers, while the ancient era does not make the distinction.
 //Thus, Modern pitchers in the rotation are marked as SP, while anienct are just P
-fn new_rotation(gender: PlayerGender, mut thread: &mut ThreadRng, era: Era) -> Vec<Player> {
+fn new_rotation(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = match era {
         Era::Ancient => vec!["P", "P", "P", "P", "P"],
         Era::Modern => vec!["SP", "SP", "SP", "SP", "SP"],
     };
 
-    new_player_vec(base, gender, &mut thread, PitcherQuality::TopProspect, era)
+    new_player_vec(base, gender, thread, PitcherQuality::TopProspect, era)
    
 }
 // Ancient Era teams do not have a bullpen, so a bullpen is wrapped in an option.
-fn new_bullpen(gender: PlayerGender, mut thread: &mut ThreadRng, era: Era) -> Option<Vec<Player>> {
+fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option<Vec<Player>> {
     match era {
         Era::Ancient => None,
         Era::Modern => {
@@ -62,7 +62,7 @@ fn new_bullpen(gender: PlayerGender, mut thread: &mut ThreadRng, era: Era) -> Op
             Some(new_player_vec(
                 base,
                 gender,
-                &mut thread,
+                thread,
                 PitcherQuality::TopProspect,
                 era,
             ))
@@ -92,7 +92,7 @@ fn team_score_from_vec(vec: &Vec<Player>) -> i32 {
     vec.iter()
         .map(|player| player.get_team_score_contribution())
         .reduce(|acc, e| acc + e)
-        .unwrap_or_else(|| 0)
+        .unwrap_or(0)
 }
 
 //Takes a vector of players, and generates a string consiting of the players converted to strings.
@@ -131,12 +131,12 @@ fn get_sorted_batter_strings(vec: &Vec<Player>) -> String{
 
 fn get_batter_info_string(desc: String, vec: &Vec<Player>) -> String {
     let header = format!("{}:\nName Pos Age Hand BT OBT Traits", desc);
-    format!("{}{}\n", header, get_sorted_batter_strings(&vec))
+    format!("{}{}\n", header, get_sorted_batter_strings(vec))
 }
 
 fn get_pitcher_info_string(desc: String, vec: &Vec<Player>) -> String {
     let header = format!("{}:\nName Pos Age Hand PD Trait BT OBT", desc);
-    format!("{}{}\n", header, sorted_pitcher_pool(&vec))
+    format!("{}{}\n", header, sorted_pitcher_pool(vec))
 }
 
 
@@ -161,13 +161,13 @@ fn sort_lineup_slice(slices: LineupSlices) -> String{
 }*/
 
 impl Team {
-    pub fn new(name: &String,gender: PlayerGender, era: Era, mut thread: &mut ThreadRng) -> Team {
+    pub fn new(name: &String,gender: PlayerGender, era: Era, thread: &mut ThreadRng) -> Team {
         let mut new_team = Team {
             name: name.to_string(),
-            lineup: new_starting_lineup(gender, &mut thread, era),
-            bench: new_bench(gender, &mut thread, era),
-            starting_pitching: new_rotation(gender, &mut thread, era),
-            bullpen: new_bullpen(gender, &mut thread, era),
+            lineup: new_starting_lineup(gender, thread, era),
+            bench: new_bench(gender, thread, era),
+            starting_pitching: new_rotation(gender, thread, era),
+            bullpen: new_bullpen(gender, thread, era),
             team_score: 0,
             wins: 0,
             losses: 0,
@@ -185,13 +185,13 @@ impl Team {
         //If a team has a bullepen, the pitchers in the bullpen add to the pitching score.
         match &self.bullpen {
             Some(bullpen) => {
-                pitcher_score += team_score_from_vec(&bullpen);
+                pitcher_score += team_score_from_vec(bullpen);
             }
 
             None => (),
         };
         // Next, we multiply the pitcher score by 7.
-        pitcher_score = pitcher_score * 7;
+        pitcher_score *= 7;
         // Finally, the team score is caluclated by adding the batter score to the pitcher score and divide by 10.
         self.team_score = (batter_score + pitcher_score) / 10;
     }
@@ -207,7 +207,7 @@ impl Team {
             Some(bullpen) => format!(
                 "{}{}",
                 non_bullpen_string,
-                get_pitcher_info_string("Bullpen".to_string(), &bullpen)
+                get_pitcher_info_string("Bullpen".to_string(), bullpen)
             ),
             None => non_bullpen_string,
         }
