@@ -11,6 +11,7 @@ pub trait PlayerQuality {
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32;
     fn get_pd(&self, thread: &mut ThreadRng, era: Era) -> Option<PD>;
     fn for_pitcher(&self) -> bool;
+   
     fn calc_traits(&self, _trait_struct: &mut BTraits, _thread: &mut ThreadRng) {}
     fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait>;
 }
@@ -55,6 +56,7 @@ impl PlayerQuality for BatterQuality {
         false
     }
 
+   
     fn calc_traits(&self, trait_struct: &mut BTraits, thread: &mut ThreadRng) {
         let first_calc = trait_struct.generate(thread);
         if first_calc {
@@ -90,6 +92,8 @@ impl PlayerQuality for PitcherQuality {
         true
     }
 
+ 
+    
     fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait> {
         let roll = thread.gen_range(1..=10) + thread.gen_range(1..=10);
         //println!("Pitch Trait roll = {}", roll);

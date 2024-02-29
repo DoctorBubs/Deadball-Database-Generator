@@ -5,7 +5,7 @@ use core::fmt;
 
 struct PDInfo(i32, bool);
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum PD {
     D20,
     D12,

@@ -1,21 +1,40 @@
-use crate::traits::PlayerTrait;
+
+use core::fmt;
 use crate::Contact;
 use crate::Defense;
+use crate::Deserialize;
 use crate::Power;
+use crate::Serialize;
 use crate::Speed;
 use crate::ThreadRng;
 use crate::Toughness;
+use crate::traits::PlayerTrait;
 use rand::Rng;
 
-use crate::Deserialize;
-use crate::Serialize;
-use core::fmt;
-fn above_average(b_trait: impl PlayerTrait) -> bool {
-    b_trait.to_int() > 0
+
+
+
+
+#[derive(PartialEq, Eq, PartialOrd, Ord, Copy, Clone,Debug)]
+pub struct LineupInts {
+    power: i32,
+    contact: i32,
+    speed: i32,
 }
 
-//Creates a struct that lists if a trait is above average
 
+// BTraits is a struct that contains an instance of all traits that are related to batting, and it represents what batting traits a player has.
+#[derive(Serialize, Deserialize,Debug)]
+pub struct BTraits {
+    pub contact: Contact,
+    pub defense: Defense,
+    pub power: Power,
+    pub speed: Speed,
+    pub toughness: Toughness,
+}
+
+/*This is is a simmilar struct to B_Traits, however instead of an enum each field contains a bool regarding if a trait is above average.
+This is used in constructing a lineup. */
 pub struct BTraitAboveAverage {
     pub contact: bool,
     pub defense: bool,
@@ -24,21 +43,11 @@ pub struct BTraitAboveAverage {
     pub toughness: bool,
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Copy, Clone)]
-pub struct LineupInts {
-    power: i32,
-    contact: i32,
-    speed: i32,
+// To caclulate if a trait is above average, we convert the trait to an int and see if the value is above 0.
+fn above_average(b_trait: impl PlayerTrait) -> bool {
+    b_trait.to_int() > 0
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct BTraits {
-    pub contact: Contact,
-    pub defense: Defense,
-    pub power: Power,
-    pub speed: Speed,
-    pub toughness: Toughness,
-}
 
 impl BTraits {
     pub fn get_above_average(&self) -> BTraitAboveAverage {
@@ -50,17 +59,8 @@ impl BTraits {
             toughness: above_average(self.toughness),
         }
     }
-    /*pub fn to_string(&self) -> String {
-        format!(
-            "{}{}{}{}{}",
-            self.contact,
-            self.defense,
-            self.power,
-            self.speed,
-            self.toughness
-        )
-    }*/
-
+   
+    // creates a default BTraits
     pub fn default() -> BTraits {
         BTraits {
             contact: Contact::C0,

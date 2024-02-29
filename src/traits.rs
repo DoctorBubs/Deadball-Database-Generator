@@ -12,7 +12,7 @@ pub trait PlayerTrait {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum Power {
     P2,
     P1,
@@ -58,7 +58,7 @@ impl fmt::Display for Power {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum Speed {
     S2,
     S1,
@@ -90,7 +90,7 @@ impl fmt::Display for Speed {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum Contact {
     C1,
     C0,
@@ -123,7 +123,7 @@ impl fmt::Display for Contact {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum Defense {
     D1,
     D0,
@@ -152,7 +152,7 @@ impl fmt::Display for Defense {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 
 pub enum Toughness {
     T1,
@@ -179,7 +179,7 @@ impl fmt::Display for Toughness {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum PitcherTrait {
     CNM,
     K,

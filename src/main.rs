@@ -1,88 +1,43 @@
-use rand::rngs::ThreadRng;
-use rand::Rng;
-use std::collections::HashMap;
-mod pd;
-use crate::pd::PD;
 
-mod on_base;
-mod traits;
-use crate::traits::Contact;
-use crate::traits::Defense;
 
-use crate::traits::Power;
-use crate::traits::Speed;
-use crate::traits::Toughness;
 mod b_traits;
+mod era;
+mod league;
 mod lineup_score;
+mod pd;
 mod pitcher_rank_info;
 mod player;
 mod player_quality;
+mod team;
+mod traits;
+use crate::era::Era;
+use crate::league::League;
+use crate::pd::PD;
 use crate::player::Player;
-//use crate::traits::greater_trait;
-
 use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
-
-mod team;
 use crate::team::Team;
-
-mod league;
-use crate::league::League;
-
+use crate::traits::Contact;
+use crate::traits::Defense;
+use crate::traits::Power;
+use crate::traits::Speed;
+use crate::traits::Toughness;
+use rand::rngs::ThreadRng;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::fs;
 use std::fs::File;
-use std::io;
+use std::fs;
 use std::io::prelude::*;
+use std::io;
 use std::path::Path;
+use std::rc::Rc;
 
-/* Deadball has 2 sets of rules to simulate 2 different era's of baseball.
-The Ancient Era simulates the low scoring style of basbeall playedf in the early 1900's, while the modern is used to simulate baseball since.
-The main difference is how the the pitch die for pitchers is generated, however it also influence the numbers of players on the roster, as well as player postions.*/
-#[derive(Copy, Clone, Serialize, Deserialize)]
-enum Era {
-    Ancient,
-    Modern,
-}
 
-impl Era {
-    fn new_pd(&self, thread: &mut ThreadRng, quality: &PitcherQuality) -> PD {
-        match self {
-            // To siumlate the low scoring offense of 1900/s baseball, Anicnet Era pitchers have a signifacntly higher cieling, as their base pitch die can be as high as a D20
-            Self::Ancient => {
-                let roll = thread.gen_range(1..=12) + quality.get_pd_modifier();
-                match roll {
-                    1 => PD::D20,
-                    2..=3 => PD::D12,
-                    4..=5 => PD::D8,
-                    6..=8 => PD::D6,
-                    9..=10 => PD::D4,
-                    11 => PD::D0,
-                    12..=13 => PD::DM4,
-                    _ => PD::DM8,
-                }
-            }
-            // Modern era pitchers get a siginifacnly lowert cieling for the pd, with a d12 being the higherst  base pd generated.
-            Self::Modern => {
-                let roll = thread.gen_range(1..=8) + quality.get_pd_modifier();
-                match roll {
-                    1 => PD::D12,
-                    2..=3 => PD::D8,
-                    4..=7 => PD::D4,
-                    _ => PD::DM4,
-                }
-            }
-        }
-    }
-}
 
-#[derive(Serialize, Deserialize)]
-struct BattingStats {
-    counting_stats: HashMap<String, i32>,
-}
+
+
 
 fn trimed_capital_input() -> String {
     let mut input = String::new();

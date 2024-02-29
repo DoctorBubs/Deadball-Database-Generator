@@ -1,25 +1,60 @@
+
+
+
+
+
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
-
-use crate::player_quality::PlayerQuality;
-use crate::traits::PitcherTrait;
-
-use crate::BattingStats;
 use crate::Deserialize;
 use crate::Era;
-use crate::HashMap;
-
 use crate::lineup_score::LineupScore;
-use crate::pitcher_rank_info::PitcherRankInfo;
-use crate::Serialize;
 use crate::PD;
+use crate::pitcher_rank_info::PitcherRankInfo;
+use crate::player_quality::PlayerQuality;
+use crate::Serialize;
+use crate::traits::PitcherTrait;
 use name_maker::Gender;
 use name_maker::RandomNameGenerator;
-use rand::rngs::ThreadRng;
 use rand::Rng;
+use rand::rngs::ThreadRng;
 use std::fmt;
+
+
+
+pub enum AgeCat {
+    Prospect,
+    Rookie,
+    Veteran,
+    OldTimer,
+}
+
+impl AgeCat {
+    pub fn random(thread: &mut ThreadRng) -> AgeCat {
+        let roll = thread.gen_range(1..=6);
+        match roll {
+            1..=2 => Self::Prospect,
+            3..=4 => Self::Rookie,
+            5 => Self::Veteran,
+            6 => Self::OldTimer,
+            _ => Self::Rookie,
+        }
+    }
+
+    pub fn new_age(&self, thread: &mut ThreadRng) -> i32 {
+        let roll = thread.gen_range(1..=6);
+        match self {
+            Self::Prospect => 18 + roll,
+            Self::Rookie => 21 + roll,
+            Self::Veteran => 26 + roll,
+            Self::OldTimer => 32 + roll,
+        }
+    }
+}
+
+
+
 // Players can be either left handed or right hander, however batters may also be switch hitters. We use an enum to keep track.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize,Debug)]
 pub enum Hand {
     R,
     L,
@@ -61,37 +96,9 @@ impl fmt::Display for Hand {
     }
 }
 
-pub enum AgeCat {
-    Prospect,
-    Rookie,
-    Veteran,
-    OldTimer,
-}
 
-impl AgeCat {
-    pub fn random(thread: &mut ThreadRng) -> AgeCat {
-        let roll = thread.gen_range(1..=6);
-        match roll {
-            1..=2 => Self::Prospect,
-            3..=4 => Self::Rookie,
-            5 => Self::Veteran,
-            6 => Self::OldTimer,
-            _ => Self::Rookie,
-        }
-    }
-
-    pub fn new_age(&self, thread: &mut ThreadRng) -> i32 {
-        let roll = thread.gen_range(1..=6);
-        match self {
-            Self::Prospect => 18 + roll,
-            Self::Rookie => 21 + roll,
-            Self::Veteran => 26 + roll,
-            Self::OldTimer => 32 + roll,
-        }
-    }
-}
 // Player gender is merely cosmetic, as it is only used to generate a name for the player.
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
 pub enum PlayerGender {
     Male,
     Female,
@@ -109,7 +116,7 @@ impl PlayerGender {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize,Debug)]
 
 pub struct Player {
     pub name: String,
@@ -119,7 +126,6 @@ pub struct Player {
     pub hand: Hand,
     pub obt_mod: i32, // Used to calculate a players obt via summing with it's bt.'
     pub obt: i32,     // A player's obt is calculated by adding its bt + its obt_mod
-    pub batting_stats: BattingStats,
     pub pd: Option<PD>, // The main difference between a batter and pitcher is that pitchers have a base pitch die assocatied with themsleves, while batters do not.
     // This is sumulated using an option.
     pub b_traits: BTraits,
@@ -238,6 +244,8 @@ impl Player {
         }
     }
 
+    
+
     pub fn new(
         pos: String,
         gender: PlayerGender,
@@ -245,14 +253,12 @@ impl Player {
         thread: &mut ThreadRng,
         era: Era,
     ) -> Player {
-        let b_stats = BattingStats {
-            counting_stats: HashMap::new(),
-        };
+        
 
         let name = gender.new_name();
-        let new_bt = quality.get_bt(thread);
-        let new_obt_mod = quality.get_obt_mod(thread);
-        let new_obt = new_bt + new_obt_mod;
+        let bt = quality.get_bt(thread);
+        let obt_mod = quality.get_obt_mod(thread);
+        let obt = bt + obt_mod;
         let mut b_traits = BTraits::default();
         quality.calc_traits(&mut b_traits, thread);
         /*let pd = match quality{
@@ -269,11 +275,10 @@ impl Player {
             name,
             pos,
             age,
-            batting_stats: b_stats,
             hand,
-            bt: new_bt,
-            obt_mod: new_obt_mod,
-            obt: new_obt,
+            bt,
+            obt_mod,
+            obt,
             pd,
             b_traits,
             pitcher_trait,
