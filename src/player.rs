@@ -116,7 +116,7 @@ impl PlayerGender {
     }
 }
 
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize,Debug,Copy,Clone)]
 
 pub struct Player {
     pub name: String,
