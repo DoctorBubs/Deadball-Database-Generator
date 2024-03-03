@@ -43,8 +43,6 @@ fn trimed_capital_input() -> String {
     result
 }
 
-
-
 //#[tailcall]
 fn select_era() -> Era {
     let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
@@ -54,7 +52,6 @@ fn select_era() -> Era {
         Ok(era) => era,
         Err(_) => panic!("Error selecting era"),
     }
-   
 }
 //#[tailcall]
 fn select_gender() -> PlayerGender {
@@ -66,11 +63,9 @@ fn select_gender() -> PlayerGender {
         Ok(gender) => gender,
         Err(_) => panic!("Error selecting gender"),
     }
-    
 }
 
 fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
-   
     let validator = MinLengthValidator::new(3);
     let league_input = Text::new("Enter the name for the new league")
         .with_validator(validator)
@@ -133,24 +128,20 @@ fn add_new_team(
                 break;
             }
         }
-    };
+    }
 
     result
-   
-    
 }
 //#[tailcall]
 fn add_team_check(league: &mut League, path: &Path, thread: &mut ThreadRng) -> std::io::Result<()> {
-    
     let ans = Confirm::new("Would you like to create another team?")
-    .with_default(true)
-    .prompt();
-    
+        .with_default(true)
+        .prompt();
 
     match ans {
         Ok(true) => add_new_team(league, path, thread, false),
         Ok(false) => save_league(league, path),
-        Err(_) => panic!("Error on add team prompt")
+        Err(_) => panic!("Error on add team prompt"),
     }
 }
 
@@ -165,18 +156,15 @@ fn save_league(league: &League, path: &Path) -> std::io::Result<()> {
 }
 
 fn get_league_name() -> String {
-   
-
     let validator = MinLengthValidator::new(3);
     let name_input = Text::new("Enter the name of the new league")
         .with_validator(validator)
         .prompt();
 
-    match name_input{
+    match name_input {
         Ok(input) => input.trim().to_string(),
-        Err(_) => panic!("Error creating league name")
+        Err(_) => panic!("Error creating league name"),
     }
-   
 }
 
 //#[tailcall]
@@ -203,7 +191,7 @@ fn league_check(thread: &mut ThreadRng) -> std::io::Result<()> {
                         break;
                     }
                     Ok(true) => (),
-                    Err(_) => panic!("Erro in the league check")
+                    Err(_) => panic!("Erro in the league check"),
                 };
             }
         };
@@ -225,15 +213,11 @@ fn load_league(thread: &mut ThreadRng, path: &Path) -> std::io::Result<()> {
             let ans = Confirm::new("Would you like to load a different league?")
                 .with_default(true)
                 .prompt();
-            match ans{
-            
+            match ans {
                 Ok(true) => return league_check(thread),
                 Ok(false) => return Ok(()),
-                Err(_) => panic!("Error after league is corrupted")
-            
+                Err(_) => panic!("Error after league is corrupted"),
             }
-                
-            
         }
     };
 
@@ -270,6 +254,4 @@ fn main() -> std::io::Result<()> {
             Ok(())
         }
     }
-
-   
 }
