@@ -1,0 +1,24 @@
+Name:asdadsasd , Team Score: 39
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Bryon Pammi,3B,24,S,35,41
+Hall Ag,CF,30,R,29,35
+Deryl Nellie,C,26,L,24,32,D-
+Fleming Gigi,RF,23,L,27,30,D+
+Demetri Glenna,1B,23,R,23,30,S-
+Herrmann Yolane,LF,21,R,22,27
+Rudie Whitney,2B,27,R,21,27
+Zak Valry,SS,34,R,17,22,P+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Manfred Marie,C,34,S,30,35,C+
+August Mehetabel,OF,21,L,24,28,C-
+Sanford Casia,INF,25,R,22,28,C-
+Lazarus Karlotte,UT,30,R,21,25
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Ulysses Bertha,P,21,R,d6, 18,20
+Brant Venus,P,33,R,d4, 19,23
+Magnum Marlena,P,21,R,d4, 24,30
+Stanfield Brandice,P,27,R,-d0, 21,24
+Lin Valentina,P,22,R,-d0, 18,19

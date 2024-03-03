@@ -1,0 +1,24 @@
+Name:asdlnk;;asdjlk; , Team Score: 53
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Vassili Leonie,LF,26,R,33,36
+Nate Aviva,CF,23,R,33,36
+Obie Francis,C,29,R,29,36
+Martin Romola,2B,33,R,31,34
+Alic Cat,SS,23,L,26,31
+Worthington Freida,3B,22,R,24,29
+Jacob Chastity,RF,21,R,19,26,C-T+
+Maximilian Penelopa,1B,23,R,19,23
+Bench:
+Name Pos Age Hand BT OBT Traits
+Chas Jobie,OF,22,S,25,31
+Eddie Rickie,UT,27,R,24,28,S-
+Brewer Carine,INF,20,R,17,22,S+
+Bartolomeo Fredrika,C,21,R,17,24,D+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Erl Marjorie,P,20,R,d12, 21,23
+Harlin Beryl,P,36,L,d8, 21,26
+Chalmers Guenevere,P,26,R,d8, 17,21
+Aleksandrs Torrie,P,22,L,d6, 21,25
+Allie Windy,P,22,L,-d0,CN+, 16,17

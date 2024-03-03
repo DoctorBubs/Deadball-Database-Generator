@@ -43,17 +43,7 @@ fn trimed_capital_input() -> String {
     result
 }
 
-fn get_y_n() -> bool {
-    loop {
-        match trimed_capital_input().as_str() {
-            "Y" => return true,
-            "N" => return false,
-            _ => {
-                println!("Invalid Input, valid input is y, Y, n, or N")
-            }
-        }
-    }
-}
+
 
 //#[tailcall]
 fn select_era() -> Era {
@@ -203,13 +193,17 @@ fn league_check(thread: &mut ThreadRng) -> std::io::Result<()> {
             false => {
                 println!("Can not find folder with that name");
 
-                println!("Would you like to load a different league? Y/N");
-                match get_y_n() {
-                    false => {
+                let ans = Confirm::new("Would you like to load a different league?")
+                    .with_default(true)
+                    .prompt();
+                //println!("Would you like to load a different league? Y/N");
+                match ans {
+                    Ok(false) => {
                         result = Ok(());
                         break;
                     }
-                    true => (),
+                    Ok(true) => (),
+                    Err(_) => panic!("Erro in the league check")
                 };
             }
         };
@@ -228,14 +222,18 @@ fn load_league(thread: &mut ThreadRng, path: &Path) -> std::io::Result<()> {
         Ok(loaded_league) => league = loaded_league,
         Err(_) => {
             println!("League Info file is corrupted!");
-            loop {
-                println!("Would you like to load a different league? Y / N");
-                match trimed_capital_input().as_str() {
-                    "N" => return Ok(()),
-                    "Y" => return league_check(thread),
-                    _ => println!("Invalid Input"),
-                }
+            let ans = Confirm::new("Would you like to load a different league?")
+                .with_default(true)
+                .prompt();
+            match ans{
+            
+                Ok(true) => return league_check(thread),
+                Ok(false) => return Ok(()),
+                Err(_) => panic!("Error after league is corrupted")
+            
             }
+                
+            
         }
     };
 
