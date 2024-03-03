@@ -69,7 +69,7 @@ fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
 Team's als ohave a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Team {
     name: String,
     lineup: Vec<Player>,
@@ -102,8 +102,8 @@ fn sorted_pitcher_pool(vec: &[Player]) -> String {
         .rev()
         .map(|rank| format!("\n{}", rank.string))
         .collect()
-        /*.reduce(|acc, e| format!("{}{}", acc, e))
-        .unwrap_or_else(|| "\n".to_string())*/
+    /*.reduce(|acc, e| format!("{}{}", acc, e))
+    .unwrap_or_else(|| "\n".to_string())*/
 }
 
 fn get_sorted_batter_strings(vec: &[Player]) -> String {
@@ -114,8 +114,8 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
         .rev()
         .map(|score| format!("\n{}", &score.string))
         .collect()
-        /*.reduce(|acc, e| format!("{}{}", acc, e))
-        .unwrap_or_else(|| "\n".to_string())*/
+    /*.reduce(|acc, e| format!("{}{}", acc, e))
+    .unwrap_or_else(|| "\n".to_string())*/
 
     //.collect()
 }

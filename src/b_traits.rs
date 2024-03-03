@@ -1,5 +1,4 @@
-
-use core::fmt;
+use crate::traits::PlayerTrait;
 use crate::Contact;
 use crate::Defense;
 use crate::Deserialize;
@@ -8,23 +7,18 @@ use crate::Serialize;
 use crate::Speed;
 use crate::ThreadRng;
 use crate::Toughness;
-use crate::traits::PlayerTrait;
+use core::fmt;
 use rand::Rng;
 
-
-
-
-
-#[derive(PartialEq, Eq, PartialOrd, Ord, Copy, Clone,Debug)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Copy, Clone, Debug)]
 pub struct LineupInts {
     power: i32,
     contact: i32,
     speed: i32,
 }
 
-
 // BTraits is a struct that contains an instance of all traits that are related to batting, and it represents what batting traits a player has.
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct BTraits {
     pub contact: Contact,
     pub defense: Defense,
@@ -48,7 +42,6 @@ fn above_average(b_trait: impl PlayerTrait) -> bool {
     b_trait.to_int() > 0
 }
 
-
 impl BTraits {
     pub fn get_above_average(&self) -> BTraitAboveAverage {
         BTraitAboveAverage {
@@ -59,7 +52,7 @@ impl BTraits {
             toughness: above_average(self.toughness),
         }
     }
-   
+
     // creates a default BTraits
     pub fn default() -> BTraits {
         BTraits {

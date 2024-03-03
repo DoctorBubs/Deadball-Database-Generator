@@ -1,9 +1,9 @@
-
 use crate::Deserialize;
-use crate::PD;
 use crate::PitcherQuality;
 use crate::Serialize;
 use crate::ThreadRng;
+use crate::PD;
+use core::fmt;
 use rand::Rng;
 /* Deadball has 2 sets of rules to simulate 2 different era's of baseball.
 The Ancient Era simulates the low scoring style of basbeall playedf in the early 1900's, while the modern is used to simulate baseball since.
@@ -12,7 +12,6 @@ The main difference is how the the pitch die for pitchers is generated, however 
 pub enum Era {
     Ancient,
     Modern,
-    
 }
 impl Era {
     pub fn new_pd(&self, thread: &mut ThreadRng, quality: &PitcherQuality) -> PD {
@@ -42,5 +41,16 @@ impl Era {
                 }
             }
         }
+    }
+}
+
+impl fmt::Display for Era {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::Modern => "Modern",
+            Self::Ancient => "Ancient",
+        };
+
+        write!(f, "{}", chars)
     }
 }

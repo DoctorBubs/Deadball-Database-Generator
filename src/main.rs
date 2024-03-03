@@ -1,5 +1,3 @@
-
-
 mod b_traits;
 mod era;
 mod league;
@@ -24,20 +22,17 @@ use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
+use crate::validator::MinLengthValidator;
+use inquire::*;
 use rand::rngs::ThreadRng;
 use serde::{Deserialize, Serialize};
 use std::fmt;
-use std::fs::File;
 use std::fs;
-use std::io::prelude::*;
+use std::fs::File;
 use std::io;
+use std::io::prelude::*;
 use std::path::Path;
 use std::rc::Rc;
-
-
-
-
-
 
 fn trimed_capital_input() -> String {
     let mut input = String::new();
@@ -62,71 +57,38 @@ fn get_y_n() -> bool {
 
 //#[tailcall]
 fn select_era() -> Era {
-    let result: Era;
-    loop {
-        println!("Press A to have the era for the league be ancient, press M to have the leage be modern");
-        let mut era_input = String::new();
-        io::stdin()
-            .read_line(&mut era_input)
-            .expect("Failed to read line");
-        let era_name = era_input.trim().to_uppercase();
-        match era_name.as_str() {
-            "A" => {
-                result = Era::Ancient;
-                break;
-            }
-            "M" => {
-                result = Era::Modern;
-                break;
-            }
-            _ => {
-                println!("Invalid Era")
-            }
-        };
+    let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
+    let ans: Result<Era, InquireError> =
+        Select::new("Select the era for the league", options).prompt();
+    match ans {
+        Ok(era) => era,
+        Err(_) => panic!("Error selecting era"),
     }
-    result
+   
 }
 //#[tailcall]
 fn select_gender() -> PlayerGender {
-    let result: PlayerGender;
-    loop {
-        println!("Press M for the League Gender to be male, F for Female, C for Coed");
-        let mut gender_input = String::new();
-        io::stdin()
-            .read_line(&mut gender_input)
-            .expect("Failed to read line");
-        let gender_name = gender_input.trim().to_uppercase();
-        match gender_name.as_str() {
-            "M" => {
-                result = PlayerGender::Male;
-                break;
-            }
-            "F" => {
-                result = PlayerGender::Female;
-                break;
-            }
-            "C" => {
-                result = PlayerGender::Coed;
-                break;
-            }
-            _ => {
-                println!("Invalid Gender");
-            }
-        }
+    let options: Vec<PlayerGender> =
+        vec![PlayerGender::Male, PlayerGender::Female, PlayerGender::Coed];
+    let ans: Result<PlayerGender, InquireError> =
+        Select::new("Select the league gender,", options).prompt();
+    match ans {
+        Ok(gender) => gender,
+        Err(_) => panic!("Error selecting gender"),
     }
-
-    result
+    
 }
 
 fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
-    println!("Enter the name of the new league");
-    let mut league_input = String::new();
-    io::stdin()
-        .read_line(&mut league_input)
-        .expect("Failed to read line");
-
-    let league_name = league_input.trim().to_string();
-
+   
+    let validator = MinLengthValidator::new(3);
+    let league_input = Text::new("Enter the name for the new league")
+        .with_validator(validator)
+        .prompt();
+    let league_name = match league_input {
+        Ok(input) => input.trim().to_string(),
+        Err(_) => panic!("Error creating a league name"),
+    };
     let folder_path = Path::new(&league_name);
 
     fs::create_dir(folder_path)?;
@@ -148,20 +110,28 @@ fn add_new_team(
     first_team: bool,
 ) -> std::io::Result<()> {
     let result: std::io::Result<()>;
+
+    let mut prompt_string = match first_team {
+        true => "Enter the name of the first team",
+        false => "Enter the name of the new team",
+    };
+
+    let validator = MinLengthValidator::new(3);
     loop {
-        match first_team {
-            true => println!("Enter the name of the first team"),
-            false => println!("Enter the name of the new team"),
+        let name_input = Text::new(prompt_string)
+            .with_validator(validator.clone())
+            .prompt();
+
+        let team_name = match name_input {
+            Ok(name) => name.trim().to_string(),
+            Err(_) => panic!("Error creating team name"),
         };
-        let mut team_input = String::new();
-        io::stdin()
-            .read_line(&mut team_input)
-            .expect("Failed to read line");
-        let team_name = team_input.trim().to_string();
+
         let team_path = path.join(format!("{}.txt", team_name));
         match team_path.exists() {
             true => {
                 println!("A team with that name already exists for this leauge");
+                prompt_string = "Enter a unique team name";
             }
 
             false => {
@@ -173,27 +143,28 @@ fn add_new_team(
                 break;
             }
         }
-    }
+    };
+
     result
+   
+    
 }
 //#[tailcall]
 fn add_team_check(league: &mut League, path: &Path, thread: &mut ThreadRng) -> std::io::Result<()> {
-    println!("Would you like to create another team? Y/N");
+    
+    let ans = Confirm::new("Would you like to create another team?")
+    .with_default(true)
+    .prompt();
+    
 
-    /*let mut check_input = String::new();
-
-    io::stdin()
-        .read_line(&mut check_input)
-        .expect("Failed to read line");
-    let check = check_input.trim().to_uppercase().to_string(); */
-
-    match get_y_n() {
-        true => add_new_team(league, path, thread, false),
-        false => save_league(league, path),
+    match ans {
+        Ok(true) => add_new_team(league, path, thread, false),
+        Ok(false) => save_league(league, path),
+        Err(_) => panic!("Error on add team prompt")
     }
 }
 
-// Take's a league and a path, serializes tje league to a json object, which is saved under path.league_info.text
+// Take's a league and a path, serializes the league to a json object, which is saved under path.league_info.text
 fn save_league(league: &League, path: &Path) -> std::io::Result<()> {
     let serial = serde_json::to_string(&league).unwrap();
     let new_file_path = path.join("league_info.txt");
@@ -204,13 +175,18 @@ fn save_league(league: &League, path: &Path) -> std::io::Result<()> {
 }
 
 fn get_league_name() -> String {
-    println!("Enter the name of the league you would like to add a team to.");
-    let mut check_input = String::new();
+   
 
-    io::stdin()
-        .read_line(&mut check_input)
-        .expect("Failed to read line");
-    check_input.trim().to_string()
+    let validator = MinLengthValidator::new(3);
+    let name_input = Text::new("Enter the name of the new league")
+        .with_validator(validator)
+        .prompt();
+
+    match name_input{
+        Ok(input) => input.trim().to_string(),
+        Err(_) => panic!("Error creating league name")
+    }
+   
 }
 
 //#[tailcall]
@@ -270,25 +246,32 @@ fn load_league(thread: &mut ThreadRng, path: &Path) -> std::io::Result<()> {
 //#[tailcall]
 fn main() -> std::io::Result<()> {
     let mut r_thread = rand::thread_rng();
-    loop {
-        println!("Press l to create a new league, t to create a new team");
-        /*let mut first_input = String::new();
 
-        io::stdin()
-            .read_line(&mut first_input)
-            .expect("Invalid Input");
+    Text::new("Welcome to the Deadball Team generator");
 
+    let starting_options: Vec<&str> = vec![
+        "Create a new league.",
+        "Add a new team to an existing league.",
+    ];
 
-        let input_str = first_input.trim()
-            .to_uppercase();
+    let starting_choice: Result<&str, InquireError> =
+        Select::new("What would you like to do?", starting_options).prompt();
 
-        */
-        match trimed_capital_input().as_str() {
-            "L" => return create_new_league(&mut r_thread),
-            "T" => return league_check(&mut r_thread),
+    match starting_choice {
+        Ok(choice) => match choice {
+            "Create a new league." => create_new_league(&mut r_thread),
+            "Add a new team to an existing league." => league_check(&mut r_thread),
             _ => {
-                println!("Invalid Input");
+                println!("Error with starting choice");
+                Ok(())
             }
-        };
+        },
+
+        Err(_) => {
+            println!("Error matching first choice");
+            Ok(())
+        }
     }
+
+   
 }

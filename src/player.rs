@@ -1,25 +1,18 @@
-
-
-
-
-
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
-use crate::Deserialize;
-use crate::Era;
 use crate::lineup_score::LineupScore;
-use crate::PD;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
-use crate::Serialize;
 use crate::traits::PitcherTrait;
+use crate::Deserialize;
+use crate::Era;
+use crate::Serialize;
+use crate::PD;
 use name_maker::Gender;
 use name_maker::RandomNameGenerator;
-use rand::Rng;
 use rand::rngs::ThreadRng;
+use rand::Rng;
 use std::fmt;
-
-
 
 pub enum AgeCat {
     Prospect,
@@ -51,10 +44,8 @@ impl AgeCat {
     }
 }
 
-
-
 // Players can be either left handed or right hander, however batters may also be switch hitters. We use an enum to keep track.
-#[derive(Serialize, Deserialize,Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub enum Hand {
     R,
     L,
@@ -96,9 +87,8 @@ impl fmt::Display for Hand {
     }
 }
 
-
 // Player gender is merely cosmetic, as it is only used to generate a name for the player.
-#[derive(Copy, Clone, Serialize, Deserialize,Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum PlayerGender {
     Male,
     Female,
@@ -116,7 +106,19 @@ impl PlayerGender {
     }
 }
 
-#[derive(Serialize, Deserialize,Debug,Copy,Clone)]
+impl fmt::Display for PlayerGender {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::Male => "Male",
+            Self::Female => "Female",
+            Self::Coed => "Coed",
+        };
+
+        write!(f, "{}", chars)
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 
 pub struct Player {
     pub name: String,
@@ -124,8 +126,8 @@ pub struct Player {
     pub pos: String,
     pub bt: i32, // BT is essentialy a players batting average.
     pub hand: Hand,
-    pub obt_mod: i32, // Used to calculate a players obt via summing with it's bt.'
-    pub obt: i32,     // A player's obt is calculated by adding its bt + its obt_mod
+    pub obt_mod: i32,   // Used to calculate a players obt via summing with it's bt.'
+    pub obt: i32,       // A player's obt is calculated by adding its bt + its obt_mod
     pub pd: Option<PD>, // The main difference between a batter and pitcher is that pitchers have a base pitch die assocatied with themsleves, while batters do not.
     // This is sumulated using an option.
     pub b_traits: BTraits,
@@ -244,8 +246,6 @@ impl Player {
         }
     }
 
-    
-
     pub fn new(
         pos: String,
         gender: PlayerGender,
@@ -253,8 +253,6 @@ impl Player {
         thread: &mut ThreadRng,
         era: Era,
     ) -> Player {
-        
-
         let name = gender.new_name();
         let bt = quality.get_bt(thread);
         let obt_mod = quality.get_obt_mod(thread);
