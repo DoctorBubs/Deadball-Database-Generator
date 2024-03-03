@@ -1,0 +1,24 @@
+Name:Los Angeles Red Cars ,Abrv.LA, Team Score: 46
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Quent Gerri,RF,27,L,29,32,C-S+
+Garcia Lana,CF,37,R,27,34
+Sky Tabina,C,32,R,27,32
+Edgar Wally,2B,26,L,26,31
+Yacov Sibella,LF,22,L,24,31
+Sloane Katy,3B,31,R,27,32,C-P+
+Chen Serene,SS,24,R,23,28,C-
+Shelton Rozamond,1B,24,R,20,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Ludvig Lynnea,INF,23,R,23,29
+Kristopher Jeralee,C,36,L,20,28
+Jeremy Carmina,UT,38,S,19,26
+Durante Kassey,OF,27,R,19,22
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Creighton Traci,P,25,R,d8, 19,25
+Baldwin Ophelie,P,22,L,d8, 20,22
+Freddie Lezlie,P,37,R,d6, 17,22
+Spiro Winonah,P,23,L,d4, 18,19
+Luke Tobie,P,24,L,-d0, 19,20

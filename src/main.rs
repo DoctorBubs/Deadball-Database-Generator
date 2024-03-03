@@ -17,12 +17,14 @@ use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
 use crate::team::Team;
+use crate::league::AddTeamError;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
 use crate::validator::MinLengthValidator;
+use crate::validator::MaxLengthValidator;
 use inquire::*;
 use rand::rngs::ThreadRng;
 use serde::{Deserialize, Serialize};
@@ -33,6 +35,8 @@ use std::io;
 use std::io::prelude::*;
 use std::path::Path;
 use std::rc::Rc;
+use std::path::PathBuf;
+
 
 fn trimed_capital_input() -> String {
     let mut input = String::new();
@@ -65,19 +69,66 @@ fn select_gender() -> PlayerGender {
     }
 }
 
+/*struct LeagueEntry<'a>{
+
+    name: String,
+    path: &'a Path
+
+}
+
+impl LeagueEntry<'_>{
+
+    fn new() -> LeagueEntry<'static>{
+        let validator = MinLengthValidator::new(3);
+        loop{
+            let league_input = Text::new("Enter the name for the new league")
+                .with_validator(validator.clone())
+                .prompt();
+            let name = match league_input {
+                Ok(input) => input.trim().to_string(),
+                Err(_) => panic!("Error creating a league name"),
+            };
+            let path = Path::new(&name);
+
+            match fs::create_dir(path){
+            
+                Ok(_) => return LeagueEntry{
+                    name: name,
+                    path: &path
+                
+                },
+
+                Err(_) => ()
+            
+            
+            }    
+        }
+    }
+
+} */
+
 fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
+    let mut league_name: String;
+    let mut folder_path: &Path;
     let validator = MinLengthValidator::new(3);
-    let league_input = Text::new("Enter the name for the new league")
-        .with_validator(validator)
-        .prompt();
-    let league_name = match league_input {
-        Ok(input) => input.trim().to_string(),
-        Err(_) => panic!("Error creating a league name"),
+    loop{
+        let league_input = Text::new("Enter the name for the new league")
+            .with_validator(validator.clone())
+            .prompt();
+        league_name = match league_input {
+            Ok(input) => input.trim().to_string(),
+            Err(_) => panic!("Error creating a league name"),
+        };
+        
+        folder_path = Path::new(&league_name);
+        
+        match fs::create_dir(folder_path){
+            Ok(_) => break,
+            Err(_) => println!("Error creating a new league folder. Perhaps there is already a league with the same name?")
+        
+        }
     };
-    let folder_path = Path::new(&league_name);
-
-    fs::create_dir(folder_path)?;
-
+    //let LeagueEntry{name: league_name,path: folder_path} = LeagueEntry::new();
     let era = select_era();
 
     let gender = select_gender();
@@ -101,10 +152,12 @@ fn add_new_team(
         false => "Enter the name of the new team",
     };
 
-    let validator = MinLengthValidator::new(3);
+    let abrv_min_validator = MinLengthValidator::new(2);
+    let abrv_max_validator = MaxLengthValidator::new(4);
+    let name_validator = MinLengthValidator::new(3);
     loop {
         let name_input = Text::new(prompt_string)
-            .with_validator(validator.clone())
+            .with_validator(name_validator.clone())
             .prompt();
 
         let team_name = match name_input {
@@ -112,7 +165,44 @@ fn add_new_team(
             Err(_) => panic!("Error creating team name"),
         };
 
-        let team_path = path.join(format!("{}.txt", team_name));
+        let abrv_input = Text::new("Please enter an abbreviation for the new team")
+            .with_validator(abrv_min_validator.clone())
+            .with_validator(abrv_max_validator.clone())
+            .with_default(&team_name[0..=1].to_string())
+            .prompt();
+    
+        let abrv = match abrv_input{
+        
+            Ok(input) => input.trim().to_string(),
+            Err(_) => panic!("Error creating team abrv")
+        
+        };  
+        match league.new_team(&abrv,&team_name,thread){
+
+            Err(message) => {
+
+                match message{
+                    AddTeamError::AbrvTaken => println!("This league already has a team with that abbreviation, please try again"),
+                    AddTeamError::NameTaken => println!("This league already has a team with that name, please try again")
+                
+                };
+                //println!("Error {:?}",message);
+                prompt_string = "Enter a unique team name";
+            },
+
+            Ok(team_string) =>{
+                let team_path = path.join(format!("{}.txt", team_name));
+                let mut team_info = File::create(team_path)?;
+                team_info.write_all(team_string.as_bytes())?;
+                result = add_team_check(league, path, thread);
+                break;
+            }
+
+            
+        
+        };
+        
+       /* let team_path = path.join(format!("{}.txt", team_name));
         match team_path.exists() {
             true => {
                 println!("A team with that name already exists for this leauge");
@@ -127,7 +217,7 @@ fn add_new_team(
                 result = add_team_check(league, path, thread);
                 break;
             }
-        }
+        }*/
     }
 
     result

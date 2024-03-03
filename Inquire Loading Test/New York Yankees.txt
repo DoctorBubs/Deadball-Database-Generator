@@ -1,0 +1,24 @@
+Name:New York Yankees , Team Score: 44
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Dawson Lilllie,SS,21,R,29,37
+Lazare Roselin,RF,28,R,29,36,T+
+Higgins Ryann,CF,23,L,29,35
+Zechariah Yvonne,1B,27,L,27,35
+Milt Toma,3B,24,R,27,33
+Roddie Katee,LF,22,L,26,31,D-
+Antonius Modesta,2B,24,R,21,26,C-
+Myke Lorry,C,27,R,22,24
+Bench:
+Name Pos Age Hand BT OBT Traits
+Joao Carlye,INF,22,R,30,36
+Waldo Josefina,UT,20,L,24,29,S-
+Earl Shayna,OF,29,R,23,28
+Locke Sile,C,25,L,22,25,C-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Tony Cassy,P,20,L,d8, 19,24
+Pennie Aileen,P,26,R,d6, 19,25
+Hebert Heide,P,23,L,d6, 16,22
+Randell Barbie,P,20,R,d4, 18,23
+Austen Sharl,P,23,L,-d4, 21,25

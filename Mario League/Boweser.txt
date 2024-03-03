@@ -1,0 +1,34 @@
+Name:Boweser ,Abrv.Bo, Team Score: 64
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Carlo Gladys,3B,27,L,34,38
+Harris Lana,LF,24,R,32,36
+Sheffy Andrea,2B,19,L,26,30
+Randolph Constantine,CF,23,R,25,29
+Archon Lynelle,C,30,S,23,29
+Shell Elsa,SS,30,R,24,27,D+
+Ernesto Merna,1B,37,L,24,26,P--
+Windham Alvera,RF,20,L,24,27,C+D-
+Bench:
+Name Pos Age Hand BT OBT Traits
+Evelyn Kirstin,INF,21,R,25,30
+Sivert Sharlene,INF,19,R,20,25,S-
+Cobbie Jo-Anne,OF,28,R,20,24,D-
+Dirk Madalena,OF,23,R,16,23,D-
+Claudius Shara,C,24,R,15,19,D+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Ashish Cordy,SP,26,R,d12,GB, 16,22
+Edouard Fayre,SP,29,L,d4,GB, 17,18
+Benedict Glori,SP,34,R,d4, 17,25
+Skipton Teddi,SP,23,R,d4, 20,21
+Brant Arabella,SP,21,L,d4, 19,22
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Taylor Virginia,RP,26,R,d4,K+, 23,27
+Zed Margette,RP,37,R,d4, 24,26
+Rich Allis,RP,34,L,d4, 20,22
+Lane Annamari,RP,24,L,d4, 16,20
+Monte Cyndy,RP,23,R,d4, 20,27
+Baillie Blair,RP,19,L,d4, 18,24
+Micky Violante,RP,29,R,-d4, 20,24

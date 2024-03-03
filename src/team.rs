@@ -71,7 +71,8 @@ fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option
 Team's als ohave a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Team {
-    name: String,
+    pub abrv: String,
+    pub name: String,
     lineup: Vec<Player>,
     bench: Vec<Player>,
     starting_pitching: Vec<Player>,
@@ -149,8 +150,9 @@ fn sort_lineup_slice(slices: LineupSlices) -> String{
 }*/
 
 impl Team {
-    pub fn new(name: &String, gender: PlayerGender, era: Era, thread: &mut ThreadRng) -> Team {
+    pub fn new(abrv:&String, name: &String, gender: PlayerGender, era: Era, thread: &mut ThreadRng) -> Team {
         let mut new_team = Team {
+            abrv: abrv.to_string(),
             name: name.to_string(),
             lineup: new_starting_lineup(gender, thread, era),
             bench: new_bench(gender, thread, era),
@@ -207,7 +209,7 @@ impl Team {
 
 impl fmt::Display for Team {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let base_info = format!("Name:{} , Team Score: {}\n", self.name, self.team_score);
+        let base_info = format!("Name:{} ,Abrv.{}, Team Score: {}\n", self.name, self.abrv,self.team_score);
         let lineup_string = get_batter_info_string("Lineup".to_string(), &self.lineup);
         let bench_string = get_batter_info_string("Bench".to_string(), &self.bench);
         let rotation_string =

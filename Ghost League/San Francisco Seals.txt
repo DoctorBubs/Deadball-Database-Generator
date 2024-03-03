@@ -1,0 +1,24 @@
+Name:San Francisco Seals ,Abrv.SF, Team Score: 62
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Scarface Tracie,1B,22,R,32,38
+Tammie Cassandre,2B,24,L,30,38
+Teador Gabriela,CF,23,L,29,34,T+
+Luigi Collette,RF,29,R,27,32
+Noble Mariette,C,33,R,25,32
+Lester Demetria,LF,34,R,24,30
+Shepard Hyacinth,3B,23,L,18,24
+Taylor Dotti,SS,30,R,18,24,P+S-
+Bench:
+Name Pos Age Hand BT OBT Traits
+Jean-Lou Helaine,UT,22,R,22,30
+Perceval Marion,OF,24,L,25,28,P++
+Mohammed Hatti,C,38,R,21,23
+Rogers Kaylil,INF,32,L,15,17
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Hazel Traci,P,24,R,d20, 18,19
+Mauritz Maribeth,P,20,L,d12,St+, 20,25
+Timothy Querida,P,22,R,d6, 21,28
+Bay Ninon,P,22,R,d6, 15,22
+Roarke Christabella,P,24,R,d4, 15,20

@@ -1,0 +1,34 @@
+Name:mario ,Abrv.ma, Team Score: 62
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Bertrand Lilla,LF,27,R,33,38,P+
+Norton Verena,RF,20,R,27,35
+Isaak Bird,CF,23,L,28,34
+Berkeley Kora,1B,24,R,27,34,D+
+Gerri Barbey,C,28,L,26,30
+Elwood Susan,SS,24,L,28,30,P+S-
+Haskel Letitia,3B,25,R,23,28
+Levi Robinetta,2B,25,R,17,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Aloysius Zorah,INF,22,R,28,31,C-
+Phillipp Marcelline,C,21,L,22,27
+Elwood JoAnne,INF,30,R,21,26
+Oren Reine,OF,32,R,22,26,C+
+Angus Annabella,OF,37,R,19,22,D+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Pierson Kaila,SP,22,R,d12, 21,22
+Ollie Carolie,SP,33,R,d4,St+, 19,22
+Dru Desirae,SP,32,L,d4, 16,17
+Shepard Desiri,SP,24,R,d4, 15,18
+Tann Constancy,SP,27,R,-d4, 22,24
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Davidde Eulalie,RP,34,R,d8, 21,25
+Yves Camila,RP,36,R,d4, 16,18
+Timmy Jeraldine,RP,32,R,d4, 19,24
+Sander Collie,RP,23,L,d4, 18,20
+Clancy Annamari,RP,20,L,d4, 14,18
+Donn Judye,RP,19,L,d4, 21,24
+Tito Keri,RP,23,R,-d4, 22,27

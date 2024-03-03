@@ -1,0 +1,34 @@
+Name:Las Vesas Aces ,Abrv.LV, Team Score: 60
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Oliy Crista,2B,34,L,31,36
+Rodolphe Ivonne,SS,22,R,31,33
+Trever Gabbey,C,23,R,26,31
+Arvie Page,3B,36,L,24,30,D-
+Marrissa Marylynne,RF,20,R,22,28
+Marcello Alis,1B,24,L,25,29,P+
+Angel Andi,CF,34,S,23,27,T+
+Rafaelia Shawna,LF,22,S,18,21
+Bench:
+Name Pos Age Hand BT OBT Traits
+Miguelita Kylie,INF,36,L,25,28,D-
+Torrence Courtney,C,22,R,21,27
+Paten Mae,OF,20,L,19,25
+Bernette Maryann,OF,37,L,19,23
+Irma Ardine,INF,25,S,16,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Mariya Alice,SP,24,R,d12, 19,25
+Adolpho Myrtice,SP,38,L,d8, 17,23
+Inna Gwendolen,SP,26,R,d4, 19,22
+Sunshine Susanetta,SP,22,L,d4, 19,20
+Cornelius Margit,SP,22,L,d4, 16,20
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Mady Marcelia,RP,37,L,d4,CN-, 17,23
+Aliza Gillian,RP,36,R,d4, 19,27
+Juliane Gill,RP,35,R,d4, 19,24
+Jefferson Marnie,RP,22,L,d4, 22,26
+Israel Josefa,RP,22,R,d4, 21,29
+Odelle Nela,RP,26,R,-d4, 14,17
+Honey Lorene,RP,23,R,-d4, 15,19

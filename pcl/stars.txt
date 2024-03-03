@@ -1,0 +1,24 @@
+Name:stars ,Abrv.hyd, Team Score: 56
+Lineup:
+Name Pos Age Hand BT OBT Traits
+West Kath,RF,23,R,34,41,C-P+
+Constantine Judy,LF,21,R,32,38
+Scott Arleen,1B,24,R,30,37
+Garey Cyndi,C,24,L,32,36
+Joseph Venus,SS,23,R,30,35
+Weylin Ellie,2B,38,L,28,33,S-
+Nikos Wilhelmine,3B,24,R,30,33,P--S-
+Lawrence Orella,CF,24,R,25,28
+Bench:
+Name Pos Age Hand BT OBT Traits
+Tarrance Minni,OF,24,R,28,34
+Dion Wilow,INF,20,L,27,32
+Barri Dorie,UT,19,L,26,30,P+
+Ransell Aleta,C,24,S,21,24
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Emmy Sherri,P,35,R,d12, 15,21
+Nahum Viva,P,20,R,d12, 17,23
+Eberhard Annetta,P,29,R,d8,CN+, 18,22
+Gilles Larisa,P,23,R,d4, 18,24
+Penny Yolande,P,21,R,-d4, 19,26
