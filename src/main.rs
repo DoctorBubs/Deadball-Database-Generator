@@ -31,21 +31,19 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::fs;
 use std::fs::File;
-use std::io;
 use std::io::prelude::*;
 use std::path::Path;
-use std::rc::Rc;
-use std::path::PathBuf;
 
 
-fn trimed_capital_input() -> String {
+
+/*fn trimed_capital_input() -> String {
     let mut input = String::new();
     io::stdin()
         .read_line(&mut input)
         .expect("Failed to read line");
     let result = input.trim().to_uppercase();
     result
-}
+} */
 
 //#[tailcall]
 fn select_era() -> Era {
