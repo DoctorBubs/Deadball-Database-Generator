@@ -134,7 +134,7 @@ fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
     let gender = select_gender();
 
     let mut new_league = League::new(&league_name, gender, era);
-
+    println!("{} created", &league_name);
     add_new_team(&mut new_league, folder_path, thread, true)
 }
 
@@ -168,7 +168,7 @@ fn add_new_team(
         let abrv_input = Text::new("Please enter an abbreviation for the new team")
             .with_validator(abrv_min_validator.clone())
             .with_validator(abrv_max_validator.clone())
-            .with_default(&team_name[0..=1].to_string())
+            .with_default(&team_name[0..=1].to_string().to_uppercase())
             .prompt();
     
         let abrv = match abrv_input{
