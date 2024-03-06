@@ -34,6 +34,7 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
+use rusqlite::{Connection, Result};
 
 /*fn trimed_capital_input() -> String {
     let mut input = String::new();
@@ -284,6 +285,10 @@ fn load_league(thread: &mut ThreadRng, path: &Path) -> std::io::Result<()> {
 
 //#[tailcall]
 fn main() -> std::io::Result<()> {
+    
+    
+    let mut conn = load_database();
+
     let mut r_thread = rand::thread_rng();
     fs::create_dir_all("leagues")?;
     println!("Welcome to the Deadball Team generator");
@@ -311,4 +316,66 @@ fn main() -> std::io::Result<()> {
             Ok(())
         }
     }
+}
+
+
+fn load_database() -> Connection{
+
+
+    let conn_check = Connection::open("league.db");
+
+    let conn =match conn_check{
+        Ok(db) => db,
+        Err(_) => panic!("Could not create or open a new databse")
+    };
+
+    let leauge_gen = conn.execute(
+        "create table if not exists league (
+             id integer primary key,
+             league_name text not null,
+         )",
+        (),
+    );
+
+    match leauge_gen{
+        Ok(_) => (),
+        Err(_) => panic!("Could not generate league table")
+    };
+
+    let player_gen = conn.execute(
+        "create table if not exists players(
+             id integer primary key,
+             team_id integer not null,
+             player_name text not null,
+             age integer not null,
+             pos integer not null,
+             hand integer not null
+             bt integer not null,
+             obt_mod integer not null,
+             obt integer not null,
+             pitcher_trait text,
+             team_spot text
+         )",
+        (),
+    );
+
+    match player_gen{
+        Ok(_) => (),
+        Err(_) => panic!("Could not create player table.")
+    };
+
+    let batting_traits_gen = conn.execute(
+        "create table if not exists batter_traits(
+             id integer primary key,
+             player_id integer not null,
+             contact text not null,
+             defense text not null,
+             power text not null,
+             speed text not null,
+             toughness text not null
+         )",
+        (),
+    );
+
+    conn
 }

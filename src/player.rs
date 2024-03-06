@@ -124,8 +124,8 @@ pub struct Player {
     pub name: String,
     pub age: i32,
     pub pos: String,
-    pub bt: i32, // BT is essentialy a players batting average.
     pub hand: Hand,
+    pub bt: i32, // BT is essentialy a players batting average.
     pub obt_mod: i32,   // Used to calculate a players obt via summing with it's bt.'
     pub obt: i32,       // A player's obt is calculated by adding its bt + its obt_mod
     pub pd: Option<PD>, // The main difference between a batter and pitcher is that pitchers have a base pitch die assocatied with themsleves, while batters do not.
