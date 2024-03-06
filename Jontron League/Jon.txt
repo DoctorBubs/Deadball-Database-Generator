@@ -1,0 +1,34 @@
+Name:Jon ,Abrv.JON, Team Score: 89
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Clyde Violet,3B,33,L,31,38
+Adrian Danita,1B,37,L,32,37
+Clifford Hedy,2B,24,S,29,33,S-
+Hugo Krissie,C,22,R,26,32
+Brewster Neysa,RF,37,R,25,31
+Cheston Virginia,SS,23,R,28,32,P+
+Aubrey Isis,CF,23,R,25,29
+Hodge Kordula,LF,19,R,21,28
+Bench:
+Name Pos Age Hand BT OBT Traits
+Darrell Devina,INF,33,R,27,33,D+
+Christiano Easter,INF,36,R,29,31
+Stanly Amandi,OF,23,R,23,29
+Kaiser Natalya,OF,25,R,22,26
+Zebulen Mara,C,19,S,20,26,C+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Matteo Aurore,SP,38,R,d12, 16,21
+Winford Onida,SP,28,R,d8,CN-, 18,19
+Arne Angelina,SP,27,L,d8, 22,24
+Gino Moira,SP,23,L,d8, 17,25
+Avrom Susanne,SP,23,R,d4,CN-, 21,22
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Hammad Rosy,RP,24,L,d12, 19,23
+Jeremiah Dyane,RP,20,L,d8,CN-, 16,23
+Gilburt Deena,RP,30,L,d8, 20,21
+Hodge Berthe,RP,27,L,d8, 20,28
+Wald Claribel,RP,37,R,d4, 18,26
+Carlos Clary,RP,19,L,d4, 21,29
+Gordon Cat,RP,23,L,-d4, 20,26

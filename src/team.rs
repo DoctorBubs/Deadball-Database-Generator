@@ -10,6 +10,7 @@ use crate::PlayerQuality;
 use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
+use std::fmt::Write;
 // This function is used to create vectors of players, based off a vector of strings.
 fn new_player_vec<T: Copy + PlayerQuality>(
     vec: Vec<&str>,
@@ -101,8 +102,12 @@ fn sorted_pitcher_pool(vec: &[Player]) -> String {
     ranks
         .iter()
         .rev()
-        .map(|rank| format!("\n{}", rank.string))
-        .collect()
+        .fold(String::new(),|mut output,rank| {
+            let new_str = &rank.string; 
+            let _ = write!(output,"\n{new_str}");
+            output
+        })
+        
     /*.reduce(|acc, e| format!("{}{}", acc, e))
     .unwrap_or_else(|| "\n".to_string())*/
 }
@@ -113,8 +118,13 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
     scores
         .iter()
         .rev()
-        .map(|score| format!("\n{}", &score.string))
-        .collect()
+        .fold(String::new(),|mut output, score|{
+            let new_str = &score.string;
+            let _ = write!(output, "\n{new_str}");
+            output
+        })
+        //.map(|score| format!("\n{}", &score.string))
+        //.collect()
     /*.reduce(|acc, e| format!("{}{}", acc, e))
     .unwrap_or_else(|| "\n".to_string())*/
 
@@ -150,7 +160,13 @@ fn sort_lineup_slice(slices: LineupSlices) -> String{
 }*/
 
 impl Team {
-    pub fn new(abrv:&String, name: &String, gender: PlayerGender, era: Era, thread: &mut ThreadRng) -> Team {
+    pub fn new(
+        abrv: &String,
+        name: &String,
+        gender: PlayerGender,
+        era: Era,
+        thread: &mut ThreadRng,
+    ) -> Team {
         let mut new_team = Team {
             abrv: abrv.to_string(),
             name: name.to_string(),
@@ -209,7 +225,10 @@ impl Team {
 
 impl fmt::Display for Team {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let base_info = format!("Name:{} ,Abrv.{}, Team Score: {}\n", self.name, self.abrv,self.team_score);
+        let base_info = format!(
+            "Name:{} ,Abrv.{}, Team Score: {}\n",
+            self.name, self.abrv, self.team_score
+        );
         let lineup_string = get_batter_info_string("Lineup".to_string(), &self.lineup);
         let bench_string = get_batter_info_string("Bench".to_string(), &self.bench);
         let rotation_string =

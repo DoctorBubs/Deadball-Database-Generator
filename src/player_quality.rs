@@ -4,6 +4,8 @@ use crate::traits::PitcherTrait;
 use crate::Era;
 use crate::ThreadRng;
 use rand::Rng;
+use serde::Deserialize;
+use serde::Serialize;
 
 // Batters and Pitchers both have  several calculations to be common, howver the way their stats are generated differ.
 pub trait PlayerQuality {
@@ -16,10 +18,10 @@ pub trait PlayerQuality {
     fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait>;
 }
 
-/* Batterquality is the enum used ot generated batters. Batters do not get a abase pitch die, however their stats for hitting are much better then pitchers.
- The batter qualtiy enum has 2 levels, TopProspect adn Framhand. Currently, TopProspect is used to generatee playts in a teams startingl lineup, while the lower quality
+/* Batterquality is the enum used ot generated batters. Batters do not get a base pitch die, however their stats for hitting are much better then pitchers.
+ The batter qualtiy enum has 2 levels, TopProspect adn Framhand. Currently, TopProspect is used to generatee playts in a teams startinging lineup, while the lower quality
 farmhands is used for bench players */
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone,Serialize,Deserialize)]
 pub enum BatterQuality {
     TopProspect,
     Farmhand,

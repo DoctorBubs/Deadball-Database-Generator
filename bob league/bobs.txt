@@ -1,0 +1,34 @@
+Name:bobs ,Abrv.BBS, Team Score: 61
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Fletch Midge,2B,36,L,33,38
+Jervis Janka,3B,20,S,28,33
+Kinna Celina,1B,24,R,26,29,S+
+Terina Belia,C,23,R,25,31,P-
+Hermy Karlie,LF,20,R,25,30
+Phoebe Hadria,RF,33,R,26,28
+Sander Millicent,CF,25,R,21,24,D-
+Norman Tobey,SS,27,R,22,25,P++
+Bench:
+Name Pos Age Hand BT OBT Traits
+Emelita Janenna,OF,22,R,31,35,D+
+Paddy Louisette,INF,23,L,26,31
+Sydney Betty,OF,30,R,25,29
+Jean-Christophe Cleo,INF,22,L,24,28,C-
+Mallory Emili,C,31,S,22,25,S-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Davon Marena,SP,24,R,d12, 21,25
+Wilton Evey,SP,22,R,d12, 22,25
+Marielle Geeta,SP,22,L,d8, 21,25
+Tracie Mickie,SP,36,R,-d4, 18,20
+Lotta Dalenna,SP,21,R,-d4, 20,28
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Ollie Sheila-Kathryn,RP,27,R,d8,GB, 20,22
+Christi Cammi,RP,23,R,d4,CN+, 19,22
+Zondra Claudie,RP,27,L,d4, 19,20
+Patience Marybeth,RP,25,R,d4, 22,28
+Corny Belvia,RP,25,R,d4, 19,24
+Bridgette Billie,RP,36,R,-d4, 18,22
+Margaretha Cameo,RP,21,L,-d4, 17,20

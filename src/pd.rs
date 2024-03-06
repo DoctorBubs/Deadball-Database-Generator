@@ -6,6 +6,15 @@ use core::fmt;
 struct PDInfo(i32, bool);
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+
+/*  In Deadball, the bigggest difference between pitchers is their Pitch Die, which when playing the game corresponds to which die is rolled when the pitcher is used during a game,
+as well as if the numger generated is postiive or negative.
+
+For example,when using a pitcher with a PD of D12, a 12 sided die is rolled, and the number generated is positive.
+Inversely, a pitcher with a PD of -D4 rolls a 4 sided die, the the number generated is negative.
+*/
+
+// To reflect Die notation the PD enum is organized via the following pattern: D[i] is equivalant to d[i], while DM[i] is equivilant to -d[i]
 pub enum PD {
     D20,
     D12,

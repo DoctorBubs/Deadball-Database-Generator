@@ -8,7 +8,9 @@ mod player;
 mod player_quality;
 mod team;
 mod traits;
+//mod futures;
 use crate::era::Era;
+use crate::league::AddTeamError;
 use crate::league::League;
 use crate::pd::PD;
 use crate::player::Player;
@@ -17,14 +19,13 @@ use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
 use crate::team::Team;
-use crate::league::AddTeamError;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
-use crate::validator::MinLengthValidator;
 use crate::validator::MaxLengthValidator;
+use crate::validator::MinLengthValidator;
 use inquire::*;
 use rand::rngs::ThreadRng;
 use serde::{Deserialize, Serialize};
@@ -33,8 +34,6 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-
-
 
 /*fn trimed_capital_input() -> String {
     let mut input = String::new();
@@ -45,7 +44,7 @@ use std::path::Path;
     result
 } */
 
-//#[tailcall]
+
 fn select_era() -> Era {
     let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
     let ans: Result<Era, InquireError> =
@@ -55,7 +54,7 @@ fn select_era() -> Era {
         Err(_) => panic!("Error selecting era"),
     }
 }
-//#[tailcall]
+
 fn select_gender() -> PlayerGender {
     let options: Vec<PlayerGender> =
         vec![PlayerGender::Male, PlayerGender::Female, PlayerGender::Coed];
@@ -67,72 +66,39 @@ fn select_gender() -> PlayerGender {
     }
 }
 
-/*struct LeagueEntry<'a>{
 
-    name: String,
-    path: &'a Path
-
-}
-
-impl LeagueEntry<'_>{
-
-    fn new() -> LeagueEntry<'static>{
-        let validator = MinLengthValidator::new(3);
-        loop{
-            let league_input = Text::new("Enter the name for the new league")
-                .with_validator(validator.clone())
-                .prompt();
-            let name = match league_input {
-                Ok(input) => input.trim().to_string(),
-                Err(_) => panic!("Error creating a league name"),
-            };
-            let path = Path::new(&name);
-
-            match fs::create_dir(path){
-            
-                Ok(_) => return LeagueEntry{
-                    name: name,
-                    path: &path
-                
-                },
-
-                Err(_) => ()
-            
-            
-            }    
-        }
-    }
-
-} */
-
+// To create a new league
 fn create_new_league(thread: &mut ThreadRng) -> std::io::Result<()> {
     let mut league_name: String;
     let mut folder_path: &Path;
     let validator = MinLengthValidator::new(3);
-    loop{
+    loop {
+        // We ask the user for the name of the new league they would like to generate.
         let league_input = Text::new("Enter the name for the new league")
             .with_validator(validator.clone())
             .prompt();
+        // If there is an error using inquire, the program panics.
         league_name = match league_input {
             Ok(input) => input.trim().to_string(),
-            Err(_) => panic!("Error creating a league name"),
+            Err(_) => panic!("Error creating a league name!"),
         };
-        
+        // We use the input to create a path.
         folder_path = Path::new(&league_name);
-        
+        // We attempt to create a new folder from the path. If there is an error creating the folder, E.G there is already a folder with the same name, we display an error and loop agian.
         match fs::create_dir(folder_path){
             Ok(_) => break,
             Err(_) => println!("Error creating a new league folder. Perhaps there is already a league with the same name?")
-        
         }
-    };
-    //let LeagueEntry{name: league_name,path: folder_path} = LeagueEntry::new();
+    }
+    // We have the user select the era for the league.
     let era = select_era();
-
+    // As well as the gender of the players for the league.
     let gender = select_gender();
 
+    // We then create a league struct.
     let mut new_league = League::new(&league_name, gender, era);
     println!("{} created", &league_name);
+    //And then prompt the user to create the first team for the league.
     add_new_team(&mut new_league, folder_path, thread, true)
 }
 
@@ -144,7 +110,7 @@ fn add_new_team(
     first_team: bool,
 ) -> std::io::Result<()> {
     let result: std::io::Result<()>;
-
+    // If this is the first team generated for the league, we display a different prompt to the user.
     let mut prompt_string = match first_team {
         true => "Enter the name of the first team",
         false => "Enter the name of the new team",
@@ -153,6 +119,7 @@ fn add_new_team(
     let abrv_min_validator = MinLengthValidator::new(2);
     let abrv_max_validator = MaxLengthValidator::new(4);
     let name_validator = MinLengthValidator::new(3);
+    // Each team must have a unique name and abbreviation, we loop until we receive one.
     loop {
         let name_input = Text::new(prompt_string)
             .with_validator(name_validator.clone())
@@ -168,39 +135,37 @@ fn add_new_team(
             .with_validator(abrv_max_validator.clone())
             .with_default(&team_name[0..=1].to_string().to_uppercase())
             .prompt();
-    
-        let abrv = match abrv_input{
-        
+
+        let abrv = match abrv_input {
             Ok(input) => input.trim().to_string(),
-            Err(_) => panic!("Error creating team abrv")
-        
-        };  
-        match league.new_team(&abrv,&team_name,thread){
-
+            Err(_) => panic!("Error creating team abrv"),
+        };
+        /*  The league takes the name and abreviation we just created. If there is already a team in the league with that name or abbreviation,  it returns an error.
+        Otherwise, the league generates a new team, and then returns the team as a string wrapped in an Ok, which we use to save the team as a file on the disk.*/
+        match league.new_team(&abrv, &team_name, thread) {
             Err(message) => {
-
-                match message{
-                    AddTeamError::AbrvTaken => println!("This league already has a team with that abbreviation, please try again"),
-                    AddTeamError::NameTaken => println!("This league already has a team with that name, please try again")
-                
+                match message {
+                    AddTeamError::AbrvTaken => println!(
+                        "This league already has a team with that abbreviation, please try again"
+                    ),
+                    AddTeamError::NameTaken => {
+                        println!("This league already has a team with that name, please try again")
+                    }
                 };
                 //println!("Error {:?}",message);
                 prompt_string = "Enter a unique team name";
-            },
-
-            Ok(team_string) =>{
+            }
+            // If the league returns OK, we take the string, and write it to a new file in the leauge folder
+            Ok(team_string) => {
                 let team_path = path.join(format!("{}.txt", team_name));
                 let mut team_info = File::create(team_path)?;
                 team_info.write_all(team_string.as_bytes())?;
                 result = add_team_check(league, path, thread);
                 break;
             }
-
-            
-        
         };
-        
-       /* let team_path = path.join(format!("{}.txt", team_name));
+
+        /* let team_path = path.join(format!("{}.txt", team_name));
         match team_path.exists() {
             true => {
                 println!("A team with that name already exists for this leauge");
@@ -220,14 +185,16 @@ fn add_new_team(
 
     result
 }
-//#[tailcall]
+// After creating a new team, we ask the user if they would like to create another team.
 fn add_team_check(league: &mut League, path: &Path, thread: &mut ThreadRng) -> std::io::Result<()> {
     let ans = Confirm::new("Would you like to create another team?")
         .with_default(true)
         .prompt();
 
     match ans {
+        // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, path, thread, false),
+        //If not, we save the leauge and hten exit.
         Ok(false) => save_league(league, path),
         Err(_) => panic!("Error on add team prompt"),
     }
@@ -235,17 +202,19 @@ fn add_team_check(league: &mut League, path: &Path, thread: &mut ThreadRng) -> s
 
 // Take's a league and a path, serializes the league to a json object, which is saved under path.league_info.text
 fn save_league(league: &League, path: &Path) -> std::io::Result<()> {
+    // We take the league, and convert it to a Json object.
     let serial = serde_json::to_string(&league).unwrap();
     let new_file_path = path.join("league_info.txt");
-
+    // We then save the league string under league_info.txt.
     let mut league_info = File::create(new_file_path)?;
     league_info.write_all(serial.as_bytes())?;
+    // We then exit the program.
     Ok(())
 }
 
 fn get_league_name() -> String {
     let validator = MinLengthValidator::new(3);
-    let name_input = Text::new("Enter the name of the new league")
+    let name_input = Text::new("Enter the name of the league you would like to add a team to.")
         .with_validator(validator)
         .prompt();
 
@@ -255,7 +224,7 @@ fn get_league_name() -> String {
     }
 }
 
-//#[tailcall]
+// if a user wants to add a new team to an existing league, we check to see if we can find the league folder.
 fn league_check(thread: &mut ThreadRng) -> std::io::Result<()> {
     let result: std::io::Result<()>;
     loop {
@@ -279,7 +248,7 @@ fn league_check(thread: &mut ThreadRng) -> std::io::Result<()> {
                         break;
                     }
                     Ok(true) => (),
-                    Err(_) => panic!("Erro in the league check"),
+                    Err(_) => panic!("Error in the league check"),
                 };
             }
         };
@@ -316,8 +285,8 @@ fn load_league(thread: &mut ThreadRng, path: &Path) -> std::io::Result<()> {
 //#[tailcall]
 fn main() -> std::io::Result<()> {
     let mut r_thread = rand::thread_rng();
-
-    Text::new("Welcome to the Deadball Team generator");
+    fs::create_dir_all("leagues")?;
+    println!("Welcome to the Deadball Team generator");
 
     let starting_options: Vec<&str> = vec![
         "Create a new league.",
