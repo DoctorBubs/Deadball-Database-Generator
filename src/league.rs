@@ -5,10 +5,10 @@ use crate::Deserialize;
 use crate::Era;
 use crate::PlayerGender;
 
+use crate::player_quality::BatterQuality;
 use crate::Serialize;
 use crate::Team;
 use crate::ThreadRng;
-use crate::player_quality::BatterQuality;
 
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
@@ -24,7 +24,7 @@ pub struct League {
 pub enum AddTeamError {
     AbrvTaken,
     NameTaken,
-    DatabaseError
+    DatabaseError,
 }
 
 impl League {
@@ -34,7 +34,6 @@ impl League {
             teams: Vec::new(),
             gender,
             era,
-            
         }
     }
 
@@ -44,7 +43,7 @@ impl League {
         new_name: &String,
         thread: &mut ThreadRng,
         league_id: i64,
-        conn:&mut Connection
+        conn: &mut Connection,
     ) -> Result<String, AddTeamError> {
         for team in &self.teams {
             if new_abrv == &team.abrv {
@@ -53,19 +52,23 @@ impl League {
                 return Err(AddTeamError::NameTaken);
             };
         }
-        
 
         let team_id = conn.last_insert_rowid();
         let new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
         let new_team_score = new_team.team_score.to_string();
         let team_enter_result = conn.execute(
-            "INSERT INTO teams(team_name,abrv, league_id, team_score) VALUES(?1,?2, ?3,?4)", 
-            [&new_name, &new_abrv, &league_id.to_string(),&new_team_score],
+            "INSERT INTO teams(team_name,abrv, league_id, team_score) VALUES(?1,?2, ?3,?4)",
+            [
+                &new_name,
+                &new_abrv,
+                &league_id.to_string(),
+                &new_team_score,
+            ],
         );
 
-        match team_enter_result{
+        match team_enter_result {
             Ok(_) => (),
-            Err(message) => panic!("{}",message)
+            Err(message) => panic!("{}", message),
         };
         new_team.save_players_sql(conn, team_id);
         let new_team_string = new_team.to_string();

@@ -101,15 +101,12 @@ fn sorted_pitcher_pool(vec: &[Player]) -> String {
         .map(|player| player.get_pitcher_rank_info())
         .collect();
     ranks.sort();
-    ranks
-        .iter()
-        .rev()
-        .fold(String::new(),|mut output,rank| {
-            let new_str = &rank.string; 
-            let _ = write!(output,"\n{new_str}");
-            output
-        })
-        
+    ranks.iter().rev().fold(String::new(), |mut output, rank| {
+        let new_str = &rank.string;
+        let _ = write!(output, "\n{new_str}");
+        output
+    })
+
     /*.reduce(|acc, e| format!("{}{}", acc, e))
     .unwrap_or_else(|| "\n".to_string())*/
 }
@@ -120,13 +117,13 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
     scores
         .iter()
         .rev()
-        .fold(String::new(),|mut output, score|{
+        .fold(String::new(), |mut output, score| {
             let new_str = &score.string;
             let _ = write!(output, "\n{new_str}");
             output
         })
-        //.map(|score| format!("\n{}", &score.string))
-        //.collect()
+    //.map(|score| format!("\n{}", &score.string))
+    //.collect()
     /*.reduce(|acc, e| format!("{}{}", acc, e))
     .unwrap_or_else(|| "\n".to_string())*/
 
@@ -161,11 +158,11 @@ fn sort_lineup_slice(slices: LineupSlices) -> String{
 
 }*/
 
-pub enum TeamSpot{
+pub enum TeamSpot {
     StartingLineup,
     BenchHitter,
     StartingPitcher,
-    Bullpen
+    Bullpen,
 }
 
 impl fmt::Display for TeamSpot {
@@ -174,13 +171,11 @@ impl fmt::Display for TeamSpot {
             Self::StartingLineup => "Starting Lineup",
             Self::BenchHitter => "Bench Hitter",
             Self::StartingPitcher => "Starting Pitcher",
-            Self::Bullpen => "Bullpen"
+            Self::Bullpen => "Bullpen",
         };
         write!(f, "{}", chars)
     }
 }
-
-
 
 impl Team {
     pub fn new(
@@ -188,8 +183,7 @@ impl Team {
         name: &String,
         gender: PlayerGender,
         era: Era,
-        thread: &mut ThreadRng
-
+        thread: &mut ThreadRng,
     ) -> Team {
         let mut new_team = Team {
             abrv: abrv.to_string(),
@@ -226,26 +220,30 @@ impl Team {
         self.team_score = (batter_score + pitcher_score) / 10;
     }
 
-    pub fn save_players_sql(&self, conn:&mut Connection, team_id: i64) -> Result<(),rusqlite::Error>{
-        for starter in &self.lineup{
-            starter.save_sql(conn,team_id, TeamSpot::StartingLineup);
-        };
+    pub fn save_players_sql(
+        &self,
+        conn: &mut Connection,
+        team_id: i64,
+    ) -> Result<(), rusqlite::Error> {
+        for starter in &self.lineup {
+            starter.save_sql(conn, team_id, TeamSpot::StartingLineup);
+        }
 
-        for bench in &self.bench{
-            bench.save_sql(conn,team_id,TeamSpot::StartingLineup);
-        };
+        for bench in &self.bench {
+            bench.save_sql(conn, team_id, TeamSpot::StartingLineup);
+        }
 
-        for starter in &self.starting_pitching{
+        for starter in &self.starting_pitching {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher);
-        };
+        }
 
-        match &self.bullpen{
+        match &self.bullpen {
             Some(pen) => {
-                for reliever in pen{
-                    reliever.save_sql(conn,team_id,TeamSpot::Bullpen);
+                for reliever in pen {
+                    reliever.save_sql(conn, team_id, TeamSpot::Bullpen);
                 }
-            },
-            None => ()
+            }
+            None => (),
         };
         Ok(())
     }

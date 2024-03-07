@@ -5,6 +5,7 @@ use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
 use crate::team::Team;
+use crate::team::TeamSpot;
 use crate::traits::Contact;
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
@@ -15,10 +16,9 @@ use name_maker::Gender;
 use name_maker::RandomNameGenerator;
 use rand::rngs::ThreadRng;
 use rand::Rng;
+use rusqlite::named_params;
 use rusqlite::Connection;
 use std::fmt;
-use crate::team::TeamSpot;
-use rusqlite::named_params;
 pub enum AgeCat {
     Prospect,
     Rookie,
@@ -109,12 +109,12 @@ impl PlayerGender {
             Self::Coed => generator.generate().to_string(),
         }
     }
-    pub fn from_string(string: String) -> PlayerGender{
-        match string.as_str(){
+    pub fn from_string(string: String) -> PlayerGender {
+        match string.as_str() {
             "Male" => PlayerGender::Male,
             "Female" => PlayerGender::Female,
             "Coed" => PlayerGender::Coed,
-            _ => panic!("Invalid era load")
+            _ => panic!("Invalid era load"),
         }
     }
 }
@@ -138,7 +138,7 @@ pub struct Player {
     pub age: i32,
     pub pos: String,
     pub hand: Hand,
-    pub bt: i32, // BT is essentialy a players batting average.
+    pub bt: i32,        // BT is essentialy a players batting average.
     pub obt_mod: i32,   // Used to calculate a players obt via summing with it's bt.'
     pub obt: i32,       // A player's obt is calculated by adding its bt + its obt_mod
     pub pd: Option<PD>, // The main difference between a batter and pitcher is that pitchers have a base pitch die assocatied with themsleves, while batters do not.
@@ -212,19 +212,30 @@ impl Player {
         }
     }
 
-    pub fn save_sql(&self,conn:&mut Connection, team_id: i64, team_spot: TeamSpot) -> Result<(), rusqlite::Error>{
+    pub fn save_sql(
+        &self,
+        conn: &mut Connection,
+        team_id: i64,
+        team_spot: TeamSpot,
+    ) -> Result<(), rusqlite::Error> {
         println!("Saving player");
         let pd_string = match self.pd {
             Some(pd) => pd.to_string(),
-            None => "".to_string()
+            None => "".to_string(),
         };
 
-        let pitcher_trait_string = match self.pitcher_trait{
+        let pitcher_trait_string = match self.pitcher_trait {
             Some(tr) => tr.to_string(),
-            None => "".to_string()
+            None => "".to_string(),
         };
-        
-        let BTraits{contact, speed, power, toughness, defense} = &self.b_traits;
+
+        let BTraits {
+            contact,
+            speed,
+            power,
+            toughness,
+            defense,
+        } = &self.b_traits;
         let player_entry = conn.execute(
             "INSERT INTO players(
                 team_id,player_name,age,pos,hand,
@@ -252,13 +263,12 @@ impl Player {
             ],
         );
 
-        match player_entry{
+        match player_entry {
             Err(message) => panic!("{message}"),
-            Ok(_) => ()
+            Ok(_) => (),
         };
 
         Ok(())
-
     }
 
     /*pub fn to_string(&self) -> String {
