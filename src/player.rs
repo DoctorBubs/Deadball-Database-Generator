@@ -1,12 +1,12 @@
-use crate::b_traits;
+
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
-use crate::team::Team;
+
 use crate::team::TeamSpot;
-use crate::traits::Contact;
+
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
 use crate::Era;

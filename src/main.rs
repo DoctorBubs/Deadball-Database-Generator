@@ -36,7 +36,7 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use std::time::SystemTime;
+
 
 /*fn trimed_capital_input() -> String {
     let mut input = String::new();
@@ -70,8 +70,8 @@ fn select_gender() -> PlayerGender {
 
 // To create a new league
 fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
-    let mut league_name: String;
-    let mut folder_path: &Path;
+    let league_name: String;
+    let mut _folder_path: &Path;
     let validator = MinLengthValidator::new(3);
 
     let league_input = Text::new("Enter the name for the new league")
@@ -164,7 +164,7 @@ fn add_new_team(
                 prompt_string = "Enter a unique team name";
             }
             // If the league returns OK, we take the string, and write it to a new file in the leauge folder
-            Ok(team_string) => {
+            Ok(_team_string) => {
                 /*let team_path = path.join(format!("{}.txt", team_name));
                 let mut team_info = File::create(team_path)?;
                 team_info.write_all(team_string.as_bytes())?;*/
@@ -218,14 +218,14 @@ fn add_team_check(
 fn save_league(league: &League) -> std::io::Result<()> {
     let current_time = Utc::now().to_string();
     println!("{}", &current_time);
-    let flder_path_string = format!("{}", &league.name);
+    let flder_path_string = (&league.name).to_string();
     let folder_path = Path::new(&flder_path_string);
     fs::create_dir_all(folder_path)?;
 
     for team in &league.teams {
         let file_path = folder_path.join(format!("{}.txt", team.name).as_str());
         let mut file = File::create(file_path)?;
-        file.write_all(&team.to_string().as_bytes())?;
+        file.write_all(team.to_string().as_bytes())?;
     }
     Ok(())
 }
@@ -249,7 +249,7 @@ struct LeagueWrapper {
     league: League,
 }
 
-fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+fn league_check(conn: &mut Connection, _thread: &mut ThreadRng) -> std::io::Result<()> {
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     let league_iter = stmt
         .query_map([], |row| {
@@ -271,7 +271,7 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Resul
         options.push(wrapper.unwrap())
     }
 
-    if options.len() == 0 {
+    if options.is_empty() {
         print!("No Leagues created yet!");
         Ok(())
     } else {
@@ -279,7 +279,7 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Resul
     }
 }
 
-fn load_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
+fn load_league(_thread: &mut ThreadRng, _conn: &mut Connection) -> std::io::Result<()> {
     /*  let mut league: League;
     let league_info =
         fs::read_to_string(path.join("league_info.txt")).expect("league_info file is missing");
