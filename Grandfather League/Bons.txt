@@ -1,0 +1,24 @@
+Name:Bons ,Abrv.BON, Team Score: 55
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Pedro Clemence,SS,34,R,31,36,D+
+Artur Ainslie,1B,33,L,31,36
+Ralph Sabine,3B,32,L,29,35
+Shawn Fredi,CF,22,L,26,30
+Skelly Kellsie,RF,20,R,25,30
+Brad Molly,LF,37,S,24,30
+Northrop Faydra,C,35,L,26,29
+Corky Florri,2B,22,L,22,27
+Bench:
+Name Pos Age Hand BT OBT Traits
+Ignace Wilie,UT,20,R,28,33
+Garey Lisbeth,C,31,R,26,31,S-
+Bronson Tiphanie,OF,24,R,25,29
+Wait Mab,INF,24,L,24,26
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Stig Elana,P,37,L,d12, 18,21
+Urbanus Lucienne,P,27,R,d12, 22,30
+Duke Adela,P,32,R,d6, 23,24
+Zed Lynsey,P,21,R,d4, 21,23
+Pepillo Sam,P,32,R,-d0, 19,27

@@ -70,10 +70,10 @@ fn select_gender() -> PlayerGender {
 
 // To create a new league
 fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
-    let league_name: String;
+    //let league_name: String;
     let mut _folder_path: &Path;
     let validator = MinLengthValidator::new(3);
-
+    /* 
     let league_input = Text::new("Enter the name for the new league")
         .with_validator(validator.clone())
         .prompt();
@@ -81,7 +81,10 @@ fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::
         Ok(input) => input.trim().to_string(),
         Err(_) => panic!("Error creating a league name!"),
     };
+    */
 
+    let league_name = get_league_name()?;
+    
     // We have the user select the era for the league.
     let era = select_era();
     // As well as the gender of the players for the league.
@@ -95,7 +98,10 @@ fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::
     );
 
     match league_entry {
-        Err(message) => panic!("{message}"),
+        Err(message) => {
+            println!("Error creating a new league in the database");
+            return Err(());
+        },
         Ok(_) => (),
     };
     // Via last_inster_rowid, we get the SQl id for the new league
@@ -157,14 +163,15 @@ fn add_new_team(
                         println!("This league already has a team with that name, please try again")
                     }
                     AddTeamError::DatabaseError => {
-                        panic!("Error adding team to the data base")
+                        println!("Error adding team to the data base, please try again")
+                        return Ok(())
                     }
                 };
                 //println!("Error {:?}",message);
                 prompt_string = "Enter a unique team name";
             }
             // If the league returns OK, we take the string, and write it to a new file in the leauge folder
-            Ok(_team_string) => {
+            Ok(()) => {
                 /*let team_path = path.join(format!("{}.txt", team_name));
                 let mut team_info = File::create(team_path)?;
                 team_info.write_all(team_string.as_bytes())?;*/
@@ -210,7 +217,10 @@ fn add_team_check(
         Ok(true) => add_new_team(league, thread, conn, league_id, false),
         //If not, we save the leauge and hten exit.
         Ok(false) => save_league(league),
-        Err(_) => panic!("Error on add team prompt"),
+        Err(_) => {
+            println!("Error on add team prompt");
+            Err(())
+        }
     }
 }
 
@@ -230,31 +240,40 @@ fn save_league(league: &League) -> std::io::Result<()> {
     Ok(())
 }
 
-fn get_league_name() -> String {
+fn get_league_name() -> Result<String,()> {
     let validator = MinLengthValidator::new(3);
     let name_input = Text::new("Enter the name of the league you would like to add a team to.")
         .with_validator(validator)
         .prompt();
 
     match name_input {
-        Ok(input) => input.trim().to_string(),
-        Err(_) => panic!("Error creating league name"),
+        Ok(input) => OK(input.trim().to_string()),
+        Err(_) => Err(()),
     }
 }
 
 // if a user wants to add a new team to an existing league, we check to see if we can find the league folder.
 
 struct LeagueWrapper {
-    id: i64,
+    league_id: i64,
     league: League,
 }
 
-fn league_check(conn: &mut Connection, _thread: &mut ThreadRng) -> std::io::Result<()> {
+impl fmt::Display for LeagueWrapper {
+    // This trait requires `fmt` with this exact signature.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+   
+        write!(f, "{}_{}", self.league_id,self.league.name)
+    }
+}
+
+
+fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     let league_iter = stmt
         .query_map([], |row| {
             Ok(LeagueWrapper {
-                id: row.get(0)?,
+                league_id: row.get(0)?,
                 league: League {
                     name: row.get(1)?,
                     era: Era::from_string(row.get(2)?),
@@ -270,16 +289,62 @@ fn league_check(conn: &mut Connection, _thread: &mut ThreadRng) -> std::io::Resu
     for wrapper in league_iter {
         options.push(wrapper.unwrap())
     }
-
+    // We drop the stmt so we can borrow conn later.
+    drop(stmt);
+    // If there are no leagues in the database, the function returns
     if options.is_empty() {
         print!("No Leagues created yet!");
         Ok(())
     } else {
-        todo!()
+        let ans: Result<LeagueWrapper, InquireError> = Select::new("Select an existing league", options).prompt();
+        match ans{
+            Ok(select) => load_league(thread, conn, select),
+            Err(_) => {
+                println!("Error selecting a new league");
+                Ok(())
+            }
+        }
+        
     }
 }
 
-fn load_league(_thread: &mut ThreadRng, _conn: &mut Connection) -> std::io::Result<()> {
+struct TeamWrapper{
+    team_id: i64,
+    team: Team
+}
+
+fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWrapper) -> std::io::Result<()> {
+    
+    let LeagueWrapper{league_id,league} = wrapper;
+    let era = league.era;
+    let stmt_string = format!("SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = {}",league_id);
+    let mut stmt = conn.prepare(stmt_string.as_str()).unwrap();
+
+    let league_iter = stmt
+        .query_map([], |row|{
+            Ok(TeamWrapper{
+                team_id: row.get(0)?,
+                team: Team{
+                    abrv:row.get(1)?,
+                    name: row.get(2)?,
+                    team_score:row.get(3)?,
+                    wins:row.get(4)?,
+                    losses: row.get(5)?,
+                    lineup: Vec::new(),
+                    bench: Vec::new(),
+                    starting_pitching: Vec::new(),
+                    bullpen: match era{
+                        Era::Ancient => None,
+                        Era::Modern => Some(Vec::new())
+                    }
+                }
+
+            }
+            )
+    }).unwrap();
+
+
+    todo!();
     /*  let mut league: League;
     let league_info =
         fs::read_to_string(path.join("league_info.txt")).expect("league_info file is missing");
@@ -305,10 +370,35 @@ fn load_league(_thread: &mut ThreadRng, _conn: &mut Connection) -> std::io::Resu
     todo!()
 }
 
+fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error>{
+
+    let TeamWrapper{team_id,team} = wrapper;
+    let stmt_string = format!("SELECT * FROM players WHERE team_id = {}",team_id);
+    let mut stmt = conn.prepare(stmt_string.as_str()).unwrap();
+
+    let team_iter = stmt
+        .query_map([]], |row|{
+            Ok(Player{
+                name: row.get(2)?,
+                age: name.get(3)?,
+                pos: row.get(4)?
+            })
+        })
+    Ok(())
+}
+
 //#[tailcall]
 fn main() -> std::io::Result<()> {
-    let mut conn = load_database().unwrap();
+    let database_load = load_database();
+    let mut conn: Connection;
+    match database_load{
+        Ok(db) => conn = db,
+        Err(_) => {
+            println!("Could not load databse. Check the setting for this folder");
+            return Ok(())
+        }
 
+    };
     let mut r_thread = rand::thread_rng();
     fs::create_dir_all("leagues")?;
     println!("Welcome to the Deadball Team generator");
@@ -339,8 +429,9 @@ fn main() -> std::io::Result<()> {
 }
 
 fn load_database() -> Result<Connection, rusqlite::Error> {
+    // We look for the database, and create a new one if it doesn't exist.
     let conn = Connection::open("league.db")?;
-
+    // We create the league table
     conn.execute(
         "create table if not exists leagues (
              id integer primary key,
@@ -350,7 +441,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
-
+    // We create a league table
     conn.execute(
         "create table if not exists teams (
              id integer primary key,
@@ -363,7 +454,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
-
+    //we create a player table
     conn.execute(
         "create table if not exists players(
              id integer primary key,
@@ -399,6 +490,6 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
          )",
         (),
     );*/
-
+    // If no errors has occured, we return the database
     Ok(conn)
 }

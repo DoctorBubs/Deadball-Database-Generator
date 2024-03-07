@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use rusqlite::Connection;
 
 
@@ -44,7 +46,7 @@ impl League {
         thread: &mut ThreadRng,
         league_id: i64,
         conn: &mut Connection,
-    ) -> Result<String, AddTeamError> {
+    ) -> Result<(), AddTeamError> {
         for team in &self.teams {
             if new_abrv == &team.abrv {
                 return Err(AddTeamError::AbrvTaken);
@@ -68,12 +70,17 @@ impl League {
 
         match team_enter_result {
             Ok(_) => (),
-            Err(message) => panic!("{}", message),
+            Err(message) => return AddTeamError::DatabaseError
         };
-        new_team.save_players_sql(conn, team_id);
-        let new_team_string = new_team.to_string();
+        let save_team_result = new_team.save_players_sql(conn, team_id);
+        match save_team_result{
+            (_) => (),
+            Err(_) => return  AddTeamError::DatabaseError
+        };
+       // let new_team_string = new_team.to_string();
         self.teams.push(new_team);
-        Ok(new_team_string)
+        Ok(())
+        //Ok(new_team_string)
     }
 
     /* pub fn add_team(&mut self, team: Team) {

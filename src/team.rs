@@ -76,10 +76,10 @@ Team's als ohave a team score, which is used in Deadball to simulate a game with
 pub struct Team {
     pub abrv: String,
     pub name: String,
-    lineup: Vec<Player>,
-    bench: Vec<Player>,
-    starting_pitching: Vec<Player>,
-    bullpen: Option<Vec<Player>>,
+    pub lineup: Vec<Player>,
+    pub bench: Vec<Player>,
+    pub starting_pitching: Vec<Player>,
+    pub bullpen: Option<Vec<Player>>,
 
     pub team_score: i32,
     pub wins: i32,

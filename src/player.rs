@@ -218,7 +218,7 @@ impl Player {
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
-        println!("Saving player");
+        //println!("Saving player");
         let pd_string = match self.pd {
             Some(pd) => pd.to_string(),
             None => "".to_string(),
@@ -261,12 +261,12 @@ impl Player {
                 ":speed":&speed.to_string(), 
                 ":toughness":&toughness.to_string()
             ],
-        );
+        )?;
 
-        match player_entry {
+        /*match player_entry {
             Err(message) => panic!("{message}"),
             Ok(_) => (),
-        };
+        }; */
 
         Ok(())
     }
