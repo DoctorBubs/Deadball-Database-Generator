@@ -1,0 +1,24 @@
+Name:Ducks ,Abrv.DKS, Team Score: 46
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Demetrius Corine,RF,23,L,29,37
+Ernesto Alis,C,37,S,31,36,T+
+Sinclair Almeda,CF,22,L,27,33,S-
+Rhett Trina,SS,38,R,27,33,P+
+Rawley Merna,1B,29,L,26,30
+Pascale Allene,3B,28,R,26,29
+Benny Brooke,LF,23,L,25,29,C-
+Saxon Izzi,2B,30,S,21,25,P+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Fleming Kala,OF,37,S,28,33
+Vassily Molly,UT,22,R,28,32
+Euclid Loise,C,23,R,28,31
+Harland Annissa,INF,34,L,19,25
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Kurtis Ranna,P,20,R,d8, 15,22
+Web Jorey,P,36,L,d6,K+, 18,26
+Thorndike Malena,P,22,L,d4, 16,23
+Joab Vannie,P,19,R,d4, 18,26
+Claybourne Juditha,P,23,R,-d0,K+, 20,26

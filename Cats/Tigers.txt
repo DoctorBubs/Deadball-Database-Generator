@@ -1,0 +1,24 @@
+Name:Tigers ,Abrv.TIG, Team Score: 60
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Grant Selie,1B,22,R,28,36
+Jack Shena,2B,26,R,27,34
+Zedekiah Florentia,RF,24,L,26,32,D-S+
+Grace Quintina,C,27,R,24,31
+Maury Sibelle,3B,27,S,26,30
+Titus Yetty,LF,20,L,25,30,C+S+
+Matias Esmeralda,CF,36,R,24,27,P+S-
+Shelby Mirella,SS,37,R,22,24,P++
+Bench:
+Name Pos Age Hand BT OBT Traits
+Sky Marianne,C,23,R,32,36
+Ernie Olly,OF,30,R,23,29
+Armstrong Sheryl,INF,36,L,21,24
+Roddy Thia,UT,24,L,19,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Leland Jillayne,P,27,R,d12, 24,29
+Federico Aurlie,P,27,R,d8, 19,27
+Waldemar Kippy,P,24,R,d8, 18,23
+Dugan Iseabal,P,22,L,d8, 19,20
+Adolphus Fay,P,19,R,d8, 17,24

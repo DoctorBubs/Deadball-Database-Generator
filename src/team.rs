@@ -1,3 +1,5 @@
+use rusqlite::Connection;
+
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::BatterQuality;
@@ -79,9 +81,9 @@ pub struct Team {
     starting_pitching: Vec<Player>,
     bullpen: Option<Vec<Player>>,
 
-    team_score: i32,
-    wins: i32,
-    losses: i32,
+    pub team_score: i32,
+    pub wins: i32,
+    pub losses: i32,
 }
 
 // Takea vector of players, and reduces it to the sum of how much they contribute to a team score.
@@ -159,13 +161,35 @@ fn sort_lineup_slice(slices: LineupSlices) -> String{
 
 }*/
 
+pub enum TeamSpot{
+    StartingLineup,
+    BenchHitter,
+    StartingPitcher,
+    Bullpen
+}
+
+impl fmt::Display for TeamSpot {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::StartingLineup => "Starting Lineup",
+            Self::BenchHitter => "Bench Hitter",
+            Self::StartingPitcher => "Starting Pitcher",
+            Self::Bullpen => "Bullpen"
+        };
+        write!(f, "{}", chars)
+    }
+}
+
+
+
 impl Team {
     pub fn new(
         abrv: &String,
         name: &String,
         gender: PlayerGender,
         era: Era,
-        thread: &mut ThreadRng,
+        thread: &mut ThreadRng
+
     ) -> Team {
         let mut new_team = Team {
             abrv: abrv.to_string(),
@@ -200,6 +224,30 @@ impl Team {
         pitcher_score *= 7;
         // Finally, the team score is caluclated by adding the batter score to the pitcher score and divide by 10.
         self.team_score = (batter_score + pitcher_score) / 10;
+    }
+
+    pub fn save_players_sql(&self, conn:&mut Connection, team_id: i64) -> Result<(),rusqlite::Error>{
+        for starter in &self.lineup{
+            starter.save_sql(conn,team_id, TeamSpot::StartingLineup);
+        };
+
+        for bench in &self.bench{
+            bench.save_sql(conn,team_id,TeamSpot::StartingLineup);
+        };
+
+        for starter in &self.starting_pitching{
+            starter.save_sql(conn, team_id, TeamSpot::StartingPitcher);
+        };
+
+        match &self.bullpen{
+            Some(pen) => {
+                for reliever in pen{
+                    reliever.save_sql(conn,team_id,TeamSpot::Bullpen);
+                }
+            },
+            None => ()
+        };
+        Ok(())
     }
 
     /*pub fn to_string(&self) -> String {

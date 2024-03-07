@@ -41,6 +41,15 @@ impl Era {
                 }
             }
         }
+        
+    }
+
+    pub fn from_string(string: String) -> Era{
+        match string.as_str(){
+            "Ancient" => Era::Ancient,
+            "Modern" => Era::Modern,
+            _ => panic!("Invalid load of era")
+        }
     }
 }
 

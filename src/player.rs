@@ -1,8 +1,11 @@
+use crate::b_traits;
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
+use crate::team::Team;
+use crate::traits::Contact;
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
 use crate::Era;
@@ -12,8 +15,10 @@ use name_maker::Gender;
 use name_maker::RandomNameGenerator;
 use rand::rngs::ThreadRng;
 use rand::Rng;
+use rusqlite::Connection;
 use std::fmt;
-
+use crate::team::TeamSpot;
+use rusqlite::named_params;
 pub enum AgeCat {
     Prospect,
     Rookie,
@@ -102,6 +107,14 @@ impl PlayerGender {
             Self::Male => generator.generate_specific(Gender::Male).to_string(),
             Self::Female => generator.generate_specific(Gender::Female).to_string(),
             Self::Coed => generator.generate().to_string(),
+        }
+    }
+    pub fn from_string(string: String) -> PlayerGender{
+        match string.as_str(){
+            "Male" => PlayerGender::Male,
+            "Female" => PlayerGender::Female,
+            "Coed" => PlayerGender::Coed,
+            _ => panic!("Invalid era load")
         }
     }
 }
@@ -197,6 +210,55 @@ impl Player {
             true => self.get_base_pd().to_int(),
             false => self.bt,
         }
+    }
+
+    pub fn save_sql(&self,conn:&mut Connection, team_id: i64, team_spot: TeamSpot) -> Result<(), rusqlite::Error>{
+        println!("Saving player");
+        let pd_string = match self.pd {
+            Some(pd) => pd.to_string(),
+            None => "".to_string()
+        };
+
+        let pitcher_trait_string = match self.pitcher_trait{
+            Some(tr) => tr.to_string(),
+            None => "".to_string()
+        };
+        
+        let BTraits{contact, speed, power, toughness, defense} = &self.b_traits;
+        let player_entry = conn.execute(
+            "INSERT INTO players(
+                team_id,player_name,age,pos,hand,
+                bt,obt_mod,obt,
+                pd,pitcher_trait,team_spot,
+                contact,defense,power,speed,toughness) 
+            VALUES(:team_id, :player_name, :age, :pos, :hand, :bt, :obt_mod, :obt, :pd, :pitcher_trait, :team_spot, :contact, :defense, :power, :speed, :toughness)", 
+            named_params![
+                ":team_id": &team_id.to_string(),
+                ":player_name":&self.name, 
+                ":age":&self.age.to_string(), 
+                ":pos":&self.pos, 
+                ":hand":&self.hand.to_string(),
+                ":bt":&self.bt.to_string(),
+                ":obt_mod":&self.obt_mod.to_string(),
+                ":obt":&self.obt.to_string(),
+                ":pd":&pd_string,
+                ":pitcher_trait": &pitcher_trait_string,
+                ":team_spot":&team_spot.to_string(),
+                ":contact":&contact.to_string(),
+                ":defense":&defense.to_string(),
+                ":power":&power.to_string(), 
+                ":speed":&speed.to_string(), 
+                ":toughness":&toughness.to_string()
+            ],
+        );
+
+        match player_entry{
+            Err(message) => panic!("{message}"),
+            Ok(_) => ()
+        };
+
+        Ok(())
+
     }
 
     /*pub fn to_string(&self) -> String {

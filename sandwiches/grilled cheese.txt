@@ -1,0 +1,24 @@
+Name:grilled cheese ,Abrv.GRC, Team Score: 61
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Christ Ardenia,3B,21,L,28,35
+Jonas Brigida,1B,25,R,26,31
+Gunther Fannie,C,30,R,25,31
+Amery Katti,RF,20,L,23,28
+Karl Edin,CF,25,R,22,28,D-
+Vinny Elysia,SS,28,R,24,27
+Konstantin Birgit,LF,23,R,24,27
+Nunzio Ruella,2B,24,R,22,27,C-P-
+Bench:
+Name Pos Age Hand BT OBT Traits
+Harlin Juliann,OF,32,S,29,36
+Jefferey Brynna,C,23,R,24,32
+Jamey Ruperta,INF,27,L,25,32,C+
+Nelsen Amandy,UT,34,R,20,26
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Bo Beckie,P,22,R,d20,St+, 17,18
+Billy Allison,P,31,L,d8,CN+, 21,27
+Ingamar Hildagarde,P,22,R,d6,CN+, 20,28
+Bradley Tonia,P,24,L,d6, 19,22
+Pascale Tisha,P,23,R,d6, 21,26
