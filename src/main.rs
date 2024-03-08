@@ -33,7 +33,7 @@ use inquire::*;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
-use traits::p_trait_from_string;
+
 
 use std::fmt;
 use std::fs;
@@ -87,7 +87,7 @@ fn add_new_team(
         false => "Enter the name of the new team",
     };
     let current_teams = &league.teams;
-    if current_teams.len() > 0 {
+    if !current_teams.is_empty() {
         let names = current_teams.iter().fold(String::new(), |acc, team| {
             let new_string = format!("\n{} {}", team.abrv, team.name);
             acc + &new_string
@@ -353,7 +353,7 @@ fn load_league(
         let loaded_team = load_team(conn, wrapper)?;
 
         println!("team {} loaded", loaded_team.name);
-        println!("{}", loaded_team.to_string());
+        println!("{}", loaded_team);
         league.teams.push(loaded_team)
     }
     println!("Leauge{} loaded", league.name);
@@ -399,7 +399,7 @@ fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqli
     let TeamWrapper { team_id, mut team } = wrapper;
     //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
     let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
-    let test = 3;
+    let _test = 3;
     let team_iter = stmt.query_map([team_id], |row| {
         Ok(PlayerWrapper {
             team_spot: {
@@ -487,7 +487,7 @@ fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqli
     for result in team_iter {
         let wrapper = result.unwrap();
         let PlayerWrapper { team_spot, player } = wrapper;
-        println!("{}", player.to_string());
+        println!("{}", player);
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),
             TeamSpot::BenchHitter => team.bench.push(player),
