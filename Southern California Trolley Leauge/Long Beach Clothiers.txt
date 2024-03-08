@@ -1,0 +1,24 @@
+Name:Long Beach Clothiers ,Abrv.LBC, Team Score: 46
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Purcell Nara,RF,25,R,30,37
+Chane Jocelyn,C,25,R,29,34
+Benton Charlena,CF,20,L,28,34
+Lindsey Rosalinda,2B,26,R,27,32,D-
+Patel Birgit,LF,23,R,23,28
+Nevins Karna,SS,21,R,23,28,C-
+Piotr Violette,1B,27,S,26,28,P+
+Ingram Dulcia,3B,27,R,21,28,C+P+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Elwyn Francesca,INF,36,R,29,36,S-
+Spenser Dulcy,UT,24,L,23,28
+Cyrille Delly,C,20,R,22,25
+Woodrow Rasla,OF,24,R,15,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Win Marena,P,32,L,d8, 15,21
+Lucas Collete,P,33,L,d6,K+, 18,24
+Smitty Krystal,P,33,L,d6, 20,26
+Niven Kerianne,P,33,R,d4,GB, 21,22
+Tomas Donia,P,22,L,-d0, 23,26

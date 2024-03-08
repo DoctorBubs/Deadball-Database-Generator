@@ -345,7 +345,7 @@ struct TeamWrapper{
     team: Team
 }
 
-fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWrapper) -> Result<(),rusqlite::Error> {
+fn load_league(thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWrapper) -> Result<(),rusqlite::Error> {
     
     let LeagueWrapper{league_id,mut league} = wrapper;
     let era = league.era;
@@ -384,7 +384,9 @@ fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWr
         league.teams.push(loaded_team)
     }
     println!("Leauge{} loaded",league.name);
-    todo!();
+    add_new_team(&mut league, thread, conn, league_id, true);
+    Ok(())
+    //todo!();
     /*  let mut league: League;
     let league_info =
         fs::read_to_string(path.join("league_info.txt")).expect("league_info file is missing");
@@ -407,7 +409,7 @@ fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWr
 
     println!("League Loaded");
     add_team_check(&mut league, path, thread)*/
-    todo!()
+    
 }
 
 struct PlayerWrapper{
