@@ -58,7 +58,6 @@ impl League {
             };
         }
 
-        
         let new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
         let new_team_score = new_team.team_score.to_string();
         let team_enter_result = conn.execute(
@@ -71,7 +70,7 @@ impl League {
             ],
         );
         let team_id = conn.last_insert_rowid();
-        println!("New team id = {}",team_id);
+        println!("New team id = {}", team_id);
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
@@ -92,9 +91,8 @@ impl League {
     }*/
 }
 
-
 // To create a new league
-fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
+pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
     //let league_name: String;
     let mut _folder_path: &Path;
     let _validator = MinLengthValidator::new(3);

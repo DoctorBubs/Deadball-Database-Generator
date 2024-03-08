@@ -1,3 +1,4 @@
+use crate::traits::p_trait_from_string;
 use crate::traits::PlayerTrait;
 use crate::Contact;
 use crate::Defense;
@@ -61,6 +62,22 @@ impl BTraits {
             power: Power::P0,
             speed: Speed::S0,
             toughness: Toughness::T0,
+        }
+    }
+
+    pub fn from_strings(
+        contact_string: &String,
+        defense_string: &String,
+        power_string: &String,
+        speed_string: &String,
+        toughness_string: &String,
+    ) -> BTraits {
+        BTraits {
+            contact: p_trait_from_string(contact_string),
+            defense: p_trait_from_string(defense_string),
+            power: p_trait_from_string(power_string),
+            speed: p_trait_from_string(speed_string),
+            toughness: p_trait_from_string(toughness_string),
         }
     }
 

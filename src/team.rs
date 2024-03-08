@@ -225,7 +225,7 @@ impl Team {
         conn: &mut Connection,
         team_id: i64,
     ) -> Result<(), rusqlite::Error> {
-        ("Saving team under id{}",team_id);
+        ("Saving team under id{}", team_id);
         for starter in &self.lineup {
             starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
         }

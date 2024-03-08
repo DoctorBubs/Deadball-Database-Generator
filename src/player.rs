@@ -230,7 +230,7 @@ impl Player {
             Some(tr) => tr.to_string(),
             None => "".to_string(),
         };*/
-        println!("Adding player under team id{}",team_id);
+        println!("Adding player under team id{}", team_id);
         let pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,

@@ -1,15 +1,23 @@
 //use crate::greater_trait;
 //use crate::greater_trait as other_greater_trait;
-use crate::Deserialize;
-
 use crate::fmt;
+use crate::Deserialize;
 use crate::Serialize;
+use std::borrow::Borrow;
+
+use std::borrow::Cow;
 pub trait PlayerTrait {
     fn to_int(&self) -> i32;
 
     fn get_rbi_score(&self) -> i32 {
         0
     }
+}
+
+pub fn p_trait_from_string<'a, T: PlayerTrait + Deserialize<'a>>(input: &'a String) -> T {
+    let mut clone = &input.as_str();
+    let output = serde_json::from_str(&clone);
+    output.unwrap()
 }
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]

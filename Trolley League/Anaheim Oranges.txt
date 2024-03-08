@@ -1,0 +1,24 @@
+Name:Anaheim Oranges, Abrv:ANA, Team Score: 49
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Garrott Milli,RF,24,R,34,41
+Ephrayim Audrye,LF,33,R,33,40
+Oleg Feliza,2B,24,L,31,34
+Rich Germain,3B,26,S,27,33,D+
+Aldwin Wynnie,1B,27,S,26,33
+Wildon Leodora,SS,31,R,30,34,P+
+Peyton Maren,C,27,R,27,31
+Calvin Penelope,CF,25,L,23,31,D+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Dick Cecelia,UT,22,R,25,31
+Jamie Estell,C,26,R,25,30
+Stefano Nadia,OF,23,R,19,26
+Rickie Kandy,INF,27,S,17,20,D-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Craig Margarette,P,38,R,d6, 20,27
+Wadsworth Selie,P,35,R,d6, 23,24
+Mendel Annalee,P,23,R,d6, 17,21
+Rodrigo Izzi,P,24,R,d4, 16,21
+Kingsley Prudence,P,23,L,d4, 21,22
