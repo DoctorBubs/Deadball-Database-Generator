@@ -1,5 +1,6 @@
 use rusqlite::Connection;
 
+use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::BatterQuality;
@@ -13,6 +14,129 @@ use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
 use std::fmt::Write;
+
+use crate::league::TeamWrapper;
+
+struct PlayerWrapper {
+    team_spot: TeamSpot,
+    player: Player,
+}
+
+pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
+    let TeamWrapper { team_id, mut team } = wrapper;
+    //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
+    let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
+    let _test = 3;
+    let team_iter = stmt.query_map([team_id], |row| {
+        Ok(PlayerWrapper {
+            team_spot: {
+                let input: String = row.get(12)?;
+                let chars = input.as_str();
+                let output = serde_json::from_str(chars);
+                output.unwrap()
+            },
+
+            player: Player {
+                name: row.get(2)?,
+                age: row.get(3)?,
+                pos: row.get(4)?,
+                hand: {
+                    let input: String = row.get(5)?;
+                    let chars = input.as_str();
+                    let output = serde_json::from_str(chars);
+                    output.unwrap()
+                },
+                bt: row.get(6)?,
+                obt_mod: row.get(7)?,
+                obt: row.get(8)?,
+                pd: {
+                    let input: String = row.get(9)?;
+                    let chars = input.as_str();
+                    let output = serde_json::from_str(chars);
+                    output.unwrap()
+                },
+                pitcher_trait: {
+                    let input: String = row.get(11)?;
+                    let chars = input.as_str();
+                    let output = serde_json::from_str(chars);
+                    output.unwrap()
+                },
+                b_traits: BTraits::from_strings(
+                    &row.get(13)?,
+                    &row.get(14)?,
+                    &row.get(15)?,
+                    &row.get(16)?,
+                    &row.get(17)?,
+                ),
+            },
+        })
+        /*
+        contact: p_trait_from_string(&row.get(13)?),
+        /*{
+            let input: String = row.get(13)?;
+            let chars = input.as_str();
+            let output = serde_json::from_str(chars);
+            output.unwrap()
+        },*/
+
+        defense: p_trait_from_string(&row.get(14)?),
+        /*{
+            let input: String = row.get(14)?;
+            let chars = input.as_str();
+            let output = serde_json::from_str(chars);
+            output.unwrap()
+        }*/
+
+        power: p_trait_from_string(&row.get(15)?),
+        /*{
+            let input: String = row.get(15)?;
+            let chars = input.as_str();
+            let output = serde_json::from_str(chars);
+            output.unwrap()
+        },*/
+        speed: p_trait_from_string(&row.get(16)?),
+        /*{
+            let input: String = row.get(16)?;
+            let chars = input.as_str();
+            let output = serde_json::from_str(chars);
+            output.unwrap()
+        }, */
+        toughness: p_trait_from_string(&row.get(17)?)
+        /*{
+            let input: String = row.get(17)?;
+            let chars = input.as_str();
+            let output = serde_json::from_str(chars);
+            output.unwrap()
+        }, */
+        */
+    })?;
+
+    for result in team_iter {
+        let wrapper = result.unwrap();
+        let PlayerWrapper { team_spot, player } = wrapper;
+        println!("{}", player);
+        match team_spot {
+            TeamSpot::StartingLineup => team.lineup.push(player),
+            TeamSpot::BenchHitter => team.bench.push(player),
+            TeamSpot::StartingPitcher => team.starting_pitching.push(player),
+            TeamSpot::Bullpen => match &mut team.bullpen {
+                Some(pen) => pen.push(player),
+                None => panic!("Attemped to add a reliever to a team with no bullpen"),
+            },
+        }
+
+        /*let goal_vec = match team_spot{
+            TeamSpot::StartingLineup => &mut team.lineup,
+            TeamSpot::BenchHitter => &mut team.bench,
+            TeamSpot::StartingPitcher => &mut team.starting_pitching,
+            TeamSpot::Bullpen => &mut &team.bullpen.unwrap()
+        };
+
+        goal_vec.push(player)*/
+    }
+    Ok(team)
+}
+
 // This function is used to create vectors of players, based off a vector of strings.
 fn new_player_vec<T: Copy + PlayerQuality>(
     vec: Vec<&str>,

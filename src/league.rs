@@ -7,8 +7,10 @@ use crate::add_new_team;
 use crate::get_league_name;
 use crate::select_era;
 use crate::select_gender;
+use crate::team::load_team;
 use crate::Deserialize;
 use crate::Era;
+use crate::LeagueWrapper;
 use crate::PlayerGender;
 
 use crate::Serialize;
@@ -77,8 +79,8 @@ impl League {
         };
         let save_team_result = new_team.save_players_sql(conn, team_id);
         match save_team_result {
-            _ => (),
             Err(_) => return Err(AddTeamError::DatabaseError),
+            _ => (),
         };
         // let new_team_string = new_team.to_string();
         self.teams.push(new_team);
@@ -143,4 +145,100 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
     add_new_team(&mut new_league, thread, conn, league_id, true)
+}
+
+#[derive(Debug)]
+pub struct TeamWrapper {
+    pub team_id: i64,
+    pub team: Team,
+}
+
+pub fn load_league(
+    thread: &mut ThreadRng,
+    conn: &mut Connection,
+    wrapper: LeagueWrapper,
+) -> Result<(), rusqlite::Error> {
+    let LeagueWrapper {
+        league_id,
+        mut league,
+    } = wrapper;
+    let era = league.era;
+    /*let stmt_string = format!(
+        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
+        league_id
+    );*/
+
+    /*let stmt_string = format!(
+        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
+
+    );*/
+    let mut stmt = conn.prepare(
+        "SELECT id,abrv,team_name,team_score,wins,losses 
+        FROM teams 
+        WHERE league_id = ?1",
+    )?;
+
+    let league_iter = stmt.query_map([league_id], |row| {
+        Ok(TeamWrapper {
+            team_id: row.get(0)?,
+            team: Team {
+                abrv: row.get(1)?,
+                name: row.get(2)?,
+                team_score: row.get(3)?,
+                wins: row.get(4)?,
+                losses: row.get(5)?,
+                lineup: Vec::new(),
+                bench: Vec::new(),
+                starting_pitching: Vec::new(),
+                bullpen: match era {
+                    Era::Ancient => None,
+                    Era::Modern => Some(Vec::new()),
+                },
+            },
+        })
+    })?;
+
+    let wrappers: Vec<TeamWrapper> = league_iter.map(|x| x.unwrap()).collect();
+    // We drop stmt so we can borrw conn later.
+    drop(stmt);
+    for wrapper in wrappers {
+        println!("{:?}", wrapper);
+        let loaded_team = load_team(conn, wrapper)?;
+
+        println!("team {} loaded", loaded_team.name);
+        println!("{}", loaded_team);
+        league.teams.push(loaded_team)
+    }
+    println!("Leauge{} loaded", league.name);
+    match add_new_team(&mut league, thread, conn, league_id, true) {
+        Ok(_) => Ok(()),
+        Err(_) => {
+            println!("Error adding a new team, please try again");
+            Ok(())
+        }
+    }
+
+    //todo!();
+    /*  let mut league: League;
+    let league_info =
+        fs::read_to_string(path.join("league_info.txt")).expect("league_info file is missing");
+    let league_result = serde_json::from_str(&league_info);
+
+    match league_result {
+        Ok(loaded_league) => league = loaded_league,
+        Err(_) => {
+            println!("League Info file is corrupted!");
+            let ans = Confirm::new("Would you like to load a different league?")
+                .with_default(true)
+                .prompt();
+            match ans {
+                Ok(true) => return league_check(conn, thread),
+                Ok(false) => return Ok(()),
+                Err(_) => panic!("Error after league is corrupted"),
+            }
+        }
+    };
+
+    println!("League Loaded");
+    add_team_check(&mut league, path, thread)*/
 }

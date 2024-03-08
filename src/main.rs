@@ -19,6 +19,7 @@ use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
+use crate::team::load_team;
 use crate::team::Team;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -30,10 +31,10 @@ use crate::validator::MinLengthValidator;
 use b_traits::BTraits;
 use chrono::prelude::*;
 use inquire::*;
+use league::load_league;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
-
 
 use std::fmt;
 use std::fs;
@@ -292,222 +293,6 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
             }
         }
     }
-}
-
-#[derive(Debug)]
-struct TeamWrapper {
-    team_id: i64,
-    team: Team,
-}
-
-fn load_league(
-    thread: &mut ThreadRng,
-    conn: &mut Connection,
-    wrapper: LeagueWrapper,
-) -> Result<(), rusqlite::Error> {
-    let LeagueWrapper {
-        league_id,
-        mut league,
-    } = wrapper;
-    let era = league.era;
-    /*let stmt_string = format!(
-        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
-        league_id
-    );*/
-
-    /*let stmt_string = format!(
-        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
-
-    );*/
-    let mut stmt = conn.prepare(
-        "SELECT id,abrv,team_name,team_score,wins,losses 
-        FROM teams 
-        WHERE league_id = ?1",
-    )?;
-
-    let league_iter = stmt.query_map([league_id], |row| {
-        Ok(TeamWrapper {
-            team_id: row.get(0)?,
-            team: Team {
-                abrv: row.get(1)?,
-                name: row.get(2)?,
-                team_score: row.get(3)?,
-                wins: row.get(4)?,
-                losses: row.get(5)?,
-                lineup: Vec::new(),
-                bench: Vec::new(),
-                starting_pitching: Vec::new(),
-                bullpen: match era {
-                    Era::Ancient => None,
-                    Era::Modern => Some(Vec::new()),
-                },
-            },
-        })
-    })?;
-
-    let wrappers: Vec<TeamWrapper> = league_iter.map(|x| x.unwrap()).collect();
-    // We drop stmt so we can borrw conn later.
-    drop(stmt);
-    for wrapper in wrappers {
-        println!("{:?}", wrapper);
-        let loaded_team = load_team(conn, wrapper)?;
-
-        println!("team {} loaded", loaded_team.name);
-        println!("{}", loaded_team);
-        league.teams.push(loaded_team)
-    }
-    println!("Leauge{} loaded", league.name);
-    match add_new_team(&mut league, thread, conn, league_id, true) {
-        Ok(_) => Ok(()),
-        Err(_) => {
-            println!("Error adding a new team, please try again");
-            Ok(())
-        }
-    }
-
-    //todo!();
-    /*  let mut league: League;
-    let league_info =
-        fs::read_to_string(path.join("league_info.txt")).expect("league_info file is missing");
-    let league_result = serde_json::from_str(&league_info);
-
-    match league_result {
-        Ok(loaded_league) => league = loaded_league,
-        Err(_) => {
-            println!("League Info file is corrupted!");
-            let ans = Confirm::new("Would you like to load a different league?")
-                .with_default(true)
-                .prompt();
-            match ans {
-                Ok(true) => return league_check(conn, thread),
-                Ok(false) => return Ok(()),
-                Err(_) => panic!("Error after league is corrupted"),
-            }
-        }
-    };
-
-    println!("League Loaded");
-    add_team_check(&mut league, path, thread)*/
-}
-
-struct PlayerWrapper {
-    team_spot: TeamSpot,
-    player: Player,
-}
-
-fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
-    let TeamWrapper { team_id, mut team } = wrapper;
-    //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
-    let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
-    let _test = 3;
-    let team_iter = stmt.query_map([team_id], |row| {
-        Ok(PlayerWrapper {
-            team_spot: {
-                let input: String = row.get(12)?;
-                let chars = input.as_str();
-                let output = serde_json::from_str(chars);
-                output.unwrap()
-            },
-
-            player: Player {
-                name: row.get(2)?,
-                age: row.get(3)?,
-                pos: row.get(4)?,
-                hand: {
-                    let input: String = row.get(5)?;
-                    let chars = input.as_str();
-                    let output = serde_json::from_str(chars);
-                    output.unwrap()
-                },
-                bt: row.get(6)?,
-                obt_mod: row.get(7)?,
-                obt: row.get(8)?,
-                pd: {
-                    let input: String = row.get(9)?;
-                    let chars = input.as_str();
-                    let output = serde_json::from_str(chars);
-                    output.unwrap()
-                },
-                pitcher_trait: {
-                    let input: String = row.get(11)?;
-                    let chars = input.as_str();
-                    let output = serde_json::from_str(chars);
-                    output.unwrap()
-                },
-                b_traits: BTraits::from_strings(
-                    &row.get(13)?,
-                    &row.get(14)?,
-                    &row.get(15)?,
-                    &row.get(16)?,
-                    &row.get(17)?,
-                ),
-            },
-        })
-        /*
-        contact: p_trait_from_string(&row.get(13)?),
-        /*{
-            let input: String = row.get(13)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        },*/
-
-        defense: p_trait_from_string(&row.get(14)?),
-        /*{
-            let input: String = row.get(14)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        }*/
-
-        power: p_trait_from_string(&row.get(15)?),
-        /*{
-            let input: String = row.get(15)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        },*/
-        speed: p_trait_from_string(&row.get(16)?),
-        /*{
-            let input: String = row.get(16)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        }, */
-        toughness: p_trait_from_string(&row.get(17)?)
-        /*{
-            let input: String = row.get(17)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        }, */
-        */
-    })?;
-
-    for result in team_iter {
-        let wrapper = result.unwrap();
-        let PlayerWrapper { team_spot, player } = wrapper;
-        println!("{}", player);
-        match team_spot {
-            TeamSpot::StartingLineup => team.lineup.push(player),
-            TeamSpot::BenchHitter => team.bench.push(player),
-            TeamSpot::StartingPitcher => team.starting_pitching.push(player),
-            TeamSpot::Bullpen => match &mut team.bullpen {
-                Some(pen) => pen.push(player),
-                None => panic!("Attemped to add a reliever to a team with no bullpen"),
-            },
-        }
-
-        /*let goal_vec = match team_spot{
-            TeamSpot::StartingLineup => &mut team.lineup,
-            TeamSpot::BenchHitter => &mut team.bench,
-            TeamSpot::StartingPitcher => &mut team.starting_pitching,
-            TeamSpot::Bullpen => &mut &team.bullpen.unwrap()
-        };
-
-        goal_vec.push(player)*/
-    }
-    Ok(team)
 }
 
 //#[tailcall]
