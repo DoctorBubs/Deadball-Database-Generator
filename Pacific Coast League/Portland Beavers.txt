@@ -1,0 +1,24 @@
+Name:Portland Beavers, Abrv:POR, Team Score: 51
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Levin Stephi,3B,27,R,34,37
+Hersch Kaari,C,20,R,31,35,S+
+Sheffield Alyson,LF,25,R,28,36
+Hakeem Poppy,2B,33,R,28,33
+Stacy Claribel,SS,19,L,27,32
+Joab Celine,1B,37,R,27,32
+Conway Angelita,RF,21,L,27,32,D-
+Dickie Antonietta,CF,24,L,23,30
+Bench:
+Name Pos Age Hand BT OBT Traits
+Elwyn Erika,C,21,R,31,37
+Wilt Sena,INF,22,S,27,33
+Menard Damara,OF,22,R,27,29
+Dwight Alyda,UT,24,L,23,26
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Vick Audie,P,26,R,d12,K+, 19,20
+Judas Averil,P,22,R,d6,GB, 18,22
+Kristopher Tella,P,37,L,d6, 16,23
+Adger Marieann,P,19,L,d6, 17,23
+Krishna Arlana,P,32,L,-d4,K+, 20,22

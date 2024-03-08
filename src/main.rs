@@ -140,7 +140,7 @@ fn add_new_team(
     };
     let current_teams = &league.teams;
     if current_teams.len() > 0 {
-        let names = current_teams.iter().fold(String::new(), |mut acc, team| {
+        let names = current_teams.iter().fold(String::new(), |acc, team| {
             let new_string = format!("\n{} {}", team.abrv, team.name);
             acc + &new_string
         });
@@ -236,9 +236,9 @@ fn add_team_check(
 
     match ans {
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
-        Ok(true) => add_new_team(league, thread, conn, league_id, false),
+        Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
         //If not, we save the leauge and hten exit.
-        Ok(false) => save_league(league),
+        Ok(false) => save_league(league)?,
         Err(_) => {
             panic!("Error on add team prompt");
         }
@@ -257,9 +257,13 @@ fn save_league(league: &League) -> std::io::Result<()> {
 
     for team in &league.teams {
         let file_path = folder_path.join(format!("{}.txt", team.name).as_str());
+        
+            
         let mut file = File::create(file_path)?;
         file.write_all(team.to_string().as_bytes())?;
-    }
+        
+        
+    };
     Ok(())
 }
 
@@ -334,7 +338,7 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
             Select::new("Select an existing league", options).prompt();
         match ans {
             Ok(select) => {
-                load_league(thread, conn, select);
+                load_league(thread, conn, select)?;
                 Ok(())
             }
             Err(_) => {
@@ -345,6 +349,7 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
     }
 }
 
+#[derive(Debug)]
 struct TeamWrapper {
     team_id: i64,
     team: Team,
@@ -360,13 +365,21 @@ fn load_league(
         mut league,
     } = wrapper;
     let era = league.era;
-    let stmt_string = format!(
-        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = {}",
+    /*let stmt_string = format!(
+        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
         league_id
-    );
-    let mut stmt = conn.prepare(stmt_string.as_str()).unwrap();
+    );*/
 
-    let league_iter = stmt.query_map([], |row| {
+    /*let stmt_string = format!(
+        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
+        
+    );*/
+    let mut stmt = conn.prepare("SELECT id,abrv,team_name,team_score,wins,losses 
+        FROM teams 
+        WHERE league_id = ?1")?;
+        
+
+    let league_iter = stmt.query_map([league_id], |row| {
         Ok(TeamWrapper {
             team_id: row.get(0)?,
             team: Team {
@@ -390,12 +403,22 @@ fn load_league(
     // We drop stmt so we can borrw conn later.
     drop(stmt);
     for wrapper in wrappers {
+        println!("{:?}",wrapper);
         let loaded_team = load_team(conn, wrapper)?;
+        
+        println!("team {} loaded", loaded_team.name);
+        println!("{}",loaded_team.to_string());
         league.teams.push(loaded_team)
     }
     println!("Leauge{} loaded", league.name);
-    add_new_team(&mut league, thread, conn, league_id, true);
-    Ok(())
+    match add_new_team(&mut league, thread, conn, league_id, true){
+        Ok(_) => Ok(()),
+        Err(_) => {
+            println!("Error adding a new team, please try again");
+            Ok(())
+        }
+    }
+    
     //todo!();
     /*  let mut league: League;
     let league_info =
@@ -428,10 +451,10 @@ struct PlayerWrapper {
 
 fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
     let TeamWrapper { team_id, mut team } = wrapper;
-    let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
-    let mut stmt = conn.prepare(stmt_string.as_str())?;
-
-    let team_iter = stmt.query_map([], |row| {
+    //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
+    let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
+    let test = 3;
+    let team_iter = stmt.query_map([team_id], |row| {
         Ok(PlayerWrapper {
             team_spot: {
                 let input: String = row.get(12)?;
@@ -505,6 +528,7 @@ fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqli
     for result in team_iter {
         let wrapper = result.unwrap();
         let PlayerWrapper { team_spot, player } = wrapper;
+        println!("{}",player.to_string());
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),
             TeamSpot::BenchHitter => team.bench.push(player),
@@ -554,7 +578,7 @@ fn main() -> std::io::Result<()> {
         Ok(choice) => match choice {
             "Create a new league." => create_new_league(&mut r_thread, &mut conn),
             "Add a new team to an existing league." => {
-                league_check(&mut conn, &mut r_thread);
+                league_check(&mut conn, &mut r_thread).unwrap();
                 Ok(())
             }
             _ => {

@@ -1,0 +1,24 @@
+Name:San Diego Mission Bells, Abrv:SD, Team Score: 69
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Tad Othelia,SS,20,S,33,37
+Barri Thalia,2B,22,L,28,31,C-T+
+Lemuel Gussie,3B,24,R,25,28,D-S+
+Tanney Wilmette,LF,27,L,23,28
+Randolf Wilmette,1B,36,R,23,26
+Dickie Oprah,CF,21,R,22,25,D-
+Reynolds Christabel,C,31,S,21,25,S-
+Mateo Consuela,RF,25,S,21,24
+Bench:
+Name Pos Age Hand BT OBT Traits
+Blayne Vivyanne,UT,38,R,28,31
+Paddie Connie,C,33,L,25,31
+Jacob Merridie,INF,30,R,24,31
+Wilek Rayshell,OF,23,R,25,27
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Hagan Aime,P,27,L,d20, 19,25
+Ambrose Sean,P,27,L,d12,CN+, 16,21
+Staffard Jeraldine,P,25,L,d12, 21,24
+Abbie Lizette,P,24,L,d12, 23,31
+Alic Madge,P,23,R,-d0, 22,23

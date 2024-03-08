@@ -1,7 +1,0 @@
-Name:Long Beach Clothiers ,Abrv.LBC, Team Score: 46
-Lineup:
-Name Pos Age Hand BT OBT Traits
-Bench:
-Name Pos Age Hand BT OBT Traits
-Rotation:
-Name Pos Age Hand PD Trait BT OBT

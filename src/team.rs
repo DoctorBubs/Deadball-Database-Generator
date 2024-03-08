@@ -44,7 +44,7 @@ fn new_bench(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Play
 }
 
 // The ancienct and modern era have different definitions of what a pitcher is. Modern era pitchers can be either starters or relievers, while the ancient era does not make the distinction.
-//Thus, Modern pitchers in the rotation are marked as SP, while anienct are just P
+//Thus, Modern pitchers in the rotation are marked as SP, while ancient are just P
 fn new_rotation(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = match era {
         Era::Ancient => vec!["P", "P", "P", "P", "P"],
@@ -225,6 +225,7 @@ impl Team {
         conn: &mut Connection,
         team_id: i64,
     ) -> Result<(), rusqlite::Error> {
+        ("Saving team under id{}",team_id);
         for starter in &self.lineup {
             starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
         }

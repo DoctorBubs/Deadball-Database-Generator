@@ -1,0 +1,24 @@
+Name:Seattle Rainiers, Abrv:SEA, Team Score: 53
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Broderic Marrilee,RF,22,L,29,37
+Barr Jonell,SS,38,R,32,36
+Luciano Courtney,1B,19,L,31,36
+Rainer Kandy,2B,25,L,29,37,C+D-
+Amadeus Sonnie,CF,31,R,28,35
+Gilles Maurine,3B,28,R,25,32,P++
+Carl Lacy,LF,27,L,26,30
+Maxfield Sharia,C,24,L,20,24
+Bench:
+Name Pos Age Hand BT OBT Traits
+Fulton Lacee,INF,31,R,25,30,P+
+Lane Hanna,C,19,L,24,28,D-
+Renaldo Jobie,UT,26,S,19,25,S+
+Sky Olivia,OF,30,L,20,23,C-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Olivier Faydra,P,27,R,d8,K+, 21,28
+Hayward Cyndi,P,27,L,d8, 17,20
+Andrej Midge,P,38,R,d6, 14,19
+Jehu Kaile,P,22,R,d6, 18,20
+Emmott Reyna,P,19,R,d4, 19,27

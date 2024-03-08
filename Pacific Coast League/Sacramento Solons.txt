@@ -1,0 +1,24 @@
+Name:Sacramento Solons, Abrv:SAC, Team Score: 46
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Uriah Hally,RF,29,R,32,38
+Duncan Janella,1B,37,L,33,35
+Henry Clio,C,24,R,27,30
+Les Sybilla,SS,19,R,26,30
+Tailor Ashli,3B,31,L,24,30
+Neal Lydie,LF,23,R,24,28
+Mike Valida,CF,22,S,23,30,C+P-
+Derrol Darice,2B,37,L,22,28
+Bench:
+Name Pos Age Hand BT OBT Traits
+Elton Fiann,INF,24,S,29,36
+Ethan Nellie,UT,19,L,31,35,C-
+Ximenes Aloisia,OF,24,L,20,28
+Yehudi Zoe,C,19,L,16,19
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Lockwood Joelle,P,25,R,d8, 16,17
+Michal Jessica,P,23,R,d8, 15,20
+Ivan Danyelle,P,26,R,d6,K+, 15,23
+Ariel Christina,P,27,R,d4, 18,23
+Tucker Laetitia,P,30,R,-d4, 23,30

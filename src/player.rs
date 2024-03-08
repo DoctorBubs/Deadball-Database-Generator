@@ -4,6 +4,7 @@ use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
 
+use crate::team;
 use crate::team::TeamSpot;
 
 use crate::traits::PitcherTrait;
@@ -181,7 +182,8 @@ impl Player {
         }
     }
 
-    //
+    // We also calculate how good a player would be at getting rbi.
+    // higher bt and positive power and contact traits are preffered.
     pub fn get_rbi_score(&self) -> i32 {
         self.bt + self.b_traits.get_rbi_score()
     }
@@ -228,7 +230,7 @@ impl Player {
             Some(tr) => tr.to_string(),
             None => "".to_string(),
         };*/
-
+        println!("Adding player under team id{}",team_id);
         let pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
@@ -245,7 +247,7 @@ impl Player {
                 contact,defense,power,speed,toughness) 
             VALUES(:team_id, :player_name, :age, :pos, :hand, :bt, :obt_mod, :obt, :pd,:pd_int, :pitcher_trait, :team_spot, :contact, :defense, :power, :speed, :toughness)", 
             named_params![
-                ":team_id": &team_id.to_string(),
+                ":team_id": &team_id,
                 ":player_name":&self.name, 
                 ":age":&self.age.to_string(), 
                 ":pos":&self.pos, 

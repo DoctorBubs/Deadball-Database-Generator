@@ -1,0 +1,24 @@
+Name:Wolfmen, Abrv:WOLF, Team Score: 48
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Charlton Cathy,LF,22,L,32,36
+Janus Ibby,RF,23,L,28,35,C+
+Del Carolynn,2B,34,R,25,33
+Brent Lilly,1B,31,L,27,32
+Dana Jesse,C,21,L,27,31
+Earle Carolyne,CF,26,R,24,30
+Isidore Kamilah,SS,22,R,22,29,D+
+Gerald Dion,3B,30,R,21,26,C+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Demetrius Arianne,INF,24,R,28,34
+Geri Mady,OF,36,S,27,34,C-
+Wilber Kaitlyn,UT,27,R,25,33
+Layton Carlee,C,23,R,19,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+John Florie,P,23,R,d12, 17,25
+Gerhardt Lucila,P,22,R,d8, 22,28
+Royce Milly,P,24,R,d6,CN+, 20,24
+Tharen Helen-Elizabeth,P,37,R,d4, 19,22
+Ossie Geraldine,P,24,R,-d4,GB, 20,24

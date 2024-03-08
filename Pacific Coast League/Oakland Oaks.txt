@@ -1,0 +1,24 @@
+Name:Oakland Oaks, Abrv:OAK, Team Score: 58
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Wayland Katharyn,2B,31,R,31,39
+Waldon Kaari,CF,24,R,29,36
+Boris Teresa,SS,22,R,31,34
+Trey Carlie,LF,24,R,27,33
+Christiano Sylvie,RF,23,R,28,32,D-
+Layton Georgeta,C,23,R,26,30
+Fabian Garland,3B,23,L,25,29
+Stacy Luise,1B,35,R,22,28,P+S+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Stinky Margarete,C,29,S,25,31
+Chadd Melesa,OF,23,L,23,26,P++
+Heywood Annalisa,UT,27,R,18,22,D+
+Graig Bria,INF,28,L,17,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Woodrow Jeane,P,34,L,d20, 18,21
+Barrett Karalee,P,35,R,d12, 23,26
+Aldis Celinda,P,21,R,d12, 19,25
+Felipe Adriane,P,26,L,-d0, 19,25
+Remington Phedra,P,22,R,-d4, 14,22

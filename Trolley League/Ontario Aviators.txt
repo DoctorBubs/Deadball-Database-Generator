@@ -1,0 +1,24 @@
+Name:Ontario Aviators, Abrv:ONT, Team Score: 52
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Mahmoud Amanda,2B,19,R,32,38
+Jules Cleo,3B,21,L,28,35
+Ram Kiri,LF,19,R,27,35,P-
+Nathanael Dallas,CF,23,R,28,33,D-
+Monte Davina,SS,35,L,28,33
+Eugen Mona,RF,22,S,26,29,S-
+Urbain Kimmy,C,22,R,24,28
+Wendell Silva,1B,36,L,22,27,D-P--
+Bench:
+Name Pos Age Hand BT OBT Traits
+Tedmund Talyah,OF,34,R,29,32
+Emanuel Rosie,UT,24,R,19,27,T+
+Philip Mabel,C,35,R,19,24
+Algernon Joleen,INF,20,L,19,24
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Timmy Correna,P,36,R,d20, 16,18
+Rey Isabelita,P,20,R,d12, 18,22
+Matt Trudey,P,34,R,-d0,K+, 22,26
+Shepard Pamelina,P,21,L,-d0,GB, 17,21
+Demosthenis Katerina,P,23,R,-d0, 20,26

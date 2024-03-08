@@ -1,5 +1,12 @@
+use std::path::Path;
+
+use inquire::validator::MinLengthValidator;
 use rusqlite::Connection;
 
+use crate::add_new_team;
+use crate::get_league_name;
+use crate::select_era;
+use crate::select_gender;
 use crate::Deserialize;
 use crate::Era;
 use crate::PlayerGender;
@@ -51,7 +58,7 @@ impl League {
             };
         }
 
-        let team_id = conn.last_insert_rowid();
+        
         let new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
         let new_team_score = new_team.team_score.to_string();
         let team_enter_result = conn.execute(
@@ -63,7 +70,8 @@ impl League {
                 &new_team_score,
             ],
         );
-
+        let team_id = conn.last_insert_rowid();
+        println!("New team id = {}",team_id);
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
@@ -82,4 +90,59 @@ impl League {
     /* pub fn add_team(&mut self, team: Team) {
         self.teams.push(team)
     }*/
+}
+
+
+// To create a new league
+fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
+    //let league_name: String;
+    let mut _folder_path: &Path;
+    let _validator = MinLengthValidator::new(3);
+    /*
+    let league_input = Text::new("Enter the name for the new league")
+        .with_validator(validator.clone())
+        .prompt();
+    league_name = match league_input {
+        Ok(input) => input.trim().to_string(),
+        Err(_) => panic!("Error creating a league name!"),
+    };
+    */
+
+    let league_name_attempt = get_league_name();
+    let league_name = match league_name_attempt {
+        Ok(name) => name,
+        Err(_) => {
+            println!("Error getting league name");
+            return Ok(());
+        }
+    };
+
+    // We have the user select the era for the league.
+    let era = select_era();
+    // As well as the gender of the players for the league.
+    let gender = select_gender();
+
+    // We then create a league struct.
+
+    let era_json = serde_json::to_string(&era).unwrap();
+
+    let gender_json = serde_json::to_string(&gender).unwrap();
+    let league_entry = conn.execute(
+        "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
+        [&league_name, &era_json, &gender_json],
+    );
+
+    match league_entry {
+        Err(_) => {
+            println!("Error creating a new league in the database");
+            return Ok(());
+        }
+        Ok(_) => (),
+    };
+    // Via last_inster_rowid, we get the SQl id for the new league
+    let league_id = conn.last_insert_rowid();
+    let mut new_league = League::new(&league_name, gender, era);
+    println!("{} created", &league_name);
+    //And then prompt the user to create the first team for the league.
+    add_new_team(&mut new_league, thread, conn, league_id, true)
 }

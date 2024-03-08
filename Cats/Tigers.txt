@@ -1,0 +1,24 @@
+Name:Tigers, Abrv:TIG, Team Score: 57
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Conroy Ella,2B,37,L,32,38
+Salim Alfreda,3B,25,R,32,36,P-S-
+Jessie Haily,SS,35,L,29,33
+Boyce Margarette,1B,35,R,28,32
+Daryl Lisette,C,23,R,21,28,D-
+Clint Kriste,LF,29,R,20,26
+Aube Sybil,CF,21,L,22,24
+Gregorio Mirabella,RF,19,L,21,24,D+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Thorstein Missy,UT,27,R,30,33
+Flynn Oliy,OF,38,L,24,28,D+
+Muhammad Mame,C,19,R,20,25,C+
+Pascale Dorolice,INF,25,R,18,22
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Edward Ester,P,23,L,d12, 19,24
+Siward Patricia,P,22,L,d12, 18,25
+Nikki Clarey,P,26,R,d6, 24,26
+Patricio Chastity,P,25,R,d6, 19,27
+Corey Dorice,P,22,L,d4, 17,20

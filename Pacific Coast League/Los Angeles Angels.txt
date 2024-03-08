@@ -1,0 +1,24 @@
+Name:Los Angeles Angels, Abrv:LAA, Team Score: 59
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Bartel Adeline,RF,19,R,29,34,C-
+Reginald Lucy,2B,23,R,28,33
+Boris Malva,CF,33,L,28,32
+Roman Meris,3B,21,R,28,31
+Darby Imojean,LF,21,R,27,31,C-
+Silvain Valli,1B,33,R,27,32,P+
+Adnan Aurora,SS,22,R,24,27
+Herve Loella,C,29,R,22,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Merry Marylin,INF,37,R,31,33
+Kimmo Joyan,C,20,R,19,24
+Caldwell Carlen,UT,29,R,20,23
+Sim Karilynn,OF,24,R,17,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Shurlock Didi,P,27,R,d20,GB, 22,29
+Abdulkarim Darya,P,23,R,d12, 18,24
+Jotham Carlota,P,22,R,d8, 19,23
+Nahum Erina,P,32,R,d6, 16,21
+Verge Faith,P,38,L,-d4, 17,23
