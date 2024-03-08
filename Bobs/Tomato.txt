@@ -1,0 +1,24 @@
+Name:Tomato ,Abrv.TMTO, Team Score: 58
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Gino Julietta,2B,35,R,31,35
+Ephraim Berna,CF,31,L,29,35,T+
+Inigo Amalle,RF,22,R,31,33,C-D+
+Ave Alyson,C,28,R,27,32,D+
+Chandler Yetta,1B,32,S,31,33,P+
+Flynn Heather,SS,22,L,25,28
+Mohammed Chantalle,LF,28,L,24,28
+Tannie Anneliese,3B,27,R,21,23
+Bench:
+Name Pos Age Hand BT OBT Traits
+Torey Jeniece,OF,38,R,25,28
+Teodoor Nichol,UT,19,R,20,25
+Zary Atalanta,INF,26,R,19,22,P-
+Antoine Kiah,C,24,R,18,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Shanan Selene,P,30,R,d20,CN-, 15,20
+Edouard Mufinella,P,33,L,d12, 17,18
+Garrott Blithe,P,23,R,d12, 21,23
+Bogdan Hadria,P,25,R,-d0, 17,21
+Carleigh Fania,P,24,R,-d4, 22,23

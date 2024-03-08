@@ -1,0 +1,34 @@
+Name:sdaasd ,Abrv.das, Team Score: 101
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Cinnamon Amabelle,SS,26,L,28,33
+Barbabas Dolly,CF,26,R,27,34,P++S-
+Jody Morena,2B,37,L,27,29,C-
+Rocky Bridie,1B,19,S,23,29
+Cy Nita,C,37,R,21,28
+Bridie Isa,3B,27,R,21,27
+Merna Almira,LF,37,L,22,26
+Chrissa Cappella,RF,22,L,21,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Rosalind Henka,OF,24,R,27,35
+Wake Meghann,INF,27,R,24,32
+Spud Giselle,OF,20,L,25,31,D+
+Thatcher Selinda,INF,23,R,26,30
+Carissa Meridel,C,19,R,26,29,D+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Victor Gypsy,SP,22,R,d12, 20,26
+Paton Berty,SP,24,L,d8, 18,19
+Verina Freddi,SP,38,R,d4, 17,20
+Martainn Gena,SP,32,R,d4, 17,23
+Quint Kimmie,SP,23,L,d4, 17,23
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Lemuel Beilul,RP,19,L,d12,K+, 19,26
+Marjie Feodora,RP,24,R,d12, 24,26
+Che Ami,RP,24,R,d12, 20,23
+Amelia Vin,RP,22,L,d12, 21,28
+Siddhartha Dyane,RP,24,R,d8,CN-, 16,21
+Lorie Shirlene,RP,23,R,d8, 17,18
+Tucky Dodie,RP,24,R,d4, 21,24

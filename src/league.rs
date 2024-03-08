@@ -70,12 +70,12 @@ impl League {
 
         match team_enter_result {
             Ok(_) => (),
-            Err(message) => return AddTeamError::DatabaseError
+            Err(message) => return Err(AddTeamError::DatabaseError)
         };
         let save_team_result = new_team.save_players_sql(conn, team_id);
         match save_team_result{
             (_) => (),
-            Err(_) => return  AddTeamError::DatabaseError
+            Err(_) => return  Err(AddTeamError::DatabaseError)
         };
        // let new_team_string = new_team.to_string();
         self.teams.push(new_team);

@@ -1,0 +1,34 @@
+Name:Bobs ,Abrv.BOBS, Team Score: 71
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Kendrick Julianne,2B,27,L,34,38
+Stu Mariejeanne,3B,23,L,31,38
+Eduardo Lyda,SS,23,L,30,36,D-
+Ernst Ema,C,24,L,29,34,D-
+Tabb Ardath,RF,22,R,27,31,D+
+Barret Thea,CF,31,R,26,30,P+
+Lindsey Carissa,1B,27,S,19,27
+Sascha Inger,LF,22,R,18,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+August Robinet,OF,31,R,26,32
+Samuele Lotta,INF,24,L,24,26
+Renado Alma,OF,26,R,20,22,D+
+Oran Manya,C,21,S,16,22
+Dick Corrinne,INF,24,S,18,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Tabbie Ricky,SP,23,R,d8,K+, 18,20
+Tam Rivalee,SP,24,R,d8, 17,24
+Aleksandrs Karen,SP,22,R,d8, 14,22
+Zelig Rosario,SP,38,L,d4, 23,30
+Tymothy Dorian,SP,19,R,d4, 19,21
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Putnam Damaris,RP,35,L,d8, 20,26
+Weidar Lusa,RP,23,R,d8, 22,28
+Lauren Charmane,RP,19,R,d8, 20,23
+Phineas Electra,RP,30,L,d4, 18,22
+Morty Jessi,RP,26,L,d4, 16,21
+Vaughan Kara,RP,35,R,-d4,K+, 16,20
+Petr Aindrea,RP,26,R,-d4, 18,21

@@ -1,0 +1,24 @@
+Name:dan man ,Abrv.DMN, Team Score: 59
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Josef Leoine,1B,23,R,32,35
+Marcelo Rosabelle,2B,32,S,30,35
+Prasun Greer,C,22,L,31,33,D-
+Otes Aurilia,SS,32,R,26,31,D-
+Worden Catlin,3B,29,R,23,29
+Yves Cleopatra,LF,22,S,24,28
+Leland Odelinda,RF,26,L,23,28,S-
+Angie Harriot,CF,24,L,24,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Wain Catherine,C,26,L,30,34,S-
+Zak Anitra,UT,34,R,19,27
+Bertrand Elisabeth,INF,27,R,19,26,C-
+Montgomery Karlie,OF,27,S,16,20,P--
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Barris Lilia,P,30,R,d12, 19,21
+Garrot Larisa,P,21,R,d12, 19,21
+Hans Philipa,P,32,R,d6,GB, 21,28
+Salomone Sarine,P,38,L,d6, 20,28
+Sammy Marjie,P,20,R,d6, 21,23

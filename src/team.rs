@@ -157,7 +157,7 @@ fn sort_lineup_slice(slices: LineupSlices) -> String{
     let
 
 }*/
-
+#[derive(Serialize, Deserialize, Debug)]
 pub enum TeamSpot {
     StartingLineup,
     BenchHitter,
@@ -226,21 +226,21 @@ impl Team {
         team_id: i64,
     ) -> Result<(), rusqlite::Error> {
         for starter in &self.lineup {
-            starter.save_sql(conn, team_id, TeamSpot::StartingLineup);
+            starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
         }
 
         for bench in &self.bench {
-            bench.save_sql(conn, team_id, TeamSpot::StartingLineup);
+            bench.save_sql(conn, team_id, TeamSpot::BenchHitter)?;
         }
 
         for starter in &self.starting_pitching {
-            starter.save_sql(conn, team_id, TeamSpot::StartingPitcher);
+            starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
         }
 
         match &self.bullpen {
             Some(pen) => {
                 for reliever in pen {
-                    reliever.save_sql(conn, team_id, TeamSpot::Bullpen);
+                    reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
                 }
             }
             None => (),

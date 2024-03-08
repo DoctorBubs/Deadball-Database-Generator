@@ -1,0 +1,24 @@
+Name:ketchup ,Abrv.kps, Team Score: 57
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Teador Bertie,1B,20,L,32,39
+Maddie Milzie,CF,27,R,32,37,D+
+Alphonso Lark,RF,27,L,25,33,P++
+Keene Jaymee,C,21,L,24,30,C-D-
+Llewellyn Verla,2B,34,L,22,29
+Averill Natalee,SS,30,R,23,27
+Ingelbert Katharyn,3B,22,L,23,26
+Kurtis Bethena,LF,19,L,24,27,C+D+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Blayne Abigale,UT,20,R,23,30
+Gilles Katuscha,INF,34,R,27,29,S-
+Leonardo Sashenka,C,24,L,21,25
+Klee Sharlene,OF,31,L,17,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Madison Freida,P,19,R,d12,CN+, 16,20
+Alden Bertina,P,34,R,d12, 21,22
+Mustafa Krystal,P,24,R,d6,CN-, 16,22
+Giffie Martguerita,P,33,L,d6, 24,27
+Chip Lottie,P,37,L,d4, 22,28

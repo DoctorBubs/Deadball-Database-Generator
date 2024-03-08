@@ -26,11 +26,14 @@ use crate::traits::Speed;
 use crate::traits::Toughness;
 use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
+use b_traits::BTraits;
 use chrono::prelude::*;
 use inquire::*;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
+use serde_json::*;
+use team::TeamSpot;
 use std::fmt;
 use std::fs;
 use std::fs::File;
@@ -83,24 +86,34 @@ fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::
     };
     */
 
-    let league_name = get_league_name()?;
-    
+    let league_name_attempt = get_league_name();
+    let league_name = match league_name_attempt {
+        Ok(name) => name,
+        Err(_) => {
+            println!("Error getting league name");
+            return Ok(())
+        }
+    };
+
     // We have the user select the era for the league.
     let era = select_era();
     // As well as the gender of the players for the league.
     let gender = select_gender();
 
     // We then create a league struct.
+    
+    let era_json = serde_json::to_string(&era).unwrap();
 
+    let gender_json = serde_json::to_string(&gender).unwrap();
     let league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
-        [&league_name, &era.to_string(), &gender.to_string()],
+        [&league_name, &era_json, &gender_json],
     );
 
     match league_entry {
-        Err(message) => {
+        Err(_) => {
             println!("Error creating a new league in the database");
-            return Err(());
+            return Ok(());
         },
         Ok(_) => (),
     };
@@ -163,7 +176,7 @@ fn add_new_team(
                         println!("This league already has a team with that name, please try again")
                     }
                     AddTeamError::DatabaseError => {
-                        println!("Error adding team to the data base, please try again")
+                        println!("Error adding team to the data base, please try again");
                         return Ok(())
                     }
                 };
@@ -218,10 +231,12 @@ fn add_team_check(
         //If not, we save the leauge and hten exit.
         Ok(false) => save_league(league),
         Err(_) => {
-            println!("Error on add team prompt");
-            Err(())
+            panic!("Error on add team prompt");
+            
         }
-    }
+    };
+
+    Ok(())
 }
 
 // Take's a league and a path, serializes the league to a json object, which is saved under path.league_info.text
@@ -247,7 +262,7 @@ fn get_league_name() -> Result<String,()> {
         .prompt();
 
     match name_input {
-        Ok(input) => OK(input.trim().to_string()),
+        Ok(input) => Ok(input.trim().to_string()),
         Err(_) => Err(()),
     }
 }
@@ -268,7 +283,7 @@ impl fmt::Display for LeagueWrapper {
 }
 
 
-fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(),rusqlite::Error> {
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     let league_iter = stmt
         .query_map([], |row| {
@@ -276,14 +291,27 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Resul
                 league_id: row.get(0)?,
                 league: League {
                     name: row.get(1)?,
-                    era: Era::from_string(row.get(2)?),
-                    gender: PlayerGender::from_string(row.get(3)?),
+                    era:{
+                        let input:String = row.get(2)?;
+                        println!("{}",&input);
+                        let chars = input.as_str();
+                        print!("{}",chars.to_string());
+                        serde_json::from_str(chars).unwrap()
+                    },
+                    //
+                    gender: {
+                        let input:String = row.get(3)?;
+                        let chars = input.as_str();
+                        serde_json::from_str(chars).unwrap()
+                    },
+                    
+                    //PlayerGender::from_string(row.get(3)?),
                     teams: Vec::new(),
                 },
             })
         })
         .unwrap();
-
+    
     let mut options = Vec::new();
 
     for wrapper in league_iter {
@@ -298,7 +326,11 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Resul
     } else {
         let ans: Result<LeagueWrapper, InquireError> = Select::new("Select an existing league", options).prompt();
         match ans{
-            Ok(select) => load_league(thread, conn, select),
+            Ok(select) => {
+                load_league(thread, conn, select);
+                Ok(())
+                
+            },
             Err(_) => {
                 println!("Error selecting a new league");
                 Ok(())
@@ -313,9 +345,9 @@ struct TeamWrapper{
     team: Team
 }
 
-fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWrapper) -> std::io::Result<()> {
+fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWrapper) -> Result<(),rusqlite::Error> {
     
-    let LeagueWrapper{league_id,league} = wrapper;
+    let LeagueWrapper{league_id,mut league} = wrapper;
     let era = league.era;
     let stmt_string = format!("SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = {}",league_id);
     let mut stmt = conn.prepare(stmt_string.as_str()).unwrap();
@@ -341,9 +373,17 @@ fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWr
 
             }
             )
-    }).unwrap();
-
-
+    })?;
+    
+    let wrappers: Vec<TeamWrapper> = league_iter.map(|x| x.unwrap()).collect();
+    // We drop stmt so we can borrw conn later.
+    drop(stmt);
+    for wrapper in wrappers{
+        
+        let loaded_team = load_team(conn, wrapper)?;
+        league.teams.push(loaded_team)
+    }
+    println!("Leauge{} loaded",league.name);
     todo!();
     /*  let mut league: League;
     let league_info =
@@ -370,21 +410,115 @@ fn load_league(_thread: &mut ThreadRng, conn: &mut Connection, wrapper: LeagueWr
     todo!()
 }
 
+struct PlayerWrapper{
+    team_spot:TeamSpot,
+    player: Player
+
+}
+
 fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error>{
 
-    let TeamWrapper{team_id,team} = wrapper;
+    let TeamWrapper{team_id,mut team} = wrapper;
     let stmt_string = format!("SELECT * FROM players WHERE team_id = {}",team_id);
-    let mut stmt = conn.prepare(stmt_string.as_str()).unwrap();
+    let mut stmt = conn.prepare(stmt_string.as_str())?;
 
     let team_iter = stmt
-        .query_map([]], |row|{
-            Ok(Player{
-                name: row.get(2)?,
-                age: name.get(3)?,
-                pos: row.get(4)?
+        .query_map([], |row|{
+            Ok(PlayerWrapper{
+                    team_spot:{
+                        let input:String = row.get(11)?;
+                        let chars = input.as_str();
+                        let output = serde_json::from_str(chars);
+                        output.unwrap()
+                    },
+                    
+                    player:Player{
+                        name: row.get(2)?,
+                        age: row.get(3)?,
+                        pos: row.get(4)?,
+                        hand: {
+                            let input: String = row.get(5)?;
+                            let chars = input.as_str();
+                            let output = serde_json::from_str(chars);
+                            output.unwrap()
+                        },
+                        bt: row.get(6)?,
+                        obt_mod: row.get(7)?,
+                        obt: row.get(8)?,
+                        pd:{
+                            let input: String = row.get(9)?;
+                            let chars = input.as_str();
+                            let output = serde_json::from_str(chars);
+                            output.unwrap()
+                        },
+                        pitcher_trait:{
+                            let input: String = row.get(10)?;
+                            let chars = input.as_str();
+                            let output = serde_json::from_str(chars);
+                            output.unwrap()
+                        },
+                        b_traits: BTraits{
+                            contact:{
+                                let input: String = row.get(12)?;
+                                let chars = input.as_str();
+                                let output = serde_json::from_str(chars);
+                                output.unwrap()
+                            },
+
+                            defense:{
+                                let input: String = row.get(13)?;
+                                let chars = input.as_str();
+                                let output = serde_json::from_str(chars);
+                                output.unwrap()
+                            },
+                            power: {
+                                let input: String = row.get(14)?;
+                                let chars = input.as_str();
+                                let output = serde_json::from_str(chars);
+                                output.unwrap()
+                            },
+                            speed:{
+                                let input: String = row.get(15)?;
+                                let chars = input.as_str();
+                                let output = serde_json::from_str(chars);
+                                output.unwrap()
+                            },
+                            toughness:{
+                                let input: String = row.get(16)?;
+                                let chars = input.as_str();
+                                let output = serde_json::from_str(chars);
+                                output.unwrap()
+                            }
+                        }
+                    }
             })
-        })
-    Ok(())
+        })?;
+    
+    for result in team_iter{
+        let wrapper = result.unwrap();
+        let PlayerWrapper{team_spot,player} = wrapper;
+        match team_spot{
+            TeamSpot::StartingLineup => {team.lineup.push(player)},
+            TeamSpot::BenchHitter => {team.bench.push(player)}
+            TeamSpot::StartingPitcher => {team.starting_pitching.push(player)}
+            TeamSpot::Bullpen => {
+                match &mut team.bullpen{
+                    Some(pen) => pen.push(player),
+                    None => panic!("Attemped to add a reliever to a team with no bullpen")
+                }
+            }
+        }
+        
+        /*let goal_vec = match team_spot{
+            TeamSpot::StartingLineup => &mut team.lineup,
+            TeamSpot::BenchHitter => &mut team.bench,
+            TeamSpot::StartingPitcher => &mut team.starting_pitching,
+            TeamSpot::Bullpen => &mut &team.bullpen.unwrap()
+        };
+
+        goal_vec.push(player)*/
+    };
+    Ok(team)
 }
 
 //#[tailcall]
@@ -414,7 +548,7 @@ fn main() -> std::io::Result<()> {
     match starting_choice {
         Ok(choice) => match choice {
             "Create a new league." => create_new_league(&mut r_thread, &mut conn),
-            "Add a new team to an existing league." => league_check(&mut conn, &mut r_thread),
+            "Add a new team to an existing league." => {league_check(&mut conn, &mut r_thread); Ok(())},
             _ => {
                 println!("Error with starting choice");
                 Ok(())

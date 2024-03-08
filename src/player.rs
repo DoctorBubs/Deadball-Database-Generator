@@ -18,6 +18,7 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::named_params;
 use rusqlite::Connection;
+use serde::de;
 use std::fmt;
 pub enum AgeCat {
     Prospect,
@@ -248,18 +249,18 @@ impl Player {
                 ":player_name":&self.name, 
                 ":age":&self.age.to_string(), 
                 ":pos":&self.pos, 
-                ":hand":&self.hand.to_string(),
+                ":hand":serde_json::to_string(&self.hand).unwrap(),
                 ":bt":&self.bt.to_string(),
                 ":obt_mod":&self.obt_mod.to_string(),
                 ":obt":&self.obt.to_string(),
-                ":pd":&pd_string,
-                ":pitcher_trait": &pitcher_trait_string,
-                ":team_spot":&team_spot.to_string(),
-                ":contact":&contact.to_string(),
-                ":defense":&defense.to_string(),
-                ":power":&power.to_string(), 
-                ":speed":&speed.to_string(), 
-                ":toughness":&toughness.to_string()
+                ":pd":serde_json::to_string(&self.pd).unwrap(),
+                ":pitcher_trait": serde_json::to_string(&self.pitcher_trait).unwrap(),
+                ":team_spot":serde_json::to_string(&team_spot).unwrap(),
+                ":contact":serde_json::to_string(contact).unwrap(),
+                ":defense":serde_json::to_string(defense).unwrap(),
+                ":power":serde_json::to_string(power).unwrap(), 
+                ":speed":serde_json::to_string(speed).unwrap(), 
+                ":toughness":serde_json::to_string(toughness).unwrap()
             ],
         )?;
 

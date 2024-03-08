@@ -1,0 +1,24 @@
+Name:Pasadena Palms ,Abrv.PAS, Team Score: 50
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Gerald Laure,C,23,R,33,36,D+
+Mortie Cherianne,1B,24,R,30,36,D+
+Zed Maritsa,SS,23,L,27,34
+Alister Barbe,2B,24,R,27,34,T+
+Berchtold Carma,LF,23,R,25,28,P--S+
+Pen Rey,3B,28,S,26,29
+Lambert Becki,RF,24,R,25,28
+Oleg Andra,CF,28,S,20,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Zachery Rosalie,UT,27,R,24,30,P+
+Munroe Cathie,OF,33,L,18,23
+Renaldo Raquela,INF,35,R,20,23,P+
+Boris Mikako,C,32,R,16,21,P--
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Carmine Corina,P,23,R,d12,GB, 20,27
+Sergeant Aubry,P,21,R,d12, 18,25
+Peyton Claudette,P,27,R,d6, 18,19
+Davin Sallyanne,P,34,R,d4, 16,17
+Terence Zsazsa,P,26,R,-d4, 18,23
