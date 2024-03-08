@@ -1,0 +1,34 @@
+Name:San Francisco Giants ,Abrv.SF, Team Score: 69
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Zak Andree,CF,31,R,32,36
+Rutger Florice,2B,30,L,29,34
+Damien Eveleen,LF,19,R,28,33
+Seymour Herminia,1B,26,R,21,29,D+P-
+Marty Codie,C,27,L,24,29,P+
+Mauricio Brittan,3B,27,R,23,26
+Kris Gracie,RF,21,L,23,25
+Alden Cayla,SS,36,L,17,19
+Bench:
+Name Pos Age Hand BT OBT Traits
+Webster Corliss,INF,23,L,25,28
+Weber Inga,OF,27,R,23,27
+Pip Cosetta,OF,37,R,23,26,P+
+Averell Natalina,C,19,R,20,24,D+
+Siegfried Francesca,INF,22,R,19,23,D+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Kendal Marnie,SP,23,L,d8,GB, 20,28
+Theodoric Emelia,SP,33,R,d4, 20,22
+Adolfo Misha,SP,28,R,d4, 18,22
+Jonny Adelice,SP,20,L,d4, 19,22
+Berkley Florry,SP,32,R,-d4, 21,29
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Mayor Bessie,RP,33,R,d12, 20,21
+Mahmud Charissa,RP,35,R,d8, 17,22
+Jerry Dinny,RP,22,R,d4,St+, 21,22
+Andy Jelene,RP,36,L,d4, 19,23
+Giraldo Ondrea,RP,31,L,d4, 17,25
+Davis Maryrose,RP,26,R,d4, 16,18
+Clifford Deny,RP,22,L,d4, 19,23

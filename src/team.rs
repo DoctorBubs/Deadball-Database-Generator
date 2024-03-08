@@ -272,7 +272,7 @@ impl Team {
 impl fmt::Display for Team {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let base_info = format!(
-            "Name:{} ,Abrv.{}, Team Score: {}\n",
+            "Name:{}, Abrv:{}, Team Score: {}\n",
             self.name, self.abrv, self.team_score
         );
         let lineup_string = get_batter_info_string("Lineup".to_string(), &self.lineup);

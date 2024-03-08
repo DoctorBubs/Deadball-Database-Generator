@@ -1,4 +1,3 @@
-
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
@@ -18,7 +17,7 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::named_params;
 use rusqlite::Connection;
-use serde::de;
+
 use std::fmt;
 pub enum AgeCat {
     Prospect,
@@ -220,16 +219,17 @@ impl Player {
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
         //println!("Saving player");
-        let pd_string = match self.pd {
+        /*let _pd_string = match self.pd {
             Some(pd) => pd.to_string(),
             None => "".to_string(),
         };
 
-        let pitcher_trait_string = match self.pitcher_trait {
+        let _pitcher_trait_string = match self.pitcher_trait {
             Some(tr) => tr.to_string(),
             None => "".to_string(),
-        };
+        };*/
 
+        let pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
             speed,
@@ -237,13 +237,13 @@ impl Player {
             toughness,
             defense,
         } = &self.b_traits;
-        let player_entry = conn.execute(
+        conn.execute(
             "INSERT INTO players(
                 team_id,player_name,age,pos,hand,
                 bt,obt_mod,obt,
-                pd,pitcher_trait,team_spot,
+                pd,pd_int,pitcher_trait,team_spot,
                 contact,defense,power,speed,toughness) 
-            VALUES(:team_id, :player_name, :age, :pos, :hand, :bt, :obt_mod, :obt, :pd, :pitcher_trait, :team_spot, :contact, :defense, :power, :speed, :toughness)", 
+            VALUES(:team_id, :player_name, :age, :pos, :hand, :bt, :obt_mod, :obt, :pd,:pd_int, :pitcher_trait, :team_spot, :contact, :defense, :power, :speed, :toughness)", 
             named_params![
                 ":team_id": &team_id.to_string(),
                 ":player_name":&self.name, 
@@ -254,6 +254,7 @@ impl Player {
                 ":obt_mod":&self.obt_mod.to_string(),
                 ":obt":&self.obt.to_string(),
                 ":pd":serde_json::to_string(&self.pd).unwrap(),
+                ":pd_int": pd_int_string,
                 ":pitcher_trait": serde_json::to_string(&self.pitcher_trait).unwrap(),
                 ":team_spot":serde_json::to_string(&team_spot).unwrap(),
                 ":contact":serde_json::to_string(contact).unwrap(),

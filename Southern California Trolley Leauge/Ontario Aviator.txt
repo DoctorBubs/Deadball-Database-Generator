@@ -1,4 +1,4 @@
-Name:Long Beach Clothiers ,Abrv.LBC, Team Score: 46
+Name:Ontario Aviator ,Abrv.ONT, Team Score: 55
 Lineup:
 Name Pos Age Hand BT OBT Traits
 Bench:

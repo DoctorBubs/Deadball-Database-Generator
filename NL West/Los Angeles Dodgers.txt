@@ -1,0 +1,34 @@
+Name:Los Angeles Dodgers ,Abrv.LAD, Team Score: 73
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Hermon Robbin,1B,30,R,35,37,C-
+Archibold Breanne,2B,22,L,29,37
+Bishop Janenna,3B,21,L,27,32
+Doyle Gabriell,RF,24,L,22,30,S+
+Mahmoud Gilli,LF,23,R,23,30
+Batholomew Jobi,C,34,L,23,30,D+P-
+Ulick Nanni,SS,22,R,21,27
+Reynold Colly,CF,36,L,19,23,D-
+Bench:
+Name Pos Age Hand BT OBT Traits
+Carlo Danny,OF,32,R,25,30
+Myron Dianemarie,OF,30,R,23,30
+Fairfax Clemmie,INF,30,R,23,29
+Raynard Cordie,INF,26,R,23,27,D-
+Tobin Heidie,C,33,R,21,26
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Rowland Mariette,SP,24,L,d12, 22,28
+Georgia Virgie,SP,27,R,d4, 18,19
+Jorge Mamie,SP,26,R,d4, 17,20
+Maxim Ernesta,SP,24,R,d4, 24,30
+Graham Donny,SP,23,L,d4, 21,24
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Paul Valina,RP,22,R,d8,CN+, 21,25
+Brody Rosita,RP,36,R,d4, 23,26
+Brice Anette,RP,36,R,d4, 17,24
+Gail Sibelle,RP,34,L,d4, 17,22
+Waine Muriel,RP,26,R,d4, 19,20
+Poul Kaja,RP,24,R,d4, 23,28
+Gordan Kaycee,RP,22,R,d4, 24,30

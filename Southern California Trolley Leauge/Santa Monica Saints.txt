@@ -1,4 +1,4 @@
-Name:Long Beach Clothiers ,Abrv.LBC, Team Score: 46
+Name:Santa Monica Saints ,Abrv.SMA, Team Score: 59
 Lineup:
 Name Pos Age Hand BT OBT Traits
 Bench:
