@@ -229,7 +229,7 @@ impl Player {
             Some(tr) => tr.to_string(),
             None => "".to_string(),
         };*/
-        println!("Adding player under team id{}", team_id);
+        
         let pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
@@ -393,24 +393,4 @@ impl fmt::Display for Player {
     }
 }
 
-pub trait PlayerWrapper {
-    fn unwrap(&mut self) -> &mut Player;
-}
 
-#[derive(Serialize, Deserialize)]
-pub struct Pitcher(Player);
-
-impl PlayerWrapper for Pitcher {
-    fn unwrap(&mut self) -> &mut Player {
-        &mut self.0
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Hitter(Player);
-
-impl PlayerWrapper for Hitter {
-    fn unwrap(&mut self) -> &mut Player {
-        &mut self.0
-    }
-}

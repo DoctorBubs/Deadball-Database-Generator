@@ -1,0 +1,24 @@
+Name:San Francisco Seals, Abrv:SF, Team Score: 53
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Merle Rosario,RF,24,L,33,40
+Rodge Iseabal,2B,25,R,29,35
+Morly Gayleen,SS,27,R,27,34
+Elisha Caren,LF,22,R,26,31
+Neale Ralina,CF,35,R,27,29
+Theobald Joyce,3B,33,R,22,28,D-
+Alfonse Sharai,C,24,R,25,27
+Ruben Bernetta,1B,25,L,23,26,D+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Guillermo Leanna,OF,24,R,31,39
+Daryle Retha,INF,23,R,30,37
+Harald Netti,C,23,R,23,29
+Robin Beitris,UT,23,R,19,25,D-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Kimmo Benni,P,24,R,d8,CN+, 19,24
+Lew Blair,P,28,R,d6,CN+, 18,22
+Beau Amalie,P,19,L,d6,CN+, 15,20
+Levy Betsey,P,24,R,d6, 15,18
+Barris Gunilla,P,23,L,d6, 19,26

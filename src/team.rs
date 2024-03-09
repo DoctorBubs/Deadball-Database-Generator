@@ -56,7 +56,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                     output.unwrap()
                 },
                 pitcher_trait: {
-                    let input: String = row.get(11)?;
+                    let input: String =  row.get(11)?;
                     let chars = input.as_str();
                     let output = serde_json::from_str(chars);
                     output.unwrap()
@@ -114,7 +114,6 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
     for result in team_iter {
         let wrapper = result.unwrap();
         let PlayerWrapper { team_spot, player } = wrapper;
-        println!("{}", player);
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),
             TeamSpot::BenchHitter => team.bench.push(player),

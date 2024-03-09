@@ -1,0 +1,24 @@
+Name:San Diego Mission Bells, Abrv:SD, Team Score: 55
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Davie Pollyanna,3B,20,R,32,38
+Zippy Joby,CF,25,L,28,33
+Rinaldo Elberta,LF,19,R,28,31
+Aristotle Chris,2B,28,R,24,30
+Patty Dita,RF,25,R,23,29,S-
+Kalil Gertrude,SS,22,R,23,28
+Crawford Esmeralda,C,36,L,20,24
+Haywood Silvia,1B,35,R,19,23,C-S-
+Bench:
+Name Pos Age Hand BT OBT Traits
+Lucian Fifine,UT,22,R,22,25,S+
+Tommy Lishe,INF,26,R,20,25
+Beau Zarah,C,22,L,18,22
+Stephanus Viviana,OF,38,R,16,20
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Hill Betta,P,38,L,d12, 23,30
+Kaspar Aila,P,34,R,d12, 16,17
+Hilbert Nell,P,31,R,d12, 19,25
+Rocky Adeline,P,38,R,d4, 19,25
+Piet Myrah,P,23,R,-d0,CN-, 17,20
