@@ -93,10 +93,10 @@ impl League {
     }*/
 }
 
-// To create a new league
+// Creates a new leagues, and saves the league in the database
 pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
     //let league_name: String;
-    let mut _folder_path: &Path;
+    //let mut _folder_path: &Path;
     let _validator = MinLengthValidator::new(3);
     /*
     let league_input = Text::new("Enter the name for the new league")
@@ -124,9 +124,12 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
 
     // We then create a league struct.
 
+
+    // We then serialize the era and jender to json.
     let era_json = serde_json::to_string(&era).unwrap();
 
     let gender_json = serde_json::to_string(&gender).unwrap();
+    // And we create a new entry in the sql databse.
     let league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
@@ -139,8 +142,9 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
         }
         Ok(_) => (),
     };
-    // Via last_inster_rowid, we get the SQl id for the new league
+    // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
+    // We then create a leage struct in rust.
     let mut new_league = League::new(&league_name, gender, era);
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
@@ -162,6 +166,7 @@ pub fn load_league(
         league_id,
         mut league,
     } = wrapper;
+    
     let era = league.era;
     /*let stmt_string = format!(
         "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
@@ -172,6 +177,8 @@ pub fn load_league(
         "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
 
     );*/
+
+    // We select the teams from the database that matchch the league id
     let mut stmt = conn.prepare(
         "SELECT id,abrv,team_name,team_score,wins,losses 
         FROM teams 
@@ -202,14 +209,16 @@ pub fn load_league(
     // We drop stmt so we can borrw conn later.
     drop(stmt);
     for wrapper in wrappers {
-        println!("{:?}", wrapper);
+        // We load the team from the database in the form of a Rust struct.
         let loaded_team = load_team(conn, wrapper)?;
 
-        println!("team {} loaded", loaded_team.name);
-        println!("{}", loaded_team);
+        //println!("team {} loaded", loaded_team.name);
+        //println!("{}", loaded_team);
+        // And add the team to the team vector for hte league.
         league.teams.push(loaded_team)
     }
     println!("Leauge{} loaded", league.name);
+    // Now that we have loaded the existing league from the database, it is time to generate a new team.
     match add_new_team(&mut league, thread, conn, league_id, true) {
         Ok(_) => Ok(()),
         Err(_) => {

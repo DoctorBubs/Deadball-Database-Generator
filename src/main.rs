@@ -19,7 +19,7 @@ use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
-use crate::team::load_team;
+
 use crate::team::Team;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -28,7 +28,7 @@ use crate::traits::Speed;
 use crate::traits::Toughness;
 use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
-use b_traits::BTraits;
+
 use chrono::prelude::*;
 use inquire::*;
 use league::load_league;
@@ -41,7 +41,7 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-use team::TeamSpot;
+
 
 /*fn trimed_capital_input() -> String {
     let mut input = String::new();
@@ -179,6 +179,7 @@ fn add_team_check(
     thread: &mut ThreadRng,
     league_id: i64,
 ) -> std::io::Result<()> {
+    
     let ans = Confirm::new("Would you like to create another team?")
         .with_default(true)
         .prompt();
@@ -196,7 +197,7 @@ fn add_team_check(
     Ok(())
 }
 
-// Take's a league and a path, serializes the league to a json object, which is saved under path.league_info.text
+// Once a league is saved, we save a copy of the league data in a folder.
 fn save_league(league: &League) -> std::io::Result<()> {
     let current_time = Utc::now().to_string();
     println!("{}", &current_time);
@@ -307,7 +308,7 @@ fn main() -> std::io::Result<()> {
         }
     };
     let mut r_thread = rand::thread_rng();
-    fs::create_dir_all("leagues")?;
+    
     println!("Welcome to the Deadball Team generator");
 
     let starting_options: Vec<&str> = vec![
