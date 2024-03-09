@@ -42,7 +42,6 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-
 /*fn trimed_capital_input() -> String {
     let mut input = String::new();
     io::stdin()
@@ -179,7 +178,6 @@ fn add_team_check(
     thread: &mut ThreadRng,
     league_id: i64,
 ) -> std::io::Result<()> {
-    
     let ans = Confirm::new("Would you like to create another team?")
         .with_default(true)
         .prompt();
@@ -212,18 +210,6 @@ fn save_league(league: &League) -> std::io::Result<()> {
         file.write_all(team.to_string().as_bytes())?;
     }
     Ok(())
-}
-
-fn get_league_name() -> Result<String, ()> {
-    let validator = MinLengthValidator::new(3);
-    let name_input = Text::new("Enter the name of the league you would like to add a team to.")
-        .with_validator(validator)
-        .prompt();
-
-    match name_input {
-        Ok(input) => Ok(input.trim().to_string()),
-        Err(_) => Err(()),
-    }
 }
 
 // if a user wants to add a new team to an existing league, we check to see if we can find the league folder.
@@ -277,8 +263,9 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
     // We drop the stmt so we can borrow conn later.
     drop(stmt);
     // If there are no leagues in the database, the function returns
-    if options.is_empty() {
-        print!("No Leagues created yet!");
+    if options.len() == 0 {
+        println!("No Leagues created yet! Let's create a new league to get started.");
+        create_new_league(thread, conn);
         Ok(())
     } else {
         let ans: Result<LeagueWrapper, InquireError> =
@@ -308,7 +295,7 @@ fn main() -> std::io::Result<()> {
         }
     };
     let mut r_thread = rand::thread_rng();
-    
+
     println!("Welcome to the Deadball Team generator");
 
     let starting_options: Vec<&str> = vec![
@@ -341,7 +328,7 @@ fn main() -> std::io::Result<()> {
 
 fn load_database() -> Result<Connection, rusqlite::Error> {
     // We look for the database, and create a new one if it doesn't exist.
-    let conn = Connection::open("league.db")?;
+    let conn = Connection::open("deadball.db")?;
     // We create the league table
     conn.execute(
         "create table if not exists leagues (

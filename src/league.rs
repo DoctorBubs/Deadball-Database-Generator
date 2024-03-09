@@ -1,10 +1,11 @@
-use std::path::Path;
+use std::string;
 
 use inquire::validator::MinLengthValidator;
+use inquire::Text;
 use rusqlite::Connection;
 
 use crate::add_new_team;
-use crate::get_league_name;
+
 use crate::select_era;
 use crate::select_gender;
 use crate::team::load_team;
@@ -93,6 +94,30 @@ impl League {
     }*/
 }
 
+struct NameUnwrapper(String);
+
+fn check_name_vec(conn: &Connection, ) -> Result<Vec<String>,rusqlite::Error> {
+    let mut stmt = conn.prepare("SELECT league_name FROM leagues")?;
+    let rows = stmt.query_map([], |row| row.get(0))?;
+
+    let mut names = Vec::new();
+    for name_result in rows {
+        names.push(name_result?);
+    }
+
+    Ok(names)
+}
+
+fn check_league_name(conn: &mut Connection) -> Result<Vec<String>, rusqlite::Error> {
+    //let mut stmt = conn.prepare("SELECT id FROM leagues WHERE league_name = ?1")?;
+    
+
+    match check_name_vec(conn){
+        Err(err) => Err(err),
+        Ok(vec) => Ok(vec)
+        
+    }
+}
 // Creates a new leagues, and saves the league in the database
 pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
     //let league_name: String;
@@ -108,14 +133,29 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     };
     */
 
-    let league_name_attempt = get_league_name();
-    let league_name = match league_name_attempt {
-        Ok(name) => name,
-        Err(_) => {
-            println!("Error getting league name");
-            return Ok(());
+    //let mut stmt = conn.prepare("SELECT id) FROM leagues WHERE league_name = ?1").unwrap();
+
+    let mut league_name: String;
+
+    let taken_names = check_name_vec(conn).unwrap();
+    
+
+    loop {
+        if taken_names.len() > 0 {
+            println!("The following league names have already been taken");
+            for name in &taken_names{
+                println!("\n{}",name)
+            };
+        };
+
+        let potential_name = Text::new("Please enter a name for the new league").prompt().unwrap();
+        
+        if !taken_names.contains(&potential_name){
+            league_name = potential_name;
+            break
         }
-    };
+
+    }
 
     // We have the user select the era for the league.
     let era = select_era();
@@ -123,7 +163,6 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     let gender = select_gender();
 
     // We then create a league struct.
-
 
     // We then serialize the era and jender to json.
     let era_json = serde_json::to_string(&era).unwrap();
@@ -166,7 +205,7 @@ pub fn load_league(
         league_id,
         mut league,
     } = wrapper;
-    
+
     let era = league.era;
     /*let stmt_string = format!(
         "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",

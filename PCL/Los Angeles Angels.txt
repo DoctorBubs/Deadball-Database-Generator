@@ -1,0 +1,24 @@
+Name:Los Angeles Angels, Abrv:LAA, Team Score: 56
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Jennings Christabel,1B,23,R,33,39,C-
+Marshal Neila,SS,35,L,30,37
+Davin Flo,CF,21,R,32,36
+Darby Mirelle,RF,24,L,30,34
+Hobart Bethany,C,27,L,29,31,C-D-
+Ray Sarita,3B,21,S,24,29
+Conan Amanda,2B,31,R,24,29
+Myke Angelle,LF,37,L,22,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Istvan Rosabella,OF,36,L,25,31,P--
+Sunny Karine,C,23,L,24,28
+Mac Randie,UT,22,R,24,28
+Earl Jandy,INF,21,L,16,21,C-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Chan Ailee,P,19,L,d20, 15,22
+Erich Alvera,P,20,R,d8,CN-, 16,21
+Richie Blondie,P,26,R,d6, 18,26
+Wain Wynne,P,22,L,d6, 17,19
+Rowland Rosana,P,31,R,-d4, 16,22

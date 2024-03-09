@@ -1,0 +1,24 @@
+Name:Dodgers, Abrv:DO, Team Score: 50
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Grove Wilma,1B,28,R,32,38
+Tremayne Cybill,SS,24,R,32,36
+Oliver Shawn,2B,28,L,28,34
+Marwin Katerina,C,33,L,27,30
+Hall Tate,CF,19,L,25,29
+Wainwright Trude,3B,19,L,23,26
+Hebert Ulrica,RF,26,S,20,25
+Donn Kaylil,LF,37,S,19,23
+Bench:
+Name Pos Age Hand BT OBT Traits
+Rudd Kitty,INF,25,S,31,34
+Sutton Del,C,31,R,27,31,P+
+Alexei Rina,UT,35,L,24,28
+Ike Tobi,OF,24,R,22,25
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Raphael Nellie,P,21,R,d8, 21,24
+Waylon Brina,P,19,L,d6,K+, 20,25
+Hilliard Kalina,P,29,L,d6, 23,28
+Beauregard Rubina,P,27,L,d4,CN+, 23,24
+Woodrow Viva,P,19,L,d4, 19,21

@@ -1,0 +1,24 @@
+Name:bobs, Abrv:bob, Team Score: 62
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Shorty Elfrieda,3B,24,R,28,33
+Dwayne Halie,SS,33,R,27,30,S+
+Othello Charlot,2B,24,L,24,31
+Matias Gennie,CF,27,S,25,30
+Gabriele Jenelle,C,27,R,24,29,S-
+Thad Juliana,LF,31,L,23,29,S-
+Parnell Elnora,1B,37,R,24,28
+Talbert Eran,RF,21,R,22,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Vernor Cammie,OF,19,R,23,28
+Maxie Ann-Mari,UT,35,R,22,26,S-
+Aloysius Holly,C,27,R,21,26
+Boyce Edith,INF,29,R,21,25
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Derby Carmela,P,32,R,d20, 18,23
+Ehud Jacquie,P,23,R,d12, 14,21
+Zerk Guendolen,P,37,R,d8,St+, 18,26
+Ximenes Lenore,P,26,L,d4, 19,24
+Leif Raquela,P,22,L,d4, 22,29
