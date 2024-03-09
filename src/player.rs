@@ -109,14 +109,7 @@ impl PlayerGender {
             Self::Coed => generator.generate().to_string(),
         }
     }
-    pub fn from_string(string: String) -> PlayerGender {
-        match string.as_str() {
-            "Male" => PlayerGender::Male,
-            "Female" => PlayerGender::Female,
-            "Coed" => PlayerGender::Coed,
-            _ => panic!("Invalid era load"),
-        }
-    }
+    
 }
 
 impl fmt::Display for PlayerGender {

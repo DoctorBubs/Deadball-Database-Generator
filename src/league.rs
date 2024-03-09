@@ -1,4 +1,4 @@
-use std::string;
+
 
 use inquire::validator::MinLengthValidator;
 use inquire::Text;
@@ -73,16 +73,15 @@ impl League {
             ],
         );
         let team_id = conn.last_insert_rowid();
-        println!("New team id = {}", team_id);
+        
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
         };
         let save_team_result = new_team.save_players_sql(conn, team_id);
-        match save_team_result {
-            Err(_) => return Err(AddTeamError::DatabaseError),
-            _ => (),
-        };
+        if save_team_result.is_err() { 
+            return Err(AddTeamError::DatabaseError) 
+        }
         // let new_team_string = new_team.to_string();
         self.teams.push(new_team);
         Ok(())
@@ -94,7 +93,7 @@ impl League {
     }*/
 }
 
-struct NameUnwrapper(String);
+
 
 fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     let mut stmt = conn.prepare("SELECT league_name FROM leagues")?;
@@ -108,40 +107,22 @@ fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     Ok(names)
 }
 
-fn check_league_name(conn: &mut Connection) -> Result<Vec<String>, rusqlite::Error> {
-    //let mut stmt = conn.prepare("SELECT id FROM leagues WHERE league_name = ?1")?;
 
-    match check_name_vec(conn) {
-        Err(err) => Err(err),
-        Ok(vec) => Ok(vec),
-    }
-}
 // Creates a new leagues, and saves the league in the database
 pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
-    //let league_name: String;
-    //let mut _folder_path: &Path;
+    
     let _validator = MinLengthValidator::new(3);
-    /*
-    let league_input = Text::new("Enter the name for the new league")
-        .with_validator(validator.clone())
-        .prompt();
-    league_name = match league_input {
-        Ok(input) => input.trim().to_string(),
-        Err(_) => panic!("Error creating a league name!"),
-    };
-    */
+   
 
-    //let mut stmt = conn.prepare("SELECT id) FROM leagues WHERE league_name = ?1").unwrap();
-
-    let mut league_name: String;
+    let league_name: String;
 
     let taken_names = check_name_vec(conn).unwrap();
 
     loop {
-        if taken_names.len() > 0 {
-            println!("The following league names have already been taken");
+        if !taken_names.is_empty() {
+            println!("The following league names have already been taken:");
             for name in &taken_names {
-                println!("\n{}", name)
+                println!("{}", name)
             }
         };
 
@@ -172,12 +153,9 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
         [&league_name, &era_json, &gender_json],
     );
 
-    match league_entry {
-        Err(_) => {
-            println!("Error creating a new league in the database");
-            return Ok(());
-        }
-        Ok(_) => (),
+    if league_entry.is_err() {
+        println!("Error creating a new league in the database.");
+        return Ok(());
     };
     // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
@@ -254,7 +232,7 @@ pub fn load_league(
         // And add the team to the team vector for hte league.
         league.teams.push(loaded_team)
     }
-    println!("Leauge{} loaded", league.name);
+    println!("{} loaded.", league.name);
     // Now that we have loaded the existing league from the database, it is time to generate a new team.
     match add_new_team(&mut league, thread, conn, league_id, true) {
         Ok(_) => Ok(()),

@@ -2,3 +2,6 @@
 /old_leagues
 /src/graveyard.rs
 /src/league.db
+/src/deadball.db 
+/src/futures.rs
+/src/main_menu_options.rs

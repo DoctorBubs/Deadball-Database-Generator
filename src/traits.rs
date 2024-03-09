@@ -15,7 +15,7 @@ pub trait PlayerTrait {
 
 pub fn p_trait_from_string<'a, T: PlayerTrait + Deserialize<'a>>(input: &'a str) -> T {
     let clone = &input;
-    let output = serde_json::from_str(&clone);
+    let output = serde_json::from_str(clone);
     output.unwrap()
 }
 

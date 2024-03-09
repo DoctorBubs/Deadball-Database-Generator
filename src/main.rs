@@ -29,7 +29,7 @@ use crate::traits::Toughness;
 use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
 
-use chrono::prelude::*;
+
 use inquire::*;
 use league::load_league;
 use rand::rngs::ThreadRng;
@@ -108,10 +108,10 @@ fn add_new_team(
 
         let team_name = match name_input {
             Ok(name) => name.trim().to_string(),
-            Err(_) => panic!("Error creating team name"),
+            Err(_) => panic!("Error creating team name."),
         };
 
-        let abrv_input = Text::new("Please enter an abbreviation for the new team")
+        let abrv_input = Text::new("Please enter an abbreviation for the new team.")
             .with_validator(abrv_min_validator.clone())
             .with_validator(abrv_max_validator.clone())
             .with_default(&team_name[0..=1].to_string().to_uppercase())
@@ -119,7 +119,7 @@ fn add_new_team(
 
         let abrv = match abrv_input {
             Ok(input) => input.trim().to_string(),
-            Err(_) => panic!("Error creating team abrv"),
+            Err(_) => panic!("Error creating team abbreviation."),
         };
         /*  The league takes the name and abreviation we just created. If there is already a team in the league with that name or abbreviation,  it returns an error.
         Otherwise, the league generates a new team, and then returns the team as a string wrapped in an Ok, which we use to save the team as a file on the disk.*/
@@ -127,18 +127,18 @@ fn add_new_team(
             Err(message) => {
                 match message {
                     AddTeamError::AbrvTaken => println!(
-                        "This league already has a team with that abbreviation, please try again"
+                        "This league already has a team with that abbreviation, please try again."
                     ),
                     AddTeamError::NameTaken => {
-                        println!("This league already has a team with that name, please try again")
+                        println!("This league already has a team with that name, please try again.")
                     }
                     AddTeamError::DatabaseError => {
-                        println!("Error adding team to the data base, please try again");
+                        println!("Error adding team to the data base, please try again.");
                         return Ok(());
                     }
                 };
                 //println!("Error {:?}",message);
-                prompt_string = "Enter a unique team name";
+                prompt_string = "Enter a unique team name.";
             }
             // If the league returns OK, we take the string, and write it to a new file in the leauge folder
             Ok(()) => {
@@ -197,8 +197,7 @@ fn add_team_check(
 
 // Once a league is saved, we save a copy of the league data in a folder.
 fn save_league(league: &League) -> std::io::Result<()> {
-    let current_time = Utc::now().to_string();
-    println!("{}", &current_time);
+    println!();
     let flder_path_string = league.name.to_string();
     let folder_path = Path::new(&flder_path_string);
     fs::create_dir_all(folder_path)?;
@@ -209,6 +208,7 @@ fn save_league(league: &League) -> std::io::Result<()> {
         let mut file = File::create(file_path)?;
         file.write_all(team.to_string().as_bytes())?;
     }
+    println!("League saved succesfully.");
     Ok(())
 }
 
@@ -263,9 +263,9 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
     // We drop the stmt so we can borrow conn later.
     drop(stmt);
     // If there are no leagues in the database, the function returns
-    if options.len() == 0 {
+    if options.is_empty() {
         println!("No Leagues created yet! Let's create a new league to get started.");
-        create_new_league(thread, conn);
+        create_new_league(thread, conn).unwrap();
         Ok(())
     } else {
         let ans: Result<LeagueWrapper, InquireError> =
@@ -290,13 +290,13 @@ fn main() -> std::io::Result<()> {
     match database_load {
         Ok(db) => conn = db,
         Err(_) => {
-            println!("Could not load databse. Check the setting for this folder");
+            println!("Could not load databse. Check the setting for this folder.");
             return Ok(());
         }
     };
     let mut r_thread = rand::thread_rng();
 
-    println!("Welcome to the Deadball Team generator");
+    println!("Welcome to the Deadball Team generator!");
 
     let starting_options: Vec<&str> = vec![
         "Create a new league.",
@@ -314,7 +314,7 @@ fn main() -> std::io::Result<()> {
                 Ok(())
             }
             _ => {
-                println!("Error with starting choice");
+                println!("Error with starting choice.");
                 Ok(())
             }
         },
