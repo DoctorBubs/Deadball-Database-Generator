@@ -29,7 +29,6 @@ use crate::traits::Toughness;
 use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
 
-
 use inquire::*;
 use league::load_league;
 use rand::rngs::ThreadRng;
@@ -236,9 +235,9 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
                     name: row.get(1)?,
                     era: {
                         let input: String = row.get(2)?;
-                        println!("{}", &input);
+
                         let chars = input.as_str();
-                        print!("{}", chars);
+
                         serde_json::from_str(chars).unwrap()
                     },
                     //
@@ -285,15 +284,15 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
 
 //#[tailcall]
 fn main() -> std::io::Result<()> {
-    let database_load = load_database();
-    let mut conn: Connection;
-    match database_load {
+    let mut conn = load_database().unwrap();
+    //let mut conn: Connection;
+    /*match database_load {
         Ok(db) => conn = db,
         Err(_) => {
             println!("Could not load databse. Check the setting for this folder.");
             return Ok(());
         }
-    };
+    };*/
     let mut r_thread = rand::thread_rng();
 
     println!("Welcome to the Deadball Team generator!");
@@ -332,47 +331,49 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     // We create the league table
     conn.execute(
         "create table if not exists leagues (
-             id integer primary key,
-             league_name text not null,
-             era text not null,
-             gender text not null
+             id INTEGER PRIMARY KEY,
+             league_name TEXT NOT NULL,
+             era TEXT NOT NULL,
+             gender TEXT NOT NULL
          )",
         (),
     )?;
-    // We create a league table
+    // We create a team table
     conn.execute(
         "create table if not exists teams (
-             id integer primary key,
-             league_id integer not null,
-             team_name text not null,
-             abrv text not null,
-             team_score int not null,
-             wins int DEFAULT 0,
-             losses integer DEFAULT 0
+             id INTEGER PRIMARY KEY,
+             league_id INTEGER NOT NULL,
+             team_name TEXT NOT NULL,
+             abrv TEXT NOT NULL,
+             team_score INTEGER NOT NULL,
+             wins INTEGER DEFAULT 0,
+             losses INTEGER DEFAULT 0,
+             FOREIGN KEY(league_id) REFERENCES leagues(id)
          )",
         (),
     )?;
     //we create a player table
     conn.execute(
         "create table if not exists players(
-             id integer primary key,
-             team_id integer not null,
-             player_name text not null,
-             age integer not null,
-             pos text not null,
-             hand integer not null,
-             bt integer not null,
-             obt_mod integer not null,
-             obt integer not null,
-             PD text not null,
-             pd_int integer not null,
-             pitcher_trait text not null,
-             team_spot text not null,
-             contact text not null,
-             defense text not null,
-             power text not null,
-             speed text not null,
-             toughness text not null
+             id INTEGER PRIMARY KEY,
+             team_id INTEGER NOT NULL,
+             player_name TEXT NOT NULL,
+             age INTEGER NOT NULL,
+             pos TEXT NOT NULL,
+             hand INTEGER NOT NULL,
+             bt INTEGER NOT NULL,
+             obt_mod INTEGER NOT NULL,
+             obt INTEGER NOT NULL,
+             PD TEXT NOT NULL,
+             pd_int INTEGER NOT NULL,
+             pitcher_trait TEXT NOT NULL,
+             team_spot TEXT NOT NULL,
+             contact TEXT NOT NULL,
+             defense TEXT NOT NULL,
+             power TEXT NOT NULL,
+             speed TEXT NOT NULL,
+             toughness TEXT NOT NULL,
+             FOREIGN KEY(team_id) REFERENCES teams(id)
          )",
         (),
     )?;

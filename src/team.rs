@@ -56,7 +56,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                     output.unwrap()
                 },
                 pitcher_trait: {
-                    let input: String =  row.get(11)?;
+                    let input: String = row.get(11)?;
                     let chars = input.as_str();
                     let output = serde_json::from_str(chars);
                     output.unwrap()
@@ -348,7 +348,6 @@ impl Team {
         conn: &mut Connection,
         team_id: i64,
     ) -> Result<(), rusqlite::Error> {
-        
         for starter in &self.lineup {
             starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
         }

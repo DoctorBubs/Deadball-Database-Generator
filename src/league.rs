@@ -1,5 +1,3 @@
-
-
 use inquire::validator::MinLengthValidator;
 use inquire::Text;
 use rusqlite::Connection;
@@ -73,15 +71,15 @@ impl League {
             ],
         );
         let team_id = conn.last_insert_rowid();
-        
+
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
         };
-        let save_team_result = new_team.save_players_sql(conn, team_id);
-        if save_team_result.is_err() { 
-            return Err(AddTeamError::DatabaseError) 
-        }
+        let save_team_result = new_team.save_players_sql(conn, team_id).unwrap();
+        /*if save_team_result.is_err() {
+            return Err(AddTeamError::DatabaseError)
+        } */
         // let new_team_string = new_team.to_string();
         self.teams.push(new_team);
         Ok(())
@@ -92,8 +90,6 @@ impl League {
         self.teams.push(team)
     }*/
 }
-
-
 
 fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     let mut stmt = conn.prepare("SELECT league_name FROM leagues")?;
@@ -107,12 +103,9 @@ fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     Ok(names)
 }
 
-
 // Creates a new leagues, and saves the league in the database
 pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
-    
     let _validator = MinLengthValidator::new(3);
-   
 
     let league_name: String;
 
@@ -234,13 +227,15 @@ pub fn load_league(
     }
     println!("{} loaded.", league.name);
     // Now that we have loaded the existing league from the database, it is time to generate a new team.
-    match add_new_team(&mut league, thread, conn, league_id, true) {
+    let bob = add_new_team(&mut league, thread, conn, league_id, true).unwrap();
+    Ok(())
+    /*  match add_new_team(&mut league, thread, conn, league_id, true) {
         Ok(_) => Ok(()),
         Err(_) => {
             println!("Error adding a new team, please try again");
             Ok(())
         }
-    }
+    }*/
 
     //todo!();
     /*  let mut league: League;

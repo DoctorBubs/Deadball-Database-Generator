@@ -109,7 +109,6 @@ impl PlayerGender {
             Self::Coed => generator.generate().to_string(),
         }
     }
-    
 }
 
 impl fmt::Display for PlayerGender {
@@ -222,7 +221,7 @@ impl Player {
             Some(tr) => tr.to_string(),
             None => "".to_string(),
         };*/
-        
+
         let pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
@@ -385,5 +384,3 @@ impl fmt::Display for Player {
         write!(f, "{}", chars)
     }
 }
-
-
