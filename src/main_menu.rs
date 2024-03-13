@@ -27,8 +27,8 @@ impl fmt::Display for MenuInput {
     }
 }
 
-pub fn run_main_menu(conn: &mut Connection, _thread: &mut ThreadRng) -> std::io::Result<()> {
-    let mut r_thread = rand::thread_rng();
+pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+   
 
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
@@ -42,10 +42,10 @@ pub fn run_main_menu(conn: &mut Connection, _thread: &mut ThreadRng) -> std::io:
 
     match starting_choice {
         Ok(choice) => match choice {
-            MenuInput::CreateNewLeague => create_new_league(&mut r_thread, conn),
+            MenuInput::CreateNewLeague => create_new_league(thread, conn),
             MenuInput::Exit => Ok(()),
             _ => {
-                league_check(conn, &mut r_thread, choice).unwrap();
+                league_check(conn, thread, choice).unwrap();
                 Ok(())
             }
         },

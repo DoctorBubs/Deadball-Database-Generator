@@ -1,6 +1,10 @@
-use crate::add_new_team;
+
 use crate::b_traits::BTraits;
+use crate::league::AddTeamError;
+use inquire::validator::MaxLengthValidator;
+use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
+use inquire::Text;
 use rusqlite::Connection;
 
 use crate::league::save_league;
@@ -18,7 +22,7 @@ use crate::PlayerQuality;
 use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
-use inquire;
+
 use std::fmt::Write;
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
@@ -326,7 +330,7 @@ fn get_pitcher_info_string(desc: String, vec: &[Player]) -> String {
     format!("{}{}\n", header, sorted_pitcher_pool(vec))
 }
 
-// Declare if a player is in hte starting lineup, on the bench, in the starting roation, or in the bullpen
+// Declare if a player is in hte starting lineup, on the bench, in the starting roation, or in the bullpen.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum TeamSpot {
     StartingLineup,
@@ -361,7 +365,7 @@ pub fn add_team_check(
     match ans {
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
-        //If not, we save the leauge and hten exit.
+        //If not, we save the leauge.
         Ok(false) => save_league(league, conn, thread)?,
         Err(_) => {
             panic!("Error on add team prompt");
@@ -369,4 +373,83 @@ pub fn add_team_check(
     };
 
     Ok(())
+}
+
+
+pub fn add_new_team(
+    league: &mut League,
+    thread: &mut ThreadRng,
+    conn: &mut Connection,
+    league_id: i64,
+    first_team: bool,
+) -> std::io::Result<()> {
+    let result: std::io::Result<()>;
+    // If this is the first team generated for the league, we display a different prompt to the user.
+    let mut prompt_string = match first_team {
+        true => "Enter the name of the first team",
+        false => "Enter the name of the new team",
+    };
+    let current_teams = &league.teams;
+    if !current_teams.is_empty() {
+        let names = current_teams.iter().fold(String::new(), |acc, team| {
+            let new_string = format!("\n{} {}", team.abrv, team.name);
+            acc + &new_string
+        });
+        println!(
+            "This league currently includes the following teams:{}\n",
+            names
+        );
+    };
+    let abrv_min_validator = MinLengthValidator::new(2);
+    let abrv_max_validator = MaxLengthValidator::new(4);
+    let name_validator = MinLengthValidator::new(3);
+    // Each team must have a unique name and abbreviation, we loop until we receive one.
+    loop {
+        let name_input = Text::new(prompt_string)
+            .with_validator(name_validator.clone())
+            .prompt();
+
+        let team_name = match name_input {
+            Ok(name) => name.trim().to_string(),
+            Err(_) => panic!("Error creating team name."),
+        };
+
+        let abrv_input = Text::new("Please enter an abbreviation for the new team.")
+            .with_validator(abrv_min_validator.clone())
+            .with_validator(abrv_max_validator.clone())
+            .with_default(&team_name[0..=1].to_string().to_uppercase())
+            .prompt();
+
+        let abrv = match abrv_input {
+            Ok(input) => input.trim().to_string(),
+            Err(_) => panic!("Error creating team abbreviation."),
+        };
+        /*  The league takes the name and abreviation we just created. If there is already a team in the league with that name or abbreviation,  it returns an error.
+        Otherwise, the league generates a new team, and then returns the team as a string wrapped in an Ok, which we use to save the team as a file on the disk.*/
+        match league.new_team(&abrv, &team_name, thread, league_id, conn) {
+            Err(message) => {
+                match message {
+                    AddTeamError::AbrvTaken => println!(
+                        "This league already has a team with that abbreviation, please try again."
+                    ),
+                    AddTeamError::NameTaken => {
+                        println!("This league already has a team with that name, please try again.")
+                    }
+                    AddTeamError::DatabaseError => {
+                        println!("Error adding team to the data base, please try again.");
+                        return Ok(());
+                    }
+                };
+                //println!("Error {:?}",message);
+                prompt_string = "Enter a unique team name.";
+            }
+            // If the league returns OK, we take the string, and write it to a new file in the leauge folder
+            Ok(()) => {
+                result = add_team_check(league, conn, thread, league_id);
+                break;
+            }
+        };
+    }
+
+    result
 }

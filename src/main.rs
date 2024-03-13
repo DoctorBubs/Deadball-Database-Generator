@@ -11,7 +11,7 @@ mod team;
 mod traits;
 
 use crate::era::Era;
-use crate::league::create_new_league;
+
 use crate::league::AddTeamError;
 use crate::league::League;
 use crate::pd::PD;
@@ -31,9 +31,9 @@ use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
 
 use crate::main_menu::run_main_menu;
-use crate::main_menu::MenuInput;
+
 use inquire::*;
-use league::load_league;
+
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
@@ -41,111 +41,11 @@ use team::add_team_check;
 
 use league::league_check;
 use std::fmt;
-use std::fs;
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
 
-fn select_era() -> Era {
-    let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
-    let ans: Result<Era, InquireError> =
-        Select::new("Select the era for the league", options).prompt();
-    match ans {
-        Ok(era) => era,
-        Err(_) => panic!("Error selecting era"),
-    }
-}
 
-fn select_gender() -> PlayerGender {
-    let options: Vec<PlayerGender> =
-        vec![PlayerGender::Male, PlayerGender::Female, PlayerGender::Coed];
-    let ans: Result<PlayerGender, InquireError> =
-        Select::new("Select the league gender,", options).prompt();
-    match ans {
-        Ok(gender) => gender,
-        Err(_) => panic!("Error selecting gender"),
-    }
-}
 
-//#[tailcall]
-fn add_new_team(
-    league: &mut League,
-    thread: &mut ThreadRng,
-    conn: &mut Connection,
-    league_id: i64,
-    first_team: bool,
-) -> std::io::Result<()> {
-    let result: std::io::Result<()>;
-    // If this is the first team generated for the league, we display a different prompt to the user.
-    let mut prompt_string = match first_team {
-        true => "Enter the name of the first team",
-        false => "Enter the name of the new team",
-    };
-    let current_teams = &league.teams;
-    if !current_teams.is_empty() {
-        let names = current_teams.iter().fold(String::new(), |acc, team| {
-            let new_string = format!("\n{} {}", team.abrv, team.name);
-            acc + &new_string
-        });
-        println!(
-            "This league currently includes the following teams:{}\n",
-            names
-        );
-    };
-    let abrv_min_validator = MinLengthValidator::new(2);
-    let abrv_max_validator = MaxLengthValidator::new(4);
-    let name_validator = MinLengthValidator::new(3);
-    // Each team must have a unique name and abbreviation, we loop until we receive one.
-    loop {
-        let name_input = Text::new(prompt_string)
-            .with_validator(name_validator.clone())
-            .prompt();
 
-        let team_name = match name_input {
-            Ok(name) => name.trim().to_string(),
-            Err(_) => panic!("Error creating team name."),
-        };
 
-        let abrv_input = Text::new("Please enter an abbreviation for the new team.")
-            .with_validator(abrv_min_validator.clone())
-            .with_validator(abrv_max_validator.clone())
-            .with_default(&team_name[0..=1].to_string().to_uppercase())
-            .prompt();
-
-        let abrv = match abrv_input {
-            Ok(input) => input.trim().to_string(),
-            Err(_) => panic!("Error creating team abbreviation."),
-        };
-        /*  The league takes the name and abreviation we just created. If there is already a team in the league with that name or abbreviation,  it returns an error.
-        Otherwise, the league generates a new team, and then returns the team as a string wrapped in an Ok, which we use to save the team as a file on the disk.*/
-        match league.new_team(&abrv, &team_name, thread, league_id, conn) {
-            Err(message) => {
-                match message {
-                    AddTeamError::AbrvTaken => println!(
-                        "This league already has a team with that abbreviation, please try again."
-                    ),
-                    AddTeamError::NameTaken => {
-                        println!("This league already has a team with that name, please try again.")
-                    }
-                    AddTeamError::DatabaseError => {
-                        println!("Error adding team to the data base, please try again.");
-                        return Ok(());
-                    }
-                };
-                //println!("Error {:?}",message);
-                prompt_string = "Enter a unique team name.";
-            }
-            // If the league returns OK, we take the string, and write it to a new file in the leauge folder
-            Ok(()) => {
-                result = add_team_check(league, conn, thread, league_id);
-                break;
-            }
-        };
-    }
-
-    result
-}
-// After creating a new team, we ask the user if they would like to create another team.
 
 fn main() -> std::io::Result<()> {
     let mut conn = load_database().unwrap();

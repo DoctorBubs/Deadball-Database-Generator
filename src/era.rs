@@ -4,6 +4,8 @@ use crate::Serialize;
 use crate::ThreadRng;
 use crate::PD;
 use core::fmt;
+use inquire::InquireError;
+use inquire::Select;
 use rand::Rng;
 /* Deadball has 2 sets of rules to simulate 2 different era's of baseball.
 The Ancient Era simulates the low scoring style of basbeall playedf in the early 1900's, while the modern is used to simulate baseball since.
@@ -52,5 +54,16 @@ impl fmt::Display for Era {
         };
 
         write!(f, "{}", chars)
+    }
+}
+
+//Prompts a user to select  new era.
+pub fn select_era() -> Era {
+    let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
+    let ans: Result<Era, InquireError> =
+        Select::new("Select the era for the league", options).prompt();
+    match ans {
+        Ok(era) => era,
+        Err(_) => panic!("Error selecting era"),
     }
 }

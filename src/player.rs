@@ -12,6 +12,8 @@ use crate::Deserialize;
 use crate::Era;
 use crate::Serialize;
 use crate::PD;
+use inquire::InquireError;
+use inquire::Select;
 use name_maker::Gender;
 use name_maker::RandomNameGenerator;
 use rand::rngs::ThreadRng;
@@ -123,6 +125,17 @@ impl fmt::Display for PlayerGender {
         write!(f, "{}", chars)
     }
 }
+// Prompts a user to select a player gender
+pub fn select_gender() -> PlayerGender {
+    let options: Vec<PlayerGender> =
+        vec![PlayerGender::Male, PlayerGender::Female, PlayerGender::Coed];
+    let ans: Result<PlayerGender, InquireError> =
+        Select::new("Select the league gender,", options).prompt();
+    match ans {
+        Ok(gender) => gender,
+        Err(_) => panic!("Error selecting gender"),
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 
@@ -212,17 +225,7 @@ impl Player {
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
-        //println!("Saving player");
-        /*let _pd_string = match self.pd {
-            Some(pd) => pd.to_string(),
-            None => "".to_string(),
-        };
-
-        let _pitcher_trait_string = match self.pitcher_trait {
-            Some(tr) => tr.to_string(),
-            None => "".to_string(),
-        };*/
-
+     
         let _pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
@@ -288,48 +291,12 @@ impl Player {
             ],
         )?;
 
-        /*match player_entry {
-            Err(message) => panic!("{message}"),
-            Ok(_) => (),
-        }; */
+       
 
         Ok(())
     }
 
-    /*pub fn to_string(&self) -> String {
-        match self.is_pitcher() {
-            false => {
-                let base = format!(
-                    "{},{},{},{},{},{}",
-                    self.name,
-                    self.pos,
-                    self.age,
-                    self.hand.to_string(),
-                    self.bt,
-                    self.obt
-                );
-                let trait_string = self.b_traits.to_string();
-                match trait_string.trim().is_empty() {
-                    true => base,
-                    false => format!("{},{}", base, trait_string),
-                }
-            }
-
-            true => {
-                format!(
-                    "{},{},{},{},{},{} {},{}",
-                    self.name,
-                    self.pos,
-                    self.age,
-                    self.hand.to_string(),
-                    self.get_base_pd(),
-                    self.get_pitcher_trait_string(),
-                    self.bt,
-                    self.obt
-                )
-            }
-        }
-    }*/
+    
 
     pub fn get_pitcher_rank_info(&self) -> PitcherRankInfo {
         let pd_num = self.get_base_pd().to_int();

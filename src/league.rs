@@ -11,13 +11,16 @@ use inquire::Select;
 use inquire::Text;
 use rusqlite::Connection;
 
-use crate::add_new_team;
 
+
+use crate::era::select_era;
 use crate::main_menu::run_main_menu;
 use crate::main_menu::MenuInput;
 
-use crate::select_era;
-use crate::select_gender;
+
+
+use crate::player::select_gender;
+use crate::team::add_new_team;
 use crate::team::load_team;
 use crate::Deserialize;
 use crate::Era;
@@ -248,7 +251,7 @@ pub fn load_league(
  It contains the ID which the leagues is saved in the database, as well a desrtialzied League struct from the database
 */
 
-struct LeagueWrapper {
+pub struct LeagueWrapper {
     league_id: i64,
     league: League,
 }
