@@ -1,9 +1,9 @@
 use crate::add_new_team;
 use crate::b_traits::BTraits;
-use crate::save_league;
 use inquire::Confirm;
 use rusqlite::Connection;
 
+use crate::league::save_league;
 use crate::league::League;
 use crate::league::TeamWrapper;
 use crate::lineup_score::LineupScore;
@@ -18,169 +18,8 @@ use crate::PlayerQuality;
 use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
-
+use inquire;
 use std::fmt::Write;
-
-struct PlayerWrapper {
-    team_spot: TeamSpot,
-    player: Player,
-}
-
-pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
-    let TeamWrapper { team_id, mut team } = wrapper;
-    //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
-    let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
-    let _test = 3;
-    let team_iter = stmt.query_map([team_id], |row| {
-        Ok(PlayerWrapper {
-            team_spot: {
-                let input: String = row.get(12)?;
-                let chars = input.as_str();
-                let output = serde_json::from_str(chars);
-                output.unwrap()
-            },
-
-            player: Player {
-                name: row.get(2)?,
-                age: row.get(3)?,
-                pos: row.get(4)?,
-                hand: serde_json::from_value(row.get(5)?).unwrap(),
-                bt: row.get(6)?,
-                obt_mod: row.get(7)?,
-                obt: row.get(8)?,
-                pd: serde_json::from_value(row.get(9)?).unwrap(),
-                pitcher_trait: serde_json::from_value(row.get(11)?).unwrap(),
-                b_traits: BTraits {
-                    contact: serde_json::from_value(row.get(14)?).unwrap(),
-                    defense: serde_json::from_value(row.get(16)?).unwrap(),
-                    power: serde_json::from_value(row.get(18)?).unwrap(),
-                    speed: serde_json::from_value(row.get(20)?).unwrap(),
-                    toughness: serde_json::from_value(row.get(22)?).unwrap(),
-                },
-            },
-        })
-        /*
-        contact: p_trait_from_string(&row.get(13)?),
-        /*{
-            let input: String = row.get(13)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        },*/
-
-        defense: p_trait_from_string(&row.get(14)?),
-        /*{
-            let input: String = row.get(14)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        }*/
-
-        power: p_trait_from_string(&row.get(15)?),
-        /*{
-            let input: String = row.get(15)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        },*/
-        speed: p_trait_from_string(&row.get(16)?),
-        /*{
-            let input: String = row.get(16)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        }, */
-        toughness: p_trait_from_string(&row.get(17)?)
-        /*{
-            let input: String = row.get(17)?;
-            let chars = input.as_str();
-            let output = serde_json::from_str(chars);
-            output.unwrap()
-        }, */
-        */
-    })?;
-
-    for result in team_iter {
-        let wrapper = result.unwrap();
-        let PlayerWrapper { team_spot, player } = wrapper;
-        match team_spot {
-            TeamSpot::StartingLineup => team.lineup.push(player),
-            TeamSpot::BenchHitter => team.bench.push(player),
-            TeamSpot::StartingPitcher => team.starting_pitching.push(player),
-            TeamSpot::Bullpen => match &mut team.bullpen {
-                Some(pen) => pen.push(player),
-                None => panic!("Attemped to add a reliever to a team with no bullpen"),
-            },
-        }
-
-        /*let goal_vec = match team_spot{
-            TeamSpot::StartingLineup => &mut team.lineup,
-            TeamSpot::BenchHitter => &mut team.bench,
-            TeamSpot::StartingPitcher => &mut team.starting_pitching,
-            TeamSpot::Bullpen => &mut &team.bullpen.unwrap()
-        };
-
-        goal_vec.push(player)*/
-    }
-    Ok(team)
-}
-
-// This function is used to create vectors of players, based off a vector of strings.
-fn new_player_vec<T: Copy + PlayerQuality>(
-    vec: Vec<&str>,
-    gender: PlayerGender,
-    thread: &mut ThreadRng,
-    quality: T,
-    era: Era,
-) -> Vec<Player> {
-    vec.into_iter()
-        .map(|x| Player::new(x.to_string(), gender, quality, thread, era))
-        .collect()
-}
-
-// A starting lineup consists of 8 players, one for each position on the field
-//Todo: option to have a DH?
-fn new_starting_lineup(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
-    let base = vec!["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
-    new_player_vec(base, gender, thread, BatterQuality::TopProspect, era)
-}
-
-// The bench consist of all non starters. The Ancient and Modern era's have different quantities and posiions on the bech, so we use the Era enum to keep track.
-fn new_bench(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
-    let base = match era {
-        Era::Ancient => vec!["C", "INF", "OF", "UT"],
-        Era::Modern => vec!["C", "INF", "INF", "OF", "OF"],
-    };
-
-    new_player_vec(base, gender, thread, BatterQuality::Farmhand, era)
-}
-
-// The ancienct and modern era have different definitions of what a pitcher is. Modern era pitchers can be either starters or relievers, while the ancient era does not make the distinction.
-//Thus, Modern pitchers in the rotation are marked as SP, while ancient are just P
-fn new_rotation(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
-    let base = match era {
-        Era::Ancient => vec!["P", "P", "P", "P", "P"],
-        Era::Modern => vec!["SP", "SP", "SP", "SP", "SP"],
-    };
-
-    new_player_vec(base, gender, thread, PitcherQuality::TopProspect, era)
-}
-// Ancient Era teams do not have a bullpen, so a bullpen is wrapped in an option.
-fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option<Vec<Player>> {
-    match era {
-        Era::Ancient => None,
-        Era::Modern => {
-            let base = vec!["RP"; 7];
-            Some(new_player_vec(
-                base,
-                gender,
-                thread,
-                PitcherQuality::TopProspect,
-                era,
-            ))
-        }
-    }
-}
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
 Team's als ohave a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
@@ -196,97 +35,6 @@ pub struct Team {
     pub team_score: i32,
     pub wins: i32,
     pub losses: i32,
-}
-
-// Takea vector of players, and reduces it to the sum of how much they contribute to a team score.
-// Batters contribution is based off their BT, while pitchers is based off their pitch dice.
-fn team_score_from_vec(vec: &[Player]) -> i32 {
-    vec.iter()
-        .map(|player| player.get_team_score_contribution())
-        .reduce(|acc, e| acc + e)
-        .unwrap_or(0)
-}
-
-fn sorted_pitcher_pool(vec: &[Player]) -> String {
-    let mut ranks: Vec<PitcherRankInfo> = vec
-        .iter()
-        .map(|player| player.get_pitcher_rank_info())
-        .collect();
-    ranks.sort();
-    ranks.iter().rev().fold(String::new(), |mut output, rank| {
-        let new_str = &rank.string;
-        let _ = write!(output, "\n{new_str}");
-        output
-    })
-
-    /*.reduce(|acc, e| format!("{}{}", acc, e))
-    .unwrap_or_else(|| "\n".to_string())*/
-}
-
-fn get_sorted_batter_strings(vec: &[Player]) -> String {
-    let mut scores: Vec<LineupScore> = vec.iter().map(|player| player.get_lineup_score()).collect();
-    scores.sort();
-    scores
-        .iter()
-        .rev()
-        .fold(String::new(), |mut output, score| {
-            let new_str = &score.string;
-            let _ = write!(output, "\n{new_str}");
-            output
-        })
-    //.map(|score| format!("\n{}", &score.string))
-    //.collect()
-    /*.reduce(|acc, e| format!("{}{}", acc, e))
-    .unwrap_or_else(|| "\n".to_string())*/
-
-    //.collect()
-}
-
-fn get_batter_info_string(desc: String, vec: &[Player]) -> String {
-    let header = format!("{}:\nName Pos Age Hand BT OBT Traits", desc);
-    format!("{}{}\n", header, get_sorted_batter_strings(vec))
-}
-
-fn get_pitcher_info_string(desc: String, vec: &[Player]) -> String {
-    let header = format!("{}:\nName Pos Age Hand PD Trait BT OBT", desc);
-    format!("{}{}\n", header, sorted_pitcher_pool(vec))
-}
-
-/*struct LineupSlices(Vec<LineupScore>,Vec<LineupScore>);
-
-fn get_lineup_slices(vec: &Vec<Player>) -> LineupSlices {
-
-    let mut scores: Vec<LineupScore> = vec.iter().map(|player| player.get_lineup_score()).collect();
-    scores.sort();
-    scores.reverse();
-    LineupSlices(scores[0..=3].to_vec(),scores[4..=7].to_vec())
-
-}
-
-fn sort_lineup_slice(slices: LineupSlices) -> String{
-
-    let LineupSlices(first_four,rest) = slices;
-    let
-
-}*/
-#[derive(Serialize, Deserialize, Debug)]
-pub enum TeamSpot {
-    StartingLineup,
-    BenchHitter,
-    StartingPitcher,
-    Bullpen,
-}
-
-impl fmt::Display for TeamSpot {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let chars = match self {
-            Self::StartingLineup => "Starting Lineup",
-            Self::BenchHitter => "Bench Hitter",
-            Self::StartingPitcher => "Starting Pitcher",
-            Self::Bullpen => "Bullpen",
-        };
-        write!(f, "{}", chars)
-    }
 }
 
 impl Team {
@@ -408,7 +156,199 @@ impl fmt::Display for Team {
     }
 }
 
-fn add_team_check(
+// Takea vector of players, and reduces it to the sum of how much they contribute to a team score.
+// Batters contribution is based off their BT, while pitchers is based off their pitch dice.
+fn team_score_from_vec(vec: &[Player]) -> i32 {
+    vec.iter()
+        .map(|player| player.get_team_score_contribution())
+        .reduce(|acc, e| acc + e)
+        .unwrap_or(0)
+}
+
+fn sorted_pitcher_pool(vec: &[Player]) -> String {
+    let mut ranks: Vec<PitcherRankInfo> = vec
+        .iter()
+        .map(|player| player.get_pitcher_rank_info())
+        .collect();
+    ranks.sort();
+    ranks.iter().rev().fold(String::new(), |mut output, rank| {
+        let new_str = &rank.string;
+        let _ = write!(output, "\n{new_str}");
+        output
+    })
+
+    /*.reduce(|acc, e| format!("{}{}", acc, e))
+    .unwrap_or_else(|| "\n".to_string())*/
+}
+
+fn get_sorted_batter_strings(vec: &[Player]) -> String {
+    let mut scores: Vec<LineupScore> = vec.iter().map(|player| player.get_lineup_score()).collect();
+    scores.sort();
+    scores
+        .iter()
+        .rev()
+        .fold(String::new(), |mut output, score| {
+            let new_str = &score.string;
+            let _ = write!(output, "\n{new_str}");
+            output
+        })
+}
+
+struct PlayerWrapper {
+    team_spot: TeamSpot,
+    player: Player,
+}
+
+pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
+    let TeamWrapper { team_id, mut team } = wrapper;
+    //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
+    let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
+    let _test = 3;
+    let team_iter = stmt.query_map([team_id], |row| {
+        Ok(PlayerWrapper {
+            team_spot: {
+                let input: String = row.get(12)?;
+                let chars = input.as_str();
+                let output = serde_json::from_str(chars);
+                output.unwrap()
+            },
+
+            player: Player {
+                name: row.get(2)?,
+                age: row.get(3)?,
+                pos: row.get(4)?,
+                hand: serde_json::from_value(row.get(5)?).unwrap(),
+                bt: row.get(6)?,
+                obt_mod: row.get(7)?,
+                obt: row.get(8)?,
+                pd: serde_json::from_value(row.get(9)?).unwrap(),
+                pitcher_trait: serde_json::from_value(row.get(11)?).unwrap(),
+                b_traits: BTraits {
+                    contact: serde_json::from_value(row.get(14)?).unwrap(),
+                    defense: serde_json::from_value(row.get(16)?).unwrap(),
+                    power: serde_json::from_value(row.get(18)?).unwrap(),
+                    speed: serde_json::from_value(row.get(20)?).unwrap(),
+                    toughness: serde_json::from_value(row.get(22)?).unwrap(),
+                },
+            },
+        })
+    })?;
+
+    for result in team_iter {
+        let wrapper = result.unwrap();
+        let PlayerWrapper { team_spot, player } = wrapper;
+        match team_spot {
+            TeamSpot::StartingLineup => team.lineup.push(player),
+            TeamSpot::BenchHitter => team.bench.push(player),
+            TeamSpot::StartingPitcher => team.starting_pitching.push(player),
+            TeamSpot::Bullpen => match &mut team.bullpen {
+                Some(pen) => pen.push(player),
+                None => panic!("Attemped to add a reliever to a team with no bullpen"),
+            },
+        }
+
+        /*let goal_vec = match team_spot{
+            TeamSpot::StartingLineup => &mut team.lineup,
+            TeamSpot::BenchHitter => &mut team.bench,
+            TeamSpot::StartingPitcher => &mut team.starting_pitching,
+            TeamSpot::Bullpen => &mut &team.bullpen.unwrap()
+        };
+
+        goal_vec.push(player)*/
+    }
+    Ok(team)
+}
+
+// This function is used to create vectors of players, based off a vector of strings.
+fn new_player_vec<T: Copy + PlayerQuality>(
+    vec: Vec<&str>,
+    gender: PlayerGender,
+    thread: &mut ThreadRng,
+    quality: T,
+    era: Era,
+) -> Vec<Player> {
+    vec.into_iter()
+        .map(|x| Player::new(x.to_string(), gender, quality, thread, era))
+        .collect()
+}
+
+// A starting lineup consists of 8 players, one for each position on the field
+//Todo: option to have a DH?
+fn new_starting_lineup(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
+    let base = vec!["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
+    new_player_vec(base, gender, thread, BatterQuality::TopProspect, era)
+}
+
+// The bench consist of all non starters. The Ancient and Modern era's have different quantities and posiions on the bech, so we use the Era enum to keep track.
+fn new_bench(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
+    let base = match era {
+        Era::Ancient => vec!["C", "INF", "OF", "UT"],
+        Era::Modern => vec!["C", "INF", "INF", "OF", "OF"],
+    };
+
+    new_player_vec(base, gender, thread, BatterQuality::Farmhand, era)
+}
+
+// The ancienct and modern era have different definitions of what a pitcher is. Modern era pitchers can be either starters or relievers, while the ancient era does not make the distinction.
+//Thus, Modern pitchers in the rotation are marked as SP, while ancient are just P
+fn new_rotation(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
+    let base = match era {
+        Era::Ancient => vec!["P", "P", "P", "P", "P"],
+        Era::Modern => vec!["SP", "SP", "SP", "SP", "SP"],
+    };
+
+    new_player_vec(base, gender, thread, PitcherQuality::TopProspect, era)
+}
+// Ancient Era teams do not have a bullpen, so a bullpen is wrapped in an option.
+fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option<Vec<Player>> {
+    match era {
+        Era::Ancient => None,
+        Era::Modern => {
+            let base = vec!["RP"; 7];
+            Some(new_player_vec(
+                base,
+                gender,
+                thread,
+                PitcherQuality::TopProspect,
+                era,
+            ))
+        }
+    }
+}
+
+fn get_batter_info_string(desc: String, vec: &[Player]) -> String {
+    let header = format!("{}:\nName Pos Age Hand BT OBT Traits", desc);
+    format!("{}{}\n", header, get_sorted_batter_strings(vec))
+}
+
+fn get_pitcher_info_string(desc: String, vec: &[Player]) -> String {
+    let header = format!("{}:\nName Pos Age Hand PD Trait BT OBT", desc);
+    format!("{}{}\n", header, sorted_pitcher_pool(vec))
+}
+
+// Declare if a player is in hte starting lineup, on the bench, in the starting roation, or in the bullpen
+#[derive(Serialize, Deserialize, Debug)]
+pub enum TeamSpot {
+    StartingLineup,
+    BenchHitter,
+    StartingPitcher,
+    Bullpen,
+}
+
+impl fmt::Display for TeamSpot {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::StartingLineup => "Starting Lineup",
+            Self::BenchHitter => "Bench Hitter",
+            Self::StartingPitcher => "Starting Pitcher",
+            Self::Bullpen => "Bullpen",
+        };
+        write!(f, "{}", chars)
+    }
+}
+
+// After creating a new team, we ask the user if they would like to create another team.
+pub fn add_team_check(
     league: &mut League,
     conn: &mut Connection,
     thread: &mut ThreadRng,

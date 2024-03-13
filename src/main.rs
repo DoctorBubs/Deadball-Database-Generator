@@ -37,7 +37,9 @@ use league::load_league;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
+use team::add_team_check;
 
+use league::league_check;
 use std::fmt;
 use std::fs;
 use std::fs::File;
@@ -144,136 +146,6 @@ fn add_new_team(
     result
 }
 // After creating a new team, we ask the user if they would like to create another team.
-fn add_team_check(
-    league: &mut League,
-    conn: &mut Connection,
-    thread: &mut ThreadRng,
-    league_id: i64,
-) -> std::io::Result<()> {
-    let ans = Confirm::new("Would you like to create another team?")
-        .with_default(true)
-        .prompt();
-
-    match ans {
-        // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
-        Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
-        //If not, we save the leauge and hten exit.
-        Ok(false) => save_league(league, conn, thread)?,
-        Err(_) => {
-            panic!("Error on add team prompt");
-        }
-    };
-
-    Ok(())
-}
-
-// Once a league is saved, we save a copy of the league data in a folder.
-fn save_league(
-    league: &League,
-    conn: &mut Connection,
-    thread: &mut ThreadRng,
-) -> std::io::Result<()> {
-    println!();
-    let flder_path_string = league.name.to_string();
-    let folder_path = Path::new(&flder_path_string);
-    fs::create_dir_all(folder_path)?;
-
-    for team in &league.teams {
-        let file_path = folder_path.join(format!("{}.txt", team.name).as_str());
-
-        let mut file = File::create(file_path)?;
-        file.write_all(team.to_string().as_bytes())?;
-    }
-    println!("League saved succesfully.");
-    //We then prompt the user if they would like to return to the main menu
-    let ans = Confirm::new("Would you like to return to the main menu?")
-        .with_default(true)
-        .prompt();
-    match ans {
-        Ok(true) => run_main_menu(conn, thread),
-        _ => Ok(()),
-    }
-}
-
-/*  The League Wrapper struct is used when the program checks to see what leagues are saved in the database.
-
- It contains the ID which the leagues is saved in the database, as well a desrtialzied League struct from the database
-*/
-
-struct LeagueWrapper {
-    league_id: i64,
-    league: League,
-}
-
-// We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
-impl fmt::Display for LeagueWrapper {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}_{}", self.league_id, self.league.name)
-    }
-}
-
-fn league_check(
-    conn: &mut Connection,
-    thread: &mut ThreadRng,
-    input: MenuInput,
-) -> Result<(), rusqlite::Error> {
-    // We query the database to get all the leagues that already exist.
-    let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
-    // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.
-    let league_iter = stmt
-        .query_map([], |row| {
-            Ok(LeagueWrapper {
-                league_id: row.get(0)?,
-                league: League {
-                    name: row.get(1)?,
-                    era: serde_json::from_value(row.get(2)?).unwrap(),
-
-                    //
-                    gender: serde_json::from_value(row.get(3)?).unwrap(),
-
-                    //PlayerGender::from_string(row.get(3)?),
-                    teams: Vec::new(),
-                },
-            })
-        })
-        .unwrap();
-
-    let mut options = Vec::new();
-    // We unwrap the results in leauge iter, and push it to the options vec
-    for wrapper in league_iter {
-        options.push(wrapper.unwrap())
-    }
-    // We drop the stmt so we can borrow conn later.
-    drop(stmt);
-    // If there are no leagues in the database, tthe user is prompted to create a league
-    if options.is_empty() {
-        println!("No Leagues created yet! Let's create a new league to get started.");
-        create_new_league(thread, conn).unwrap();
-        Ok(())
-    } else {
-        //Otherwise, the user is shown a list of all leagues that currently exist, and is prompted to select one.
-        let ans: Result<LeagueWrapper, InquireError> =
-            Select::new("Select an existing league", options).prompt();
-        match ans {
-            Ok(select) => match input {
-                MenuInput::CreateNewTeam => {
-                    load_league(thread, conn, select)?;
-                    Ok(())
-                }
-                MenuInput::RefreshLeague => {
-                    println!("Refreshing league.");
-                    save_league(&select.league, conn, thread).unwrap();
-                    Ok(())
-                }
-                _ => panic!("Invalid Menu Input:{:?}", input),
-            },
-            Err(_) => {
-                println!("Error selecting a new league");
-                Ok(())
-            }
-        }
-    }
-}
 
 fn main() -> std::io::Result<()> {
     let mut conn = load_database().unwrap();
