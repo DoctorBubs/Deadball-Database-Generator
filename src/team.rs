@@ -1,6 +1,10 @@
+use inquire::Confirm;
 use rusqlite::Connection;
-
+use crate::add_new_team;
 use crate::b_traits::BTraits;
+use crate::save_league;
+
+use crate::league::League;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::BatterQuality;
@@ -14,7 +18,7 @@ use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
 use std::fmt::Write;
-
+use inquire;
 use crate::league::TeamWrapper;
 
 struct PlayerWrapper {
@@ -402,4 +406,35 @@ impl fmt::Display for Team {
 
         write!(f, "{}", chars)
     }
+}
+
+
+
+
+
+
+
+
+
+fn add_team_check(
+    league: &mut League,
+    conn: &mut Connection,
+    thread: &mut ThreadRng,
+    league_id: i64,
+) -> std::io::Result<()> {
+    let ans = Confirm::new("Would you like to create another team?")
+        .with_default(true)
+        .prompt();
+
+    match ans {
+        // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
+        Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
+        //If not, we save the leauge and hten exit.
+        Ok(false) => save_league(league,conn,thread)?,
+        Err(_) => {
+            panic!("Error on add team prompt");
+        }
+    };
+
+    Ok(())
 }

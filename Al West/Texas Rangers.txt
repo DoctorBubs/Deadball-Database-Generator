@@ -1,0 +1,34 @@
+Name:Texas Rangers, Abrv:TEX, Team Score: 62
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Jimmie Retha,1B,22,R,29,34
+Tull Selinda,RF,24,R,28,34
+Saw Vinita,C,20,R,25,33
+Benito Felicia,3B,26,R,26,32
+Barret Kaster,CF,35,S,26,31
+Joaquin Joline,SS,24,R,26,31
+Sonny Leonanie,2B,23,R,25,31
+Neall Taryn,LF,22,L,18,24
+Bench:
+Name Pos Age Hand BT OBT Traits
+Udall Cassandre,INF,24,R,30,34
+Upton Lolande,OF,26,L,28,33
+Jonny Ellie,OF,28,R,25,27
+Otes Talya,C,27,L,18,23
+Ike Ferne,INF,21,R,17,21
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Tomas Marybeth,SP,24,R,d8,CN+, 21,23
+Lauren Lucine,SP,27,R,d8, 20,28
+Werner Merrily,SP,24,R,d4, 19,27
+Winfield Edythe,SP,24,L,-d4, 24,27
+Russel Kata,SP,23,R,-d4, 22,23
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Rudy Gilda,RP,26,R,d12, 16,24
+Park Linnea,RP,22,R,d8, 19,24
+Ernesto Annalise,RP,35,R,d4, 19,24
+Reggy Ronna,RP,24,L,d4, 17,24
+Les Jewell,RP,22,L,d4, 20,28
+Ezechiel Nerissa,RP,22,R,d4, 16,22
+Randolph Aggi,RP,31,R,-d4, 16,17

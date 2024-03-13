@@ -1,34 +1,24 @@
-Name:Pasadena Palms, Abrv:PAS, Team Score: 60
+Name:Pasadena Palms, Abrv:PAS, Team Score: 49
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Yale Janine,RF,21,R,31,34,P-
-Bert Daniel,CF,22,R,28,34
-Sampson Doralynn,3B,26,L,28,33,D+T+
-Regen Loralee,2B,34,R,26,33
-Porter Athene,LF,24,L,27,31
-Teddy Kassi,1B,24,R,22,29
-Merrick Chastity,C,23,R,21,25,D-
-Donn Jackie,SS,22,S,18,22
+Dwayne Leone,1B,22,R,34,39
+Bernard Jessalin,SS,31,R,31,37
+Griff Sussi,RF,24,S,30,33,C+P+
+Tan Gilligan,3B,21,L,25,30
+Worthington Carilyn,2B,36,R,26,30,D-P--
+Shea Raine,LF,19,L,24,29
+Jefry Carina,C,19,R,19,24,C-
+Giffy Valina,CF,24,L,17,22,S-
 Bench:
 Name Pos Age Hand BT OBT Traits
-Egbert Dyanna,INF,31,R,24,29
-Dana Karita,OF,23,R,18,23
-Orrin La,OF,24,R,17,23
-Quinlan Andromeda,INF,19,R,18,20,P-
-Alfie Carola,C,22,R,15,18
+Allan Jen,C,31,R,26,30
+Kingston Birgit,INF,25,R,25,30
+Edwin Luana,UT,25,L,24,27
+Leonhard Gwyneth,OF,19,S,19,22
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Sawyere Micheline,SP,26,L,d12, 22,25
-Ira La,SP,27,L,d4, 20,21
-Blaine Joell,SP,27,R,d4, 20,23
-Leonard Gael,SP,25,R,-d4, 17,24
-Tadd Lisa,SP,21,L,-d4, 17,25
-Bullpen:
-Name Pos Age Hand PD Trait BT OBT
-Serge Evy,RP,27,R,d8, 19,24
-Adnan Stacey,RP,38,R,d4, 20,24
-Berchtold Kathrine,RP,37,L,d4, 16,24
-Brett Raphaela,RP,29,R,d4, 18,24
-Shorty Patrizia,RP,27,L,d4, 22,28
-Steffen Aubine,RP,23,R,d4, 19,26
-Thedric Desiri,RP,22,R,d4, 19,25
+Rajeev Jeri,P,26,R,d12, 17,19
+Verne Dea,P,27,L,d8, 18,25
+Colin Ericka,P,19,L,d8, 19,24
+Mayor Kathryn,P,20,R,d4, 16,24
+Patin Jobyna,P,26,L,-d4, 22,28

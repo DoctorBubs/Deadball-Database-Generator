@@ -1,0 +1,34 @@
+Name:Los Angeles Angels, Abrv:LAA, Team Score: 81
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Ulrich Sisely,SS,34,R,32,37
+Thorstein Kendra,LF,31,S,33,37,C+
+Bartlet Clarice,C,25,R,31,37,C+P-
+Ulrick Sibelle,2B,27,R,24,28,T+
+George Lisa,1B,27,R,24,28
+Benjie Winonah,RF,22,R,25,27,D+
+Matteo Pavia,CF,22,R,22,27
+Dwight Verile,3B,23,R,21,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Bogart Brandice,OF,23,L,29,33
+Ulysses Rosabel,C,36,S,26,33
+Jef Ann,INF,23,L,25,30
+Zacherie Bobette,INF,27,L,24,29,T+
+Corky Hilda,OF,24,R,19,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Scott Prue,SP,27,R,d12, 19,25
+Torey Roseline,SP,21,L,d4,CN+, 18,25
+Jeffrey Harriet,SP,27,R,d4, 23,30
+Theobald Christie,SP,23,L,d4, 17,18
+Corwin Kylen,SP,20,L,d4, 17,23
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Domenico Marty,RP,30,R,d12, 21,29
+Johnathan Camella,RP,20,R,d12, 20,22
+Umberto Estrella,RP,24,R,d8, 20,21
+Adair Alisa,RP,24,R,d4,K+, 16,23
+Lesley Coletta,RP,24,R,d4, 16,24
+Antone Rosabel,RP,24,L,d4, 22,27
+Udale Celinka,RP,35,R,-d4, 19,25

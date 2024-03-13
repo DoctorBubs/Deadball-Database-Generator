@@ -1,0 +1,34 @@
+Name:Anaheim Ducks, Abrv:ANA, Team Score: 94
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Augusto Charline,RF,24,L,32,37,D+P+
+Demetrius Augustina,SS,22,R,31,35,D-
+Mateo Mira,1B,27,R,29,35,P+
+Rogers Lida,LF,26,S,31,34,P+
+Sherwood Lizette,C,28,S,26,32,C-
+Zorro Dove,CF,24,L,25,29,P-
+Phillipp Emmey,2B,24,L,22,26
+Blaine Tiffani,3B,24,R,22,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Rhett Kylila,OF,27,R,28,36
+Jodie Nollie,INF,25,L,22,27
+Timmy Cathie,C,34,S,21,26
+Jethro Mara,OF,21,L,19,23
+Osbert Cassi,INF,34,L,17,20
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Cheston Ariadne,SP,35,R,d12, 19,24
+Leonidas Bidget,SP,20,R,d8, 18,22
+Eduard Lindie,SP,35,R,d4, 20,28
+Neron Avis,SP,22,R,d4, 18,22
+Gaven Biddy,SP,19,R,d4, 18,23
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Hunt Lisandra,RP,31,R,d12,CN+, 16,23
+Peirce Daffie,RP,24,L,d12,St+, 20,28
+Taber Gertie,RP,25,L,d8, 20,28
+Kaspar Edithe,RP,24,R,d8, 18,22
+Toddie Janaya,RP,22,R,d8, 21,27
+Eliott Gerhardine,RP,30,R,d4, 19,24
+Karel Willa,RP,22,L,d4, 19,25

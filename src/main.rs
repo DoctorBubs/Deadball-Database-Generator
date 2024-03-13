@@ -1,3 +1,4 @@
+
 mod b_traits;
 mod era;
 mod league;
@@ -8,6 +9,8 @@ mod player;
 mod player_quality;
 mod team;
 mod traits;
+mod main_menu;
+
 use crate::era::Era;
 use crate::league::create_new_league;
 use crate::league::AddTeamError;
@@ -28,10 +31,12 @@ use crate::traits::Toughness;
 use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
 
+use crate::main_menu::MenuInput;
+use crate::main_menu::run_main_menu;
 use inquire::*;
 use league::load_league;
 use rand::rngs::ThreadRng;
-use rusqlite::{Connection, Result,types::Null};
+use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 
 use std::fmt;
@@ -40,14 +45,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
 
-/*fn trimed_capital_input() -> String {
-    let mut input = String::new();
-    io::stdin()
-        .read_line(&mut input)
-        .expect("Failed to read line");
-    let result = input.trim().to_uppercase();
-    result
-} */
+
 
 fn select_era() -> Era {
     let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
@@ -140,31 +138,14 @@ fn add_new_team(
             }
             // If the league returns OK, we take the string, and write it to a new file in the leauge folder
             Ok(()) => {
-                /*let team_path = path.join(format!("{}.txt", team_name));
-                let mut team_info = File::create(team_path)?;
-                team_info.write_all(team_string.as_bytes())?;*/
+               
 
                 result = add_team_check(league, conn, thread, league_id);
                 break;
             }
         };
 
-        /* let team_path = path.join(format!("{}.txt", team_name));
-        match team_path.exists() {
-            true => {
-                println!("A team with that name already exists for this leauge");
-                prompt_string = "Enter a unique team name";
-            }
-
-            false => {
-                let team = league.new_team(&team_name, thread);
-                let mut team_info = File::create(team_path)?;
-                team_info.write_all(team.to_string().as_bytes())?;
-                league.add_team(team);
-                result = add_team_check(league, path, thread);
-                break;
-            }
-        }*/
+       
     }
 
     result
@@ -184,7 +165,7 @@ fn add_team_check(
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
         //If not, we save the leauge and hten exit.
-        Ok(false) => save_league(league)?,
+        Ok(false) => save_league(league,conn,thread)?,
         Err(_) => {
             panic!("Error on add team prompt");
         }
@@ -194,7 +175,7 @@ fn add_team_check(
 }
 
 // Once a league is saved, we save a copy of the league data in a folder.
-fn save_league(league: &League) -> std::io::Result<()> {
+fn save_league(league: &League, conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
     println!();
     let flder_path_string = league.name.to_string();
     let folder_path = Path::new(&flder_path_string);
@@ -207,44 +188,49 @@ fn save_league(league: &League) -> std::io::Result<()> {
         file.write_all(team.to_string().as_bytes())?;
     }
     println!("League saved succesfully.");
-    Ok(())
+    //We then prompt the user if they would like to return to the main menu
+    let ans = Confirm::new("Would you like to return to the main menu?")
+    .with_default(true)
+    .prompt();
+    match ans{
+        Ok(true) => run_main_menu(conn, thread),
+        _ => Ok(())
+    }
+    
 }
 
-// if a user wants to add a new team to an existing league, we check to see if we can find the league folder.
+/*  The League Wrapper struct is used when the program checks to see what leagues are saved in the database.
+
+ It contains the ID which the leagues is saved in the database, as well a desrtialzied League struct from the database
+*/
 
 struct LeagueWrapper {
     league_id: i64,
     league: League,
 }
 
+// We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
 impl fmt::Display for LeagueWrapper {
-    // This trait requires `fmt` with this exact signature.
+    
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}_{}", self.league_id, self.league.name)
     }
 }
 
-fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rusqlite::Error> {
+fn league_check(conn: &mut Connection, thread: &mut ThreadRng, input: MenuInput) -> Result<(), rusqlite::Error> {
+    // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
+    // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.
     let league_iter = stmt
         .query_map([], |row| {
             Ok(LeagueWrapper {
                 league_id: row.get(0)?,
                 league: League {
                     name: row.get(1)?,
-                    era: {
-                        let input: String = row.get(2)?;
-
-                        let chars = input.as_str();
-
-                        serde_json::from_str(chars).unwrap()
-                    },
+                    era: serde_json::from_value(row.get(2)?).unwrap() ,
+                    
                     //
-                    gender: {
-                        let input: String = row.get(3)?;
-                        let chars = input.as_str();
-                        serde_json::from_str(chars).unwrap()
-                    },
+                    gender: serde_json::from_value(row.get(3)?).unwrap(),
 
                     //PlayerGender::from_string(row.get(3)?),
                     teams: Vec::new(),
@@ -254,24 +240,36 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
         .unwrap();
 
     let mut options = Vec::new();
-
+        // We unwrap the results in leauge iter, and push it to the options vec
     for wrapper in league_iter {
         options.push(wrapper.unwrap())
     }
     // We drop the stmt so we can borrow conn later.
     drop(stmt);
-    // If there are no leagues in the database, the function returns
+    // If there are no leagues in the database, tthe user is prompted to create a league
     if options.is_empty() {
         println!("No Leagues created yet! Let's create a new league to get started.");
         create_new_league(thread, conn).unwrap();
         Ok(())
     } else {
+        //Otherwise, the user is shown a list of all leagues that currently exist, and is prompted to select one.
         let ans: Result<LeagueWrapper, InquireError> =
             Select::new("Select an existing league", options).prompt();
         match ans {
             Ok(select) => {
-                load_league(thread, conn, select)?;
-                Ok(())
+                match input{
+                    MenuInput::CreateNewTeam => {
+                        load_league(thread, conn, select)?;
+                        Ok(())
+                    },
+                    MenuInput::RefreshLeague =>{
+                        println!("Refreshing league.");
+                        save_league(&select.league,conn,thread).unwrap();
+                        Ok(())
+                    },
+                    _ => panic!("Invalid Menu Input:{:?}",input)
+                }
+                
             }
             Err(_) => {
                 println!("Error selecting a new league");
@@ -281,40 +279,19 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
     }
 }
 
-//#[tailcall]
+
+
+
 fn main() -> std::io::Result<()> {
     let mut conn = load_database().unwrap();
-    
     let mut r_thread = rand::thread_rng();
+    
 
     println!("Welcome to the Deadball Team generator!");
 
-    let starting_options: Vec<&str> = vec![
-        "Create a new league.",
-        "Add a new team to an existing league.",
-    ];
-
-    let starting_choice: Result<&str, InquireError> =
-        Select::new("What would you like to do?", starting_options).prompt();
-
-    match starting_choice {
-        Ok(choice) => match choice {
-            "Create a new league." => create_new_league(&mut r_thread, &mut conn),
-            "Add a new team to an existing league." => {
-                league_check(&mut conn, &mut r_thread).unwrap();
-                Ok(())
-            }
-            _ => {
-                println!("Error with starting choice.");
-                Ok(())
-            }
-        },
-
-        Err(_) => {
-            println!("Error matching first choice");
-            Ok(())
-        }
-    }
+    run_main_menu(&mut conn,&mut r_thread)
+    
+    
 }
 
 fn load_database() -> Result<Connection, rusqlite::Error> {
@@ -353,23 +330,25 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
         In Deadball, players have the chance to gain traits in the following categories: contact, defense, power,speed, and toughness, with each trait indicating if a player is average, above average, or below average in the categorie.
         In Rust, a players traits are stored in a struct name Batter Traits, with each trait beingr represented in an enum. The contents of the struct are serialized onto the players table, however the way enums are serialized is confusing to look at insided the database.
         Thus, we spilt each trait into 2 rows on the palyer table. The first column is named after the trait itself. If hte trait for hte player is average, then the value will be NULL, otherwise the value will be the players trait in a straightforward text format.
-        The next column is [name of trait]_enum, and that will contain a 
+        The next column is [name of trait]_enum, and that contains data that can be converted to the correct enum when the row is deseiralized
     */
     conn.execute(
         "create table if not exists players(
              id INTEGER PRIMARY KEY,
              team_id INTEGER NOT NULL,
-             player_name TEXT NOT NULL,
-             age INTEGER NOT NULL,
-             pos TEXT NOT NULL,
-             hand TEXT NOT NULL,
-             bt INTEGER NOT NULL,
-             obt_mod INTEGER NOT NULL,
-             obt INTEGER NOT NULL,
-             PD TEXT ,
-             pd_int INTEGER ,
-             pitcher_trait TEXT ,
-             team_spot TEXT NOT NULL,
+             player_name TEXT NOT NULL, -- Player's Name
+             age INTEGER NOT NULL, --Players Age
+             pos TEXT NOT NULL, --Player's position, E.G Shortstop, Right Fielder, Pitcher, etc.
+             hand TEXT NOT NULL, --Notes if a player bats left handed, right handed, or if the player is not a pitcher, bats as a switch hitter.
+             bt INTEGER NOT NULL, -- Players batting target, which is an apporximation of a players batting average.
+             obt_mod INTEGER NOT NULL, --OBT Modifier, which is used to calculate a players on base target by addition to a player batter target
+             obt INTEGER NOT NULL, -- On base Target, indicates how often a player get's on base. Correlates to a player on base percentage in real life.
+             PD TEXT , -- If a player is a pitcher, they are assigned a pitch die, which represents the stand rpg die, E.G. d12, d4. Pitch die can be negative.
+             pd_int INTEGER , /*If a player has a ptich die, PD_int represents the outcome of a pitch die roll that is the fartherst away from 0.
+             For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
+            */
+             pitcher_trait TEXT , --Pitchers
+             team_spot TEXT NOT NULL, -- Repreresents a player's rolke 
              contact TEXT ,
              contact_enum TEXT NOT NULL,
              defense TEXT,
@@ -385,18 +364,6 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
         (),
     )?;
 
-    /*let batting_traits_gen = conn.execute(
-        "create table if not exists batter_traits(
-             id integer primary key,
-             player_id integer not null,
-             contact text not null,
-             defense text not null,
-             power text not null,
-             speed text not null,
-             toughness text not null
-         )",
-        (),
-    );*/
-    // If no errors has occured, we return the database
+    // If no errors occured, the database is returned.
     Ok(conn)
 }

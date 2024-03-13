@@ -1,34 +1,24 @@
-Name:Portland Beavers, Abrv:PORT, Team Score: 76
+Name:Portland Beavers, Abrv:PORT, Team Score: 72
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Hill Diann,1B,27,R,30,37
-Bernie Ardra,2B,33,L,30,35
-Christos Nona,C,20,L,27,34,D+P++
-Ethelred Lisa,CF,19,R,29,32
-Arne Malina,RF,20,R,26,32
-Mikey Kaia,SS,22,L,28,31
-Reggis Sherie,LF,22,R,26,31
-Aubrey Bernadine,3B,23,L,24,31
+Abel Marci,SS,21,L,28,35
+Robert Magdaia,RF,23,L,31,36,C+
+Bearnard Cornelle,LF,27,L,29,34
+Gino Kristal,C,26,R,26,31
+Federico Nelia,2B,33,R,26,31
+Robbie Briney,1B,23,L,26,29
+Ahmad Elberta,3B,24,L,23,29
+Royal Nana,CF,22,L,24,26,C-
 Bench:
 Name Pos Age Hand BT OBT Traits
-Delbert Hulda,INF,35,R,25,32,S+
-Way Mmarianne,INF,25,S,26,34,C-
-Mitch Camilla,OF,33,L,24,29
-Osgood Geralda,OF,27,L,25,28
-Turner Bevvy,C,24,R,22,26,T+
+Nelsen Danyelle,INF,23,L,26,32
+Ed Sibylle,UT,27,L,22,27,D+
+Tadd Theodosia,C,27,R,21,24,S+
+Harcourt Tiana,OF,23,L,20,24,C-
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Giraud Merrile,SP,36,R,d4,GB, 20,26
-Pierce Dido,SP,23,R,d4, 24,31
-Erich Daisy,SP,22,R,d4, 15,16
-Niall Ree,SP,20,R,d4, 23,30
-Lindsey Eirena,SP,36,R,-d4, 14,16
-Bullpen:
-Name Pos Age Hand PD Trait BT OBT
-Alston Agathe,RP,25,L,d12,CN+, 20,22
-Uriel Camille,RP,26,R,d8,CN+, 24,27
-Ferguson Giana,RP,23,R,d8,K+, 21,25
-Oliver Fanya,RP,32,L,d8, 19,26
-Vlad Mara,RP,21,L,d4,K+, 18,26
-Harris Marjie,RP,23,R,d4, 21,28
-Haleigh Gussie,RP,23,L,d4, 15,22
+Kaiser Inessa,P,38,L,d20,CN-, 22,28
+Osbourn Zsa Zsa,P,38,L,d20, 15,18
+Valentin Nannette,P,21,R,d12, 19,23
+Ossie Dahlia,P,24,R,d4, 19,20
+Gav Fanya,P,24,L,d4, 22,27
