@@ -11,13 +11,9 @@ use inquire::Select;
 use inquire::Text;
 use rusqlite::Connection;
 
-
-
 use crate::era::select_era;
 use crate::main_menu::run_main_menu;
 use crate::main_menu::MenuInput;
-
-
 
 use crate::player::select_gender;
 use crate::team::add_new_team;

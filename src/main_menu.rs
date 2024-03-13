@@ -28,8 +28,6 @@ impl fmt::Display for MenuInput {
 }
 
 pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
-   
-
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
         MenuInput::CreateNewTeam,

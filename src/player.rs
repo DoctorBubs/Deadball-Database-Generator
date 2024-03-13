@@ -225,7 +225,6 @@ impl Player {
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
-     
         let _pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
@@ -291,12 +290,8 @@ impl Player {
             ],
         )?;
 
-       
-
         Ok(())
     }
-
-    
 
     pub fn get_pitcher_rank_info(&self) -> PitcherRankInfo {
         let pd_num = self.get_base_pd().to_int();

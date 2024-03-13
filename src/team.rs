@@ -1,4 +1,3 @@
-
 use crate::b_traits::BTraits;
 use crate::league::AddTeamError;
 use inquire::validator::MaxLengthValidator;
@@ -374,7 +373,6 @@ pub fn add_team_check(
 
     Ok(())
 }
-
 
 pub fn add_new_team(
     league: &mut League,

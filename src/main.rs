@@ -9,50 +9,34 @@ mod player;
 mod player_quality;
 mod team;
 mod traits;
-
 use crate::era::Era;
-
-use crate::league::AddTeamError;
-use crate::league::League;
 use crate::pd::PD;
 use crate::player::Player;
 use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
-
 use crate::team::Team;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
-use crate::validator::MaxLengthValidator;
-use crate::validator::MinLengthValidator;
-
 use crate::main_menu::run_main_menu;
-
-use inquire::*;
-
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
-use team::add_team_check;
-
 use league::league_check;
 use std::fmt;
 
-
-
-
-
-
 fn main() -> std::io::Result<()> {
+    // First, we load the databse, or create one if it doesn't exist.
     let mut conn = load_database().unwrap();
+    //Next we generate a thread for the random numbers we will need to generate.
     let mut r_thread = rand::thread_rng();
 
-    println!("Welcome to the Deadball Team generator!");
-
+    println!("Welcome to the Deadball league generator!");
+    // We then go to the main menu.
     run_main_menu(&mut conn, &mut r_thread)
 }
 
