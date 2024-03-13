@@ -18,7 +18,7 @@ use crate::PlayerQuality;
 use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
-use inquire;
+
 use std::fmt::Write;
 
 struct PlayerWrapper {

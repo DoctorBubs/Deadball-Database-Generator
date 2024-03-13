@@ -15,12 +15,6 @@ pub trait PlayerTrait {
     }
 }
 
-pub fn p_trait_from_string<'a, T: PlayerTrait + Deserialize<'a>>(input: &'a str) -> T {
-    let clone = &input;
-    let output = serde_json::from_str(clone);
-    output.unwrap()
-}
-
 pub fn trait_to_sql_text<T: PlayerTrait + Display>(player_trait: &T) -> Option<String> {
     let trait_string = player_trait.to_string();
     match trait_string.as_str() {

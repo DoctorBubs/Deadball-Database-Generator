@@ -223,7 +223,7 @@ impl Player {
             None => "".to_string(),
         };*/
 
-        let pd_int_string = self.get_base_pd().to_int().to_string();
+        let _pd_int_string = self.get_base_pd().to_int().to_string();
         let BTraits {
             contact,
             speed,
@@ -232,10 +232,7 @@ impl Player {
             defense,
         } = &self.b_traits;
 
-        let pd_int = match self.pd {
-            Some(die) => Some(die.to_int()),
-            None => None,
-        };
+        let pd_int = self.pd.map(|die| die.to_int());
         conn.execute(
             "INSERT INTO players(
                 team_id,player_name,age,pos,hand,

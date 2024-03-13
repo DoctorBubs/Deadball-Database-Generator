@@ -27,7 +27,7 @@ impl fmt::Display for MenuInput {
     }
 }
 
-pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+pub fn run_main_menu(conn: &mut Connection, _thread: &mut ThreadRng) -> std::io::Result<()> {
     let mut r_thread = rand::thread_rng();
 
     let starting_options: Vec<MenuInput> = vec![

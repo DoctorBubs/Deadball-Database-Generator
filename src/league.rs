@@ -76,7 +76,7 @@ impl League {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
         };
-        let save_team_result = new_team.save_players_sql(conn, team_id).unwrap();
+        new_team.save_players_sql(conn, team_id).unwrap();
         /*if save_team_result.is_err() {
             return Err(AddTeamError::DatabaseError)
         } */
@@ -227,7 +227,7 @@ pub fn load_league(
     }
     println!("{} loaded.", league.name);
     // Now that we have loaded the existing league from the database, it is time to generate a new team.
-    let bob = add_new_team(&mut league, thread, conn, league_id, true).unwrap();
+    add_new_team(&mut league, thread, conn, league_id, true).unwrap();
     Ok(())
     /*  match add_new_team(&mut league, thread, conn, league_id, true) {
         Ok(_) => Ok(()),
