@@ -232,9 +232,9 @@ impl Player {
             defense,
         } = &self.b_traits;
 
-        let pd_int = match self.pd{
+        let pd_int = match self.pd {
             Some(die) => Some(die.to_int()),
-            None => None
+            None => None,
         };
         conn.execute(
             "INSERT INTO players(
@@ -274,9 +274,9 @@ impl Player {
                 ":bt":&self.bt.to_string(),
                 ":obt_mod":&self.obt_mod.to_string(),
                 ":obt":&self.obt.to_string(),
-                ":pd":serde_json::to_value(&self.pd).unwrap(),
+                ":pd":serde_json::to_value(self.pd).unwrap(),
                 ":pd_int": serde_json::to_value(pd_int).unwrap(),
-                ":pitcher_trait": serde_json::to_value(&self.pitcher_trait).unwrap(),
+                ":pitcher_trait": serde_json::to_value(self.pitcher_trait).unwrap(),
                 ":team_spot":serde_json::to_string(&team_spot).unwrap(),
                 ":contact": serde_json::to_value(trait_to_sql_text(contact)).unwrap(),
                 ":contact_enum":serde_json::to_string(contact).unwrap(),

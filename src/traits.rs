@@ -21,12 +21,11 @@ pub fn p_trait_from_string<'a, T: PlayerTrait + Deserialize<'a>>(input: &'a str)
     output.unwrap()
 }
 
-pub fn trait_to_sql_text<T: PlayerTrait + Display>(player_trait: &T) -> Option<String>{
+pub fn trait_to_sql_text<T: PlayerTrait + Display>(player_trait: &T) -> Option<String> {
     let trait_string = player_trait.to_string();
-    match trait_string.as_str(){
+    match trait_string.as_str() {
         "" => None,
-        _ => Some(trait_string)
-
+        _ => Some(trait_string),
     }
 }
 

@@ -1,15 +1,14 @@
-
 mod b_traits;
 mod era;
 mod league;
 mod lineup_score;
+mod main_menu;
 mod pd;
 mod pitcher_rank_info;
 mod player;
 mod player_quality;
 mod team;
 mod traits;
-mod main_menu;
 
 use crate::era::Era;
 use crate::league::create_new_league;
@@ -31,8 +30,8 @@ use crate::traits::Toughness;
 use crate::validator::MaxLengthValidator;
 use crate::validator::MinLengthValidator;
 
-use crate::main_menu::MenuInput;
 use crate::main_menu::run_main_menu;
+use crate::main_menu::MenuInput;
 use inquire::*;
 use league::load_league;
 use rand::rngs::ThreadRng;
@@ -44,8 +43,6 @@ use std::fs;
 use std::fs::File;
 use std::io::prelude::*;
 use std::path::Path;
-
-
 
 fn select_era() -> Era {
     let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
@@ -138,14 +135,10 @@ fn add_new_team(
             }
             // If the league returns OK, we take the string, and write it to a new file in the leauge folder
             Ok(()) => {
-               
-
                 result = add_team_check(league, conn, thread, league_id);
                 break;
             }
         };
-
-       
     }
 
     result
@@ -165,7 +158,7 @@ fn add_team_check(
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
         //If not, we save the leauge and hten exit.
-        Ok(false) => save_league(league,conn,thread)?,
+        Ok(false) => save_league(league, conn, thread)?,
         Err(_) => {
             panic!("Error on add team prompt");
         }
@@ -175,7 +168,11 @@ fn add_team_check(
 }
 
 // Once a league is saved, we save a copy of the league data in a folder.
-fn save_league(league: &League, conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+fn save_league(
+    league: &League,
+    conn: &mut Connection,
+    thread: &mut ThreadRng,
+) -> std::io::Result<()> {
     println!();
     let flder_path_string = league.name.to_string();
     let folder_path = Path::new(&flder_path_string);
@@ -190,13 +187,12 @@ fn save_league(league: &League, conn: &mut Connection, thread: &mut ThreadRng) -
     println!("League saved succesfully.");
     //We then prompt the user if they would like to return to the main menu
     let ans = Confirm::new("Would you like to return to the main menu?")
-    .with_default(true)
-    .prompt();
-    match ans{
+        .with_default(true)
+        .prompt();
+    match ans {
         Ok(true) => run_main_menu(conn, thread),
-        _ => Ok(())
+        _ => Ok(()),
     }
-    
 }
 
 /*  The League Wrapper struct is used when the program checks to see what leagues are saved in the database.
@@ -211,13 +207,16 @@ struct LeagueWrapper {
 
 // We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
 impl fmt::Display for LeagueWrapper {
-    
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}_{}", self.league_id, self.league.name)
     }
 }
 
-fn league_check(conn: &mut Connection, thread: &mut ThreadRng, input: MenuInput) -> Result<(), rusqlite::Error> {
+fn league_check(
+    conn: &mut Connection,
+    thread: &mut ThreadRng,
+    input: MenuInput,
+) -> Result<(), rusqlite::Error> {
     // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.
@@ -227,8 +226,8 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng, input: MenuInput)
                 league_id: row.get(0)?,
                 league: League {
                     name: row.get(1)?,
-                    era: serde_json::from_value(row.get(2)?).unwrap() ,
-                    
+                    era: serde_json::from_value(row.get(2)?).unwrap(),
+
                     //
                     gender: serde_json::from_value(row.get(3)?).unwrap(),
 
@@ -240,7 +239,7 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng, input: MenuInput)
         .unwrap();
 
     let mut options = Vec::new();
-        // We unwrap the results in leauge iter, and push it to the options vec
+    // We unwrap the results in leauge iter, and push it to the options vec
     for wrapper in league_iter {
         options.push(wrapper.unwrap())
     }
@@ -256,21 +255,18 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng, input: MenuInput)
         let ans: Result<LeagueWrapper, InquireError> =
             Select::new("Select an existing league", options).prompt();
         match ans {
-            Ok(select) => {
-                match input{
-                    MenuInput::CreateNewTeam => {
-                        load_league(thread, conn, select)?;
-                        Ok(())
-                    },
-                    MenuInput::RefreshLeague =>{
-                        println!("Refreshing league.");
-                        save_league(&select.league,conn,thread).unwrap();
-                        Ok(())
-                    },
-                    _ => panic!("Invalid Menu Input:{:?}",input)
+            Ok(select) => match input {
+                MenuInput::CreateNewTeam => {
+                    load_league(thread, conn, select)?;
+                    Ok(())
                 }
-                
-            }
+                MenuInput::RefreshLeague => {
+                    println!("Refreshing league.");
+                    save_league(&select.league, conn, thread).unwrap();
+                    Ok(())
+                }
+                _ => panic!("Invalid Menu Input:{:?}", input),
+            },
             Err(_) => {
                 println!("Error selecting a new league");
                 Ok(())
@@ -279,19 +275,13 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng, input: MenuInput)
     }
 }
 
-
-
-
 fn main() -> std::io::Result<()> {
     let mut conn = load_database().unwrap();
     let mut r_thread = rand::thread_rng();
-    
 
     println!("Welcome to the Deadball Team generator!");
 
-    run_main_menu(&mut conn,&mut r_thread)
-    
-    
+    run_main_menu(&mut conn, &mut r_thread)
 }
 
 fn load_database() -> Result<Connection, rusqlite::Error> {
@@ -308,9 +298,9 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
         (),
     )?;
     /*  Leagues have a one to many relationship to teams. Each team has its own id, as well as a foreign key that references the league id.
-        Each team also has a name, and an abbreviation of their name. For example, if  you wanted to create a team named after the Los Angeles Dodgers, the abreviation would be LAD.
-        If a team is generated via the program, the program will not let you have multiple teams in the same league with the same name and/or abbreviation.
-        Teams also have a team score, which is a number that summarizes how good a team is based off the quality of their players, as well as current wins and losses*/
+    Each team also has a name, and an abbreviation of their name. For example, if  you wanted to create a team named after the Los Angeles Dodgers, the abreviation would be LAD.
+    If a team is generated via the program, the program will not let you have multiple teams in the same league with the same name and/or abbreviation.
+    Teams also have a team score, which is a number that summarizes how good a team is based off the quality of their players, as well as current wins and losses*/
     conn.execute(
         "create table if not exists teams (
              id INTEGER PRIMARY KEY,

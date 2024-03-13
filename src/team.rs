@@ -1,10 +1,11 @@
-use inquire::Confirm;
-use rusqlite::Connection;
 use crate::add_new_team;
 use crate::b_traits::BTraits;
 use crate::save_league;
+use inquire::Confirm;
+use rusqlite::Connection;
 
 use crate::league::League;
+use crate::league::TeamWrapper;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::BatterQuality;
@@ -17,9 +18,8 @@ use crate::PlayerQuality;
 use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
-use std::fmt::Write;
 use inquire;
-use crate::league::TeamWrapper;
+use std::fmt::Write;
 
 struct PlayerWrapper {
     team_spot: TeamSpot,
@@ -48,15 +48,15 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                 bt: row.get(6)?,
                 obt_mod: row.get(7)?,
                 obt: row.get(8)?,
-                pd: serde_json::from_value(row.get(9)?).unwrap(), 
+                pd: serde_json::from_value(row.get(9)?).unwrap(),
                 pitcher_trait: serde_json::from_value(row.get(11)?).unwrap(),
-                b_traits: BTraits { 
-                    contact: serde_json::from_value(row.get(14)?).unwrap(), 
-                    defense: serde_json::from_value(row.get(16)?).unwrap(), 
-                    power: serde_json::from_value(row.get(18)?).unwrap(),  
-                    speed: serde_json::from_value(row.get(20)?).unwrap(), 
+                b_traits: BTraits {
+                    contact: serde_json::from_value(row.get(14)?).unwrap(),
+                    defense: serde_json::from_value(row.get(16)?).unwrap(),
+                    power: serde_json::from_value(row.get(18)?).unwrap(),
+                    speed: serde_json::from_value(row.get(20)?).unwrap(),
                     toughness: serde_json::from_value(row.get(22)?).unwrap(),
-                }
+                },
             },
         })
         /*
@@ -408,14 +408,6 @@ impl fmt::Display for Team {
     }
 }
 
-
-
-
-
-
-
-
-
 fn add_team_check(
     league: &mut League,
     conn: &mut Connection,
@@ -430,7 +422,7 @@ fn add_team_check(
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
         //If not, we save the leauge and hten exit.
-        Ok(false) => save_league(league,conn,thread)?,
+        Ok(false) => save_league(league, conn, thread)?,
         Err(_) => {
             panic!("Error on add team prompt");
         }
