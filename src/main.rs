@@ -352,7 +352,8 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
 
         In Deadball, players have the chance to gain traits in the following categories: contact, defense, power,speed, and toughness, with each trait indicating if a player is average, above average, or below average in the categorie.
         In Rust, a players traits are stored in a struct name Batter Traits, with each trait beingr represented in an enum. The contents of the struct are serialized onto the players table, however the way enums are serialized is confusing to look at insided the database.
-        Thus
+        Thus, we spilt each trait into 2 rows on the palyer table. The first column is named after the trait itself. If hte trait for hte player is average, then the value will be NULL, otherwise the value will be the players trait in a straightforward text format.
+        The next column is [name of trait]_enum, and that will contain a 
     */
     conn.execute(
         "create table if not exists players(

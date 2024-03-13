@@ -40,34 +40,19 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                 name: row.get(2)?,
                 age: row.get(3)?,
                 pos: row.get(4)?,
-                hand: {
-                    let input: String = row.get(5)?;
-                    let chars = input.as_str();
-                    let output = serde_json::from_str(chars);
-                    output.unwrap()
-                },
+                hand: serde_json::from_value(row.get(5)?).unwrap(),
                 bt: row.get(6)?,
                 obt_mod: row.get(7)?,
                 obt: row.get(8)?,
-                pd: {
-                    let input: String = row.get(9)?;
-                    let chars = input.as_str();
-                    let output = serde_json::from_str(chars);
-                    output.unwrap()
-                },
-                pitcher_trait: {
-                    let input: String = row.get(11)?;
-                    let chars = input.as_str();
-                    let output = serde_json::from_str(chars);
-                    output.unwrap()
-                },
-                b_traits: BTraits::from_strings(
-                    &row.get(13)?,
-                    &row.get(14)?,
-                    &row.get(15)?,
-                    &row.get(16)?,
-                    &row.get(17)?,
-                ),
+                pd: serde_json::from_value(row.get(9)?).unwrap(), 
+                pitcher_trait: serde_json::from_value(row.get(11)?).unwrap(),
+                b_traits: BTraits { 
+                    contact: serde_json::from_value(row.get(14)?).unwrap(), 
+                    defense: serde_json::from_value(row.get(16)?).unwrap(), 
+                    power: serde_json::from_value(row.get(18)?).unwrap(),  
+                    speed: serde_json::from_value(row.get(20)?).unwrap(), 
+                    toughness: serde_json::from_value(row.get(22)?).unwrap(),
+                }
             },
         })
         /*
