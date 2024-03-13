@@ -1,0 +1,34 @@
+Name:Denver Bears, Abrv:DEN, Team Score: 79
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Penny Cristi,C,27,L,31,37,T+
+Giffer Jemmie,RF,24,S,29,34
+Arlo Valerie,3B,30,S,28,32
+Ahmet Aviva,SS,25,R,28,31
+Arvind Anthea,CF,28,S,25,27
+Harley Fayette,LF,27,L,23,28,P+
+Baron Laurianne,2B,22,R,23,28,P+
+Jake Raven,1B,25,L,20,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Haven Tessa,C,19,R,27,32
+Meade Loree,OF,25,L,24,31
+Myles Zsazsa,INF,24,L,20,25,T+
+Kit Mellie,INF,22,L,22,26,C+
+Leland Celinka,OF,23,S,15,18
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Christophe Ileana,SP,24,R,d12, 16,18
+Kenn Carena,SP,24,L,d8, 23,25
+Moises Valery,SP,27,L,d4, 15,21
+Townie Tawnya,SP,24,L,d4, 24,25
+Norton Diamond,SP,26,R,-d4, 19,24
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Sutherland Ange,RP,22,R,d12,CN+, 17,22
+Valentine Ardene,RP,19,R,d12, 21,23
+Kraig Tammie,RP,19,R,d4,CN+, 16,18
+Corwin Danna,RP,35,L,d4, 15,23
+Quill Ginnie,RP,31,R,d4, 18,23
+Riley Simona,RP,23,L,d4, 19,21
+Richardo Gertrude,RP,20,R,d4, 19,27

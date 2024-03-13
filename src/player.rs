@@ -6,6 +6,7 @@ use crate::player_quality::PlayerQuality;
 
 use crate::team::TeamSpot;
 
+use crate::traits::trait_to_sql_text;
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
 use crate::Era;
@@ -235,8 +236,30 @@ impl Player {
                 team_id,player_name,age,pos,hand,
                 bt,obt_mod,obt,
                 pd,pd_int,pitcher_trait,team_spot,
-                contact,defense,power,speed,toughness) 
-            VALUES(:team_id, :player_name, :age, :pos, :hand, :bt, :obt_mod, :obt, :pd,:pd_int, :pitcher_trait, :team_spot, :contact, :defense, :power, :speed, :toughness)", 
+                contact,contact_enum,defense,defense_enum,power,power_enum,speed,speed_enum,toughness,toughness_enum) 
+            VALUES(:team_id, 
+                :player_name, 
+                :age, 
+                :pos, 
+                :hand, 
+                :bt, 
+                :obt_mod, 
+                :obt, 
+                :pd,
+                :pd_int, 
+                :pitcher_trait, 
+                :team_spot, 
+                :contact,
+                :contact_enum, 
+                :defense,
+                :defense_enum, 
+                :power,
+                :power_enum, 
+                :speed,
+                :speed_enum, 
+                :toughness,
+                :toughness_enum
+            )", 
             named_params![
                 ":team_id": &team_id,
                 ":player_name":&self.name, 
@@ -246,15 +269,20 @@ impl Player {
                 ":bt":&self.bt.to_string(),
                 ":obt_mod":&self.obt_mod.to_string(),
                 ":obt":&self.obt.to_string(),
-                ":pd":serde_json::to_string(&self.pd).unwrap(),
+                ":pd":serde_json::to_value(&self.pd).unwrap(),
                 ":pd_int": pd_int_string,
-                ":pitcher_trait": serde_json::to_string(&self.pitcher_trait).unwrap(),
+                ":pitcher_trait": serde_json::to_value(&self.pitcher_trait).unwrap(),
                 ":team_spot":serde_json::to_string(&team_spot).unwrap(),
-                ":contact":serde_json::to_string(contact).unwrap(),
-                ":defense":serde_json::to_string(defense).unwrap(),
-                ":power":serde_json::to_string(power).unwrap(), 
-                ":speed":serde_json::to_string(speed).unwrap(), 
-                ":toughness":serde_json::to_string(toughness).unwrap()
+                ":contact": trait_to_sql_text(contact),
+                ":contact_enum":serde_json::to_string(contact).unwrap(),
+                ":defense":trait_to_sql_text(defense),
+                ":defense_enum":serde_json::to_string(defense).unwrap(),
+                ":power": trait_to_sql_text(power),
+                ":power_enum":serde_json::to_value(power).unwrap(),
+                ":speed": trait_to_sql_text(speed),
+                ":speed_enum":serde_json::to_string(speed).unwrap(), 
+                ":toughness": trait_to_sql_text(toughness),
+                ":toughness_enum":serde_json::to_string(toughness).unwrap()
             ],
         )?;
 

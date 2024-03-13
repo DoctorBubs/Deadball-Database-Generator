@@ -1,0 +1,34 @@
+Name:Tigers, Abrv:TIG, Team Score: 72
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Lucian Essie,SS,25,L,34,38,C+
+Niki Reeva,1B,25,R,30,35
+Edmund Jami,LF,25,R,26,33,S+
+Russ Chandra,CF,29,R,29,34
+Jonathon Erda,2B,19,R,28,33
+Laurens Anabel,RF,21,R,25,30,D-
+Jean-Pierre Fayre,3B,22,L,22,26
+Merrill Leontine,C,22,R,17,19
+Bench:
+Name Pos Age Hand BT OBT Traits
+Kin Briny,OF,21,R,26,32,C-
+Mort Candida,INF,31,R,26,31,D+
+Jay Prissie,INF,27,R,24,27,D+
+Alfonzo Corenda,C,23,R,22,27,C-
+Fyodor Theresa,OF,19,R,23,27,C+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Jud Fae,SP,24,L,d8,CN+, 17,24
+Thain Katie,SP,20,R,d4,K+, 16,17
+Ric Clo,SP,23,L,d4, 19,27
+Bernhard Luna,SP,22,R,d4, 16,19
+Kincaid Margaret,SP,25,L,-d4, 18,23
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Andrzej Elisabet,RP,21,R,d12, 18,26
+Michal Hetty,RP,29,R,d8, 19,21
+Brinkley Mayda,RP,28,R,d8, 20,26
+Daren Karilynn,RP,24,L,d8, 20,27
+Griff Gillie,RP,38,R,d4,CN-, 20,22
+Ivor Erma,RP,27,R,d4, 16,17
+Thad Kelila,RP,22,R,-d4,K+, 22,28

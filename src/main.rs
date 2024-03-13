@@ -8,7 +8,6 @@ mod player;
 mod player_quality;
 mod team;
 mod traits;
-//mod futures;
 use crate::era::Era;
 use crate::league::create_new_league;
 use crate::league::AddTeamError;
@@ -32,7 +31,7 @@ use crate::validator::MinLengthValidator;
 use inquire::*;
 use league::load_league;
 use rand::rngs::ThreadRng;
-use rusqlite::{Connection, Result};
+use rusqlite::{Connection, Result,types::Null};
 use serde::{Deserialize, Serialize};
 
 use std::fmt;
@@ -285,14 +284,7 @@ fn league_check(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rus
 //#[tailcall]
 fn main() -> std::io::Result<()> {
     let mut conn = load_database().unwrap();
-    //let mut conn: Connection;
-    /*match database_load {
-        Ok(db) => conn = db,
-        Err(_) => {
-            println!("Could not load databse. Check the setting for this folder.");
-            return Ok(());
-        }
-    };*/
+    
     let mut r_thread = rand::thread_rng();
 
     println!("Welcome to the Deadball Team generator!");
@@ -326,19 +318,22 @@ fn main() -> std::io::Result<()> {
 }
 
 fn load_database() -> Result<Connection, rusqlite::Error> {
-    // We look for the database, and create a new one if it doesn't exist.
+    // We look for the database, and create a new one if it doesn't exist. If no database exists and there we are unable to create a new database in the folder, the function returns an error
     let conn = Connection::open("deadball.db")?;
-    // We create the league table
+    // We create the league table in the database. Eeach league has an ID and a unique name. Each league also has an era and gender, which are used in creating teams and players withing the league.
     conn.execute(
         "create table if not exists leagues (
              id INTEGER PRIMARY KEY,
-             league_name TEXT NOT NULL,
+             league_name TEXT NOT NULL UNIQUE,
              era TEXT NOT NULL,
              gender TEXT NOT NULL
          )",
         (),
     )?;
-    // We create a team table
+    /*  Leagues have a one to many relationship to teams. Each team has its own id, as well as a foreign key that references the league id.
+        Each team also has a name, and an abbreviation of their name. For example, if  you wanted to create a team named after the Los Angeles Dodgers, the abreviation would be LAD.
+        If a team is generated via the program, the program will not let you have multiple teams in the same league with the same name and/or abbreviation.
+        Teams also have a team score, which is a number that summarizes how good a team is based off the quality of their players, as well as current wins and losses*/
     conn.execute(
         "create table if not exists teams (
              id INTEGER PRIMARY KEY,
@@ -352,7 +347,13 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
-    //we create a player table
+    /*  The last table to create is the players tables. Teams have a one to many relationship with players, with each player beloning to one team
+        Each player has a unique id, and a forein key team_id which refrenceses the id of the team the player belongs to
+
+        In Deadball, players have the chance to gain traits in the following categories: contact, defense, power,speed, and toughness, with each trait indicating if a player is average, above average, or below average in the categorie.
+        In Rust, a players traits are stored in a struct name Batter Traits, with each trait beingr represented in an enum. The contents of the struct are serialized onto the players table, however the way enums are serialized is confusing to look at insided the database.
+        Thus
+    */
     conn.execute(
         "create table if not exists players(
              id INTEGER PRIMARY KEY,
@@ -364,15 +365,20 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
              bt INTEGER NOT NULL,
              obt_mod INTEGER NOT NULL,
              obt INTEGER NOT NULL,
-             PD TEXT NOT NULL,
-             pd_int INTEGER NOT NULL,
-             pitcher_trait TEXT NOT NULL,
+             PD TEXT ,
+             pd_int INTEGER ,
+             pitcher_trait TEXT ,
              team_spot TEXT NOT NULL,
-             contact TEXT NOT NULL,
-             defense TEXT NOT NULL,
-             power TEXT NOT NULL,
-             speed TEXT NOT NULL,
-             toughness TEXT NOT NULL,
+             contact TEXT ,
+             contact_enum TEXT NOT NULL,
+             defense TEXT,
+             defense_enum TEXT NOT NULL,
+             power TEXT ,
+             power_enum TEXT NOT NULL,
+             speed TEXT ,
+             speed_enum TEXT NOT NULL,
+             toughness TEXT,
+             toughness_enum TEXT NOT NULL,
              FOREIGN KEY(team_id) REFERENCES teams(id)
          )",
         (),

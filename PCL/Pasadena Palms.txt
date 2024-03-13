@@ -1,0 +1,24 @@
+Name:Pasadena Palms, Abrv:PAS, Team Score: 45
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Norbert Emili,2B,19,R,32,39
+Sargent Cassandre,C,24,R,30,33,S+
+Larry Glory,RF,26,R,29,32,P--
+Thad Libbie,3B,32,S,26,30
+Meade Juliet,1B,25,L,25,30
+Gavriel Elayne,CF,33,R,22,28
+Wye Anneliese,LF,22,R,23,29,P+
+Meredeth Vina,SS,36,R,18,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Alvin Katherina,INF,23,L,26,33
+Daryle Martynne,C,27,R,29,33,P+
+Collin Odetta,OF,31,R,26,29,C+
+Alston Neile,UT,22,L,18,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Eli Maritsa,P,30,R,d8, 20,24
+Brook Ianthe,P,26,R,d8, 19,26
+Hanson Athene,P,32,R,d6, 19,24
+Kingsley Leodora,P,29,R,d4, 15,18
+Felicio Dyanne,P,19,R,-d4, 18,25

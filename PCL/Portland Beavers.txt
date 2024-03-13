@@ -1,0 +1,24 @@
+Name:Portland Beavers, Abrv:PORT, Team Score: 51
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Emory Viviene,LF,37,R,33,38,D+
+Renaud Averil,3B,21,R,31,38
+Hewe Almeta,C,23,R,31,38
+Garwin Raquel,1B,23,S,31,36,P-S-
+Phillipe Nara,SS,30,L,30,35
+Vaughn Aphrodite,CF,27,R,27,31
+Aloysius Tera,RF,21,R,26,31
+Marshal Farrah,2B,23,R,25,28
+Bench:
+Name Pos Age Hand BT OBT Traits
+Johnnie Chloe,C,36,L,31,39,D-
+Johann Tana,INF,19,L,26,33
+Carlie Shir,OF,22,R,20,25,S+
+Joshua Chantalle,UT,23,S,23,26
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Pincas Jaquith,P,30,L,d8, 24,28
+Holly Chrysler,P,21,R,d8, 18,22
+Brandon Dorena,P,24,R,d6, 15,16
+Kendrick Addis,P,27,L,d4, 20,27
+Torrin Rebeca,P,32,R,-d0, 18,22

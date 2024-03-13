@@ -1,0 +1,34 @@
+Name:Las Vegas Aces, Abrv:LSV, Team Score: 71
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Rolland Camala,SS,23,R,32,38
+Alton Ermina,C,22,R,27,34
+Hermon Lee,RF,26,R,28,33
+Wyatan Dulcia,3B,19,S,24,31
+Monte Vikki,CF,35,R,25,31,C-
+Kelley Jillie,LF,34,L,22,28,C-P+
+Del Ebba,2B,23,L,19,24
+Darrin Jen,1B,30,R,17,21
+Bench:
+Name Pos Age Hand BT OBT Traits
+Sloan Dolley,OF,32,R,32,34,P-
+Anthony Risa,OF,21,L,29,32,T+
+Herschel Rosaline,INF,27,R,27,31
+Connor Marcille,C,22,R,23,28,S+
+Rickard Cherilyn,INF,33,R,18,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Marshal Nananne,SP,29,L,d12, 21,29
+Huntington Peggi,SP,29,R,d8,K+, 19,27
+Broddie Ronnie,SP,26,L,d8,GB, 20,28
+Montgomery Goldie,SP,38,R,d4, 20,24
+Andros Beret,SP,21,L,d4, 17,25
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Roni Risa,RP,26,R,d8, 21,28
+Bryce Giselle,RP,19,R,d8, 24,27
+Torey Matilda,RP,30,L,d4,CN-, 19,20
+Aube Coretta,RP,36,R,d4, 14,19
+Hadrian Kiersten,RP,24,L,d4, 17,22
+Oscar Marris,RP,34,R,-d4, 17,21
+Templeton Amargo,RP,19,R,-d4, 16,21

@@ -1,0 +1,24 @@
+Name:Los Angeles Angels, Abrv:LAS, Team Score: 48
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Giffer Glori,C,20,R,32,38
+Vijay Dollie,3B,28,R,33,38,P-
+Elias Havivah,CF,27,L,30,38,P+S-
+Hewe JoAnne,RF,34,R,32,36
+Hugh Kori,2B,27,R,28,33
+Andrzej Dela,LF,35,R,28,33
+Rodolph Theada,1B,27,L,28,32,P+
+Burt Glennie,SS,22,R,25,30
+Bench:
+Name Pos Age Hand BT OBT Traits
+Ahmed Rhodie,C,34,R,26,30
+Georgia Kacey,UT,28,R,24,30,P+
+Travis Gianna,OF,21,L,23,28
+Eli Carleen,INF,32,R,22,27
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Wadsworth Doti,P,36,R,d12, 14,18
+Claire Ronda,P,23,L,d12, 20,21
+Patel Allis,P,27,R,d6, 22,25
+Jamie Alpa,P,27,R,-d4, 22,26
+Chevalier Magna,P,25,R,-d4, 24,31
