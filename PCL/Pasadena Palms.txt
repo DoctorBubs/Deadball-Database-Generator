@@ -1,24 +1,34 @@
-Name:Pasadena Palms, Abrv:PAS, Team Score: 45
+Name:Pasadena Palms, Abrv:PAS, Team Score: 60
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Norbert Emili,2B,19,R,32,39
-Sargent Cassandre,C,24,R,30,33,S+
-Larry Glory,RF,26,R,29,32,P--
-Thad Libbie,3B,32,S,26,30
-Meade Juliet,1B,25,L,25,30
-Gavriel Elayne,CF,33,R,22,28
-Wye Anneliese,LF,22,R,23,29,P+
-Meredeth Vina,SS,36,R,18,25
+Yale Janine,RF,21,R,31,34,P-
+Bert Daniel,CF,22,R,28,34
+Sampson Doralynn,3B,26,L,28,33,D+T+
+Regen Loralee,2B,34,R,26,33
+Porter Athene,LF,24,L,27,31
+Teddy Kassi,1B,24,R,22,29
+Merrick Chastity,C,23,R,21,25,D-
+Donn Jackie,SS,22,S,18,22
 Bench:
 Name Pos Age Hand BT OBT Traits
-Alvin Katherina,INF,23,L,26,33
-Daryle Martynne,C,27,R,29,33,P+
-Collin Odetta,OF,31,R,26,29,C+
-Alston Neile,UT,22,L,18,23
+Egbert Dyanna,INF,31,R,24,29
+Dana Karita,OF,23,R,18,23
+Orrin La,OF,24,R,17,23
+Quinlan Andromeda,INF,19,R,18,20,P-
+Alfie Carola,C,22,R,15,18
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Eli Maritsa,P,30,R,d8, 20,24
-Brook Ianthe,P,26,R,d8, 19,26
-Hanson Athene,P,32,R,d6, 19,24
-Kingsley Leodora,P,29,R,d4, 15,18
-Felicio Dyanne,P,19,R,-d4, 18,25
+Sawyere Micheline,SP,26,L,d12, 22,25
+Ira La,SP,27,L,d4, 20,21
+Blaine Joell,SP,27,R,d4, 20,23
+Leonard Gael,SP,25,R,-d4, 17,24
+Tadd Lisa,SP,21,L,-d4, 17,25
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Serge Evy,RP,27,R,d8, 19,24
+Adnan Stacey,RP,38,R,d4, 20,24
+Berchtold Kathrine,RP,37,L,d4, 16,24
+Brett Raphaela,RP,29,R,d4, 18,24
+Shorty Patrizia,RP,27,L,d4, 22,28
+Steffen Aubine,RP,23,R,d4, 19,26
+Thedric Desiri,RP,22,R,d4, 19,25

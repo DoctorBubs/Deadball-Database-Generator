@@ -361,7 +361,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
              player_name TEXT NOT NULL,
              age INTEGER NOT NULL,
              pos TEXT NOT NULL,
-             hand INTEGER NOT NULL,
+             hand TEXT NOT NULL,
              bt INTEGER NOT NULL,
              obt_mod INTEGER NOT NULL,
              obt INTEGER NOT NULL,

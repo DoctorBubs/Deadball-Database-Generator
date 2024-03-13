@@ -1,24 +1,34 @@
-Name:Portland Beavers, Abrv:PORT, Team Score: 51
+Name:Portland Beavers, Abrv:PORT, Team Score: 76
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Emory Viviene,LF,37,R,33,38,D+
-Renaud Averil,3B,21,R,31,38
-Hewe Almeta,C,23,R,31,38
-Garwin Raquel,1B,23,S,31,36,P-S-
-Phillipe Nara,SS,30,L,30,35
-Vaughn Aphrodite,CF,27,R,27,31
-Aloysius Tera,RF,21,R,26,31
-Marshal Farrah,2B,23,R,25,28
+Hill Diann,1B,27,R,30,37
+Bernie Ardra,2B,33,L,30,35
+Christos Nona,C,20,L,27,34,D+P++
+Ethelred Lisa,CF,19,R,29,32
+Arne Malina,RF,20,R,26,32
+Mikey Kaia,SS,22,L,28,31
+Reggis Sherie,LF,22,R,26,31
+Aubrey Bernadine,3B,23,L,24,31
 Bench:
 Name Pos Age Hand BT OBT Traits
-Johnnie Chloe,C,36,L,31,39,D-
-Johann Tana,INF,19,L,26,33
-Carlie Shir,OF,22,R,20,25,S+
-Joshua Chantalle,UT,23,S,23,26
+Delbert Hulda,INF,35,R,25,32,S+
+Way Mmarianne,INF,25,S,26,34,C-
+Mitch Camilla,OF,33,L,24,29
+Osgood Geralda,OF,27,L,25,28
+Turner Bevvy,C,24,R,22,26,T+
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Pincas Jaquith,P,30,L,d8, 24,28
-Holly Chrysler,P,21,R,d8, 18,22
-Brandon Dorena,P,24,R,d6, 15,16
-Kendrick Addis,P,27,L,d4, 20,27
-Torrin Rebeca,P,32,R,-d0, 18,22
+Giraud Merrile,SP,36,R,d4,GB, 20,26
+Pierce Dido,SP,23,R,d4, 24,31
+Erich Daisy,SP,22,R,d4, 15,16
+Niall Ree,SP,20,R,d4, 23,30
+Lindsey Eirena,SP,36,R,-d4, 14,16
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Alston Agathe,RP,25,L,d12,CN+, 20,22
+Uriel Camille,RP,26,R,d8,CN+, 24,27
+Ferguson Giana,RP,23,R,d8,K+, 21,25
+Oliver Fanya,RP,32,L,d8, 19,26
+Vlad Mara,RP,21,L,d4,K+, 18,26
+Harris Marjie,RP,23,R,d4, 21,28
+Haleigh Gussie,RP,23,L,d4, 15,22

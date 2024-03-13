@@ -1,0 +1,24 @@
+Name:Los Angeles Dodgers, Abrv:LAS, Team Score: 50
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Bronson Celina,C,24,L,32,39
+Byram Leena,SS,22,S,32,37
+Kirby Lilia,2B,36,R,27,34
+Gus Evvy,RF,19,L,26,31,C-
+Herbert Rodi,LF,36,R,24,29,S-
+Pascale Jacki,CF,31,R,21,26,D+
+Justis Deidre,3B,22,R,23,25
+Price Min,1B,36,R,22,26,P++
+Bench:
+Name Pos Age Hand BT OBT Traits
+Morse Estrella,UT,22,R,26,34
+Parry Jolynn,INF,29,R,26,31,D-
+Franz Ikey,OF,24,L,17,24
+Shaun Kati,C,24,S,19,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Elmore Lee,P,24,R,d12,K+, 21,27
+Tucky Margery,P,26,R,d8,K+, 21,22
+Tanney Caroline,P,33,L,d8, 18,26
+Si Adrea,P,30,R,d6, 20,28
+Dabney Heath,P,27,R,-d4, 23,27

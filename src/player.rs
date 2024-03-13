@@ -231,6 +231,11 @@ impl Player {
             toughness,
             defense,
         } = &self.b_traits;
+
+        let pd_int = match self.pd{
+            Some(die) => Some(die.to_int()),
+            None => None
+        };
         conn.execute(
             "INSERT INTO players(
                 team_id,player_name,age,pos,hand,
@@ -265,15 +270,15 @@ impl Player {
                 ":player_name":&self.name, 
                 ":age":&self.age.to_string(), 
                 ":pos":&self.pos, 
-                ":hand":serde_json::to_string(&self.hand).unwrap(),
+                ":hand":serde_json::to_value(&self.hand).unwrap(),
                 ":bt":&self.bt.to_string(),
                 ":obt_mod":&self.obt_mod.to_string(),
                 ":obt":&self.obt.to_string(),
                 ":pd":serde_json::to_value(&self.pd).unwrap(),
-                ":pd_int": pd_int_string,
+                ":pd_int": serde_json::to_value(pd_int).unwrap(),
                 ":pitcher_trait": serde_json::to_value(&self.pitcher_trait).unwrap(),
                 ":team_spot":serde_json::to_string(&team_spot).unwrap(),
-                ":contact": trait_to_sql_text(contact),
+                ":contact": serde_json::to_value(trait_to_sql_text(contact)).unwrap(),
                 ":contact_enum":serde_json::to_string(contact).unwrap(),
                 ":defense":trait_to_sql_text(defense),
                 ":defense_enum":serde_json::to_string(defense).unwrap(),
