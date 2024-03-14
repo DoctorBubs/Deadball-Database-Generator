@@ -1,0 +1,34 @@
+Name:Portland Oaks, Abrv:PORT, Team Score: 80
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Major Jelene,2B,21,L,32,36
+Lesley Fredi,RF,24,R,30,35,D+
+Hayden Traci,3B,24,R,28,35
+Antony Joselyn,C,26,R,28,33
+Mika Casandra,1B,22,L,28,31
+Henry Xylia,CF,20,R,24,28,S+
+Jephthah Doris,LF,21,R,23,29
+Tommie Tabby,SS,38,R,21,26
+Bench:
+Name Pos Age Hand BT OBT Traits
+Taber Nari,INF,27,R,24,31,D-
+Mace Jania,OF,22,L,26,29
+Kimmo Michaelina,OF,19,S,21,27
+Alfredo Piper,INF,26,R,20,27,S-
+Barty Birdie,C,37,R,19,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Griffin Holley,SP,21,R,d8,GB, 17,23
+Mahesh Desdemona,SP,26,L,d4,St+, 17,23
+Waite Cristine,SP,23,L,d4, 19,20
+Ibrahim Beverlee,SP,19,L,d4, 18,23
+Ingmar Dedra,SP,23,R,-d4,K+, 17,22
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Hussein Keren,RP,38,R,d12, 18,21
+Ev Jayme,RP,23,R,d12, 20,27
+Theobald Berenice,RP,30,R,d8,GB, 18,20
+Ware Belinda,RP,24,R,d8, 18,20
+Axel Sibeal,RP,29,L,d4, 17,20
+Chet Bab,RP,25,L,d4, 17,22
+Stephanus Alla,RP,22,R,d4, 16,19
