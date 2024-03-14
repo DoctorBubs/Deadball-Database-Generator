@@ -7,7 +7,9 @@ use rand::Rng;
 use serde::Deserialize;
 use serde::Serialize;
 
-// Batters and Pitchers both have  several calculations to be common, howver the way their stats are generated differ.
+/*  There are several fields on the player struct that are generated differently for batters and pitchers. We use a PlayerQuality trait to summarize what calculation have to be made for both,
+    and we apply the traits to an enum for both pitchers and hittters to determnig the calculations for each.
+*/
 pub trait PlayerQuality {
     fn get_bt(&self, thread: &mut ThreadRng) -> i32;
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32;
@@ -18,9 +20,9 @@ pub trait PlayerQuality {
     fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait>;
 }
 
-/* Batterquality is the enum used ot generated batters. Batters do not get a base pitch die, however their stats for hitting are much better then pitchers.
- The batter qualtiy enum has 2 levels, TopProspect adn Framhand. Currently, TopProspect is used to generatee playts in a teams startinging lineup, while the lower quality
-farmhands is used for bench players */
+/* Batter quality is the enum used ot generated batters. Batters do not get a base pitch die, however their stats for hitting are much better then pitchers.
+ The batter qualtiy enum has 2 levels, TopProspect and Farmhand. Currently, TopProspect is used to generate playts in a teams startinging lineup, while the lower quality
+farmhands is used for the typically wore performing bench players */
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum BatterQuality {
     TopProspect,
@@ -68,7 +70,7 @@ impl PlayerQuality for BatterQuality {
     }
 }
 
-// The pitcher quality enum is used to generate the pitcher stat. Currenly, only the top prosepect enum is ued.
+// The pitcher quality enum is used to generate the pitcher stats. Currenly, only the top prosepect enum is used, this may change in the future.
 #[derive(Copy, Clone)]
 pub enum PitcherQuality {
     TopProspect,

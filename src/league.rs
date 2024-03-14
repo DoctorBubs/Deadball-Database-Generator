@@ -38,6 +38,7 @@ pub struct League {
     //bench_quality:BatterQuality
 }
 #[derive(Debug)]
+//Possible Errors that oculd arrise from adding a team to a league
 pub enum AddTeamError {
     AbrvTaken,
     NameTaken,
@@ -53,7 +54,9 @@ impl League {
             era,
         }
     }
-
+    /*  Take a new abbrevaiton and name for a team, a thread for random number, a league id and connection to the the database.
+        If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it is succesfull, an Ok is returned
+    */
     pub fn new_team(
         &mut self,
         new_abrv: &String,
@@ -69,9 +72,11 @@ impl League {
                 return Err(AddTeamError::NameTaken);
             };
         }
-
+        // We create a new team
         let new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
+        // We get the team score for hte new team.
         let new_team_score = new_team.team_score.to_string();
+        // We enter the team into the database.
         let team_enter_result = conn.execute(
             "INSERT INTO teams(team_name,abrv, league_id, team_score) VALUES(?1,?2, ?3,?4)",
             [
@@ -81,25 +86,22 @@ impl League {
                 &new_team_score,
             ],
         );
+        // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
         let team_id = conn.last_insert_rowid();
 
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
         };
+        //If all has gone well, we save the players that have been generated into the database
         new_team.save_players_sql(conn, team_id).unwrap();
-        /*if save_team_result.is_err() {
-            return Err(AddTeamError::DatabaseError)
-        } */
-        // let new_team_string = new_team.to_string();
+        // And we inster the team struct into the league's team vector.
         self.teams.push(new_team);
         Ok(())
-        //Ok(new_team_string)
+        
     }
 
-    /* pub fn add_team(&mut self, team: Team) {
-        self.teams.push(team)
-    }*/
+  
 }
 
 fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
@@ -197,16 +199,19 @@ pub fn load_league(
     )?;
     
     let team_iter = stmt.query_map([league_id], |row| {
-        // For each time that    
+        // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.  
         Ok(TeamWrapper {
+            // We set the team id field to the team id from the database
             team_id: row.get(0)?,
             // We use the remaing rows to deseriale the team
             team: Team {
+                // We fill out the rest of the fields in the team struct from the database entry.
                 abrv: row.get(1)?,
                 name: row.get(2)?,
                 team_score: row.get(3)?,
                 wins: row.get(4)?,
                 losses: row.get(5)?,
+                // We create a vector for each player pool that a team has.
                 lineup: Vec::new(),
                 bench: Vec::new(),
                 starting_pitching: Vec::new(),
@@ -218,20 +223,19 @@ pub fn load_league(
             },
         })
     })?;
-
+    // We make a vector of TeamWrapper that are no longer in an ok.
     let wrappers: Vec<TeamWrapper> = team_iter.map(|x| x.unwrap()).collect();
     // We drop stmt so we can borrw conn later.
     drop(stmt);
+    // We then loa
     for wrapper in wrappers {
         // We load the team from the database in the form of a Rust struct.
         let loaded_team = load_team(conn, wrapper)?;
 
-        //println!("team {} loaded", loaded_team.name);
-        //println!("{}", loaded_team);
-        // And add the team to the team vector for hte league.
+        // And add the team to the league's teams vector.
         league.teams.push(loaded_team)
     }
-    println!("{} loaded.", league.name);
+    
     // Now that we have loaded the existing league from the database, it is time to generate a new team.
     add_new_team(&mut league, thread, conn, league_id, true).unwrap();
     Ok(())
