@@ -8,4 +8,4 @@
 /src/futures.rs
 /src/player_pools.rs
 .README.md
-deadball.db
+/deadball.db
