@@ -83,6 +83,9 @@ impl Team {
         self.team_score = (batter_score + pitcher_score) / 10;
     }
 
+    /* For each player in a team, we create a new entry in the database with a provided team id.
+    The TeamSpot enum is used to distnguish each players role on the team in its entry in the database.
+    */
     pub fn save_players_sql(
         &self,
         conn: &mut Connection,
@@ -111,25 +114,7 @@ impl Team {
         Ok(())
     }
 
-    /*pub fn to_string(&self) -> String {
-        let base_info = format!("Name:{} , Team Score: {}\n", self.name, self.team_score);
-        let lineup_string = get_batter_info_string("Lineup".to_string(), &self.lineup);
-        let bench_string = get_batter_info_string("Bench".to_string(), &self.bench);
-        let rotation_string =
-            get_pitcher_info_string("Rotation".to_string(), &self.starting_pitching);
-        let non_bullpen_string = format!(
-            "{}{}{}{}",
-            base_info, lineup_string, bench_string, rotation_string
-        );
-        match &self.bullpen {
-            Some(bullpen) => format!(
-                "{}{}",
-                non_bullpen_string,
-                get_pitcher_info_string("Bullpen".to_string(), bullpen)
-            ),
-            None => non_bullpen_string,
-        }
-    }*/
+    
 }
 
 impl fmt::Display for Team {
@@ -203,61 +188,58 @@ struct PlayerWrapper {
 }
 
 pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
+    //We destructure the team wrapper.
     let TeamWrapper { team_id, mut team } = wrapper;
-    //let stmt_string = format!("SELECT * FROM players WHERE team_id = {}", team_id);
-    let mut stmt = conn.prepare("SELECT * FROM players WHERE team_id = ?1")?;
-    let _test = 3;
-    let team_iter = stmt.query_map([team_id], |row| {
+    // We prepare a statement that will select all players from the database that has a matching team id
+    let mut stmt = conn.prepare(
+        "SELECT 
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact_enum,defense_enum,power_enum,speed_enum,toughness_enum 
+        FROM players 
+        WHERE team_id = ?1"
+    )?;
+    // We use the statment to query the database
+    let player_iter = stmt.query_map([team_id], |row| {
+        //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
         Ok(PlayerWrapper {
-            team_spot: {
-                let input: String = row.get(12)?;
-                let chars = input.as_str();
-                let output = serde_json::from_str(chars);
-                output.unwrap()
-            },
-
+            // Team spot is deserialized from the team spot row.
+            team_spot: serde_json::from_value(row.get(0)?).unwrap(),
+            // And we use the rest to fill out the player.
             player: Player {
-                name: row.get(2)?,
-                age: row.get(3)?,
-                pos: row.get(4)?,
-                hand: serde_json::from_value(row.get(5)?).unwrap(),
-                bt: row.get(6)?,
-                obt_mod: row.get(7)?,
-                obt: row.get(8)?,
-                pd: serde_json::from_value(row.get(9)?).unwrap(),
-                pitcher_trait: serde_json::from_value(row.get(11)?).unwrap(),
+                name: row.get(1)?,
+                age: row.get(2)?,
+                pos: row.get(3)?,
+                hand: serde_json::from_value(row.get(4)?).unwrap(),
+                bt: row.get(5)?,
+                obt_mod: row.get(6)?,
+                obt: row.get(7)?,
+                pd: serde_json::from_value(row.get(8)?).unwrap(),
+                pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
                 b_traits: BTraits {
-                    contact: serde_json::from_value(row.get(14)?).unwrap(),
-                    defense: serde_json::from_value(row.get(16)?).unwrap(),
-                    power: serde_json::from_value(row.get(18)?).unwrap(),
-                    speed: serde_json::from_value(row.get(20)?).unwrap(),
-                    toughness: serde_json::from_value(row.get(22)?).unwrap(),
+                    contact: serde_json::from_value(row.get(10)?).unwrap(),
+                    defense: serde_json::from_value(row.get(11)?).unwrap(),
+                    power: serde_json::from_value(row.get(12)?).unwrap(),
+                    speed: serde_json::from_value(row.get(13)?).unwrap(),
+                    toughness: serde_json::from_value(row.get(14)?).unwrap(),
                 },
             },
         })
     })?;
 
-    for result in team_iter {
+    for result in player_iter {
+        // We remove the player wrapper from the Ok.
         let wrapper = result.unwrap();
+        //We destructure the player wrapper.
         let PlayerWrapper { team_spot, player } = wrapper;
+        // And based off the team spot, the player is assigned to the correct player pool.
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),
             TeamSpot::BenchHitter => team.bench.push(player),
             TeamSpot::StartingPitcher => team.starting_pitching.push(player),
             TeamSpot::Bullpen => match &mut team.bullpen {
                 Some(pen) => pen.push(player),
-                None => panic!("Attemped to add a reliever to a team with no bullpen"),
+                None => panic!("Attemped to add a reliever to an  Ancient era team with no bullpen"),
             },
         }
-
-        /*let goal_vec = match team_spot{
-            TeamSpot::StartingLineup => &mut team.lineup,
-            TeamSpot::BenchHitter => &mut team.bench,
-            TeamSpot::StartingPitcher => &mut team.starting_pitching,
-            TeamSpot::Bullpen => &mut &team.bullpen.unwrap()
-        };
-
-        goal_vec.push(player)*/
     }
     Ok(team)
 }
@@ -276,7 +258,7 @@ fn new_player_vec<T: Copy + PlayerQuality>(
 }
 
 // A starting lineup consists of 8 players, one for each position on the field
-//Todo: option to have a DH?
+
 fn new_starting_lineup(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = vec!["C", "1B", "2B", "3B", "SS", "LF", "CF", "RF"];
     new_player_vec(base, gender, thread, BatterQuality::TopProspect, era)
@@ -319,11 +301,12 @@ fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option
     }
 }
 
+// When we save team to a txt file, we print out the batter in an optimized order, with a header for their relevnat stats.
 fn get_batter_info_string(desc: String, vec: &[Player]) -> String {
     let header = format!("{}:\nName Pos Age Hand BT OBT Traits", desc);
     format!("{}{}\n", header, get_sorted_batter_strings(vec))
 }
-
+// Same goes for pitchers.
 fn get_pitcher_info_string(desc: String, vec: &[Player]) -> String {
     let header = format!("{}:\nName Pos Age Hand PD Trait BT OBT", desc);
     format!("{}{}\n", header, sorted_pitcher_pool(vec))
@@ -373,7 +356,7 @@ pub fn add_team_check(
 
     Ok(())
 }
-
+// Prompts the user to create a new team, while also ensure that the user does not use the same name or abreviation for a team in the same league more than once.
 pub fn add_new_team(
     league: &mut League,
     thread: &mut ThreadRng,
@@ -422,8 +405,10 @@ pub fn add_new_team(
             Ok(input) => input.trim().to_string(),
             Err(_) => panic!("Error creating team abbreviation."),
         };
-        /*  The league takes the name and abreviation we just created. If there is already a team in the league with that name or abbreviation,  it returns an error.
-        Otherwise, the league generates a new team, and then returns the team as a string wrapped in an Ok, which we use to save the team as a file on the disk.*/
+        /* The leuge takes the new team name and abbreviation created.  If there is already a team with the same name and/or abbreviation, an error is returned and the user is prompted to enter in something else.
+            There is also a check to see if there is an error adding the team to the database, and returns a nerror if it does.
+            Otherwwise, the function will return OK. 
+        */
         match league.new_team(&abrv, &team_name, thread, league_id, conn) {
             Err(message) => {
                 match message {
@@ -441,7 +426,7 @@ pub fn add_new_team(
                 //println!("Error {:?}",message);
                 prompt_string = "Enter a unique team name.";
             }
-            // If the league returns OK, we take the string, and write it to a new file in the leauge folder
+            // If the league returns OK, we ask the user if they would like to create a new team.
             Ok(()) => {
                 result = add_team_check(league, conn, thread, league_id);
                 break;

@@ -171,6 +171,7 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
 }
 
 #[derive(Debug)]
+//Teamwrapper contains a team id from the database, as well as the team struct that correspond ot the id.
 pub struct TeamWrapper {
     pub team_id: i64,
     pub team: Team,
@@ -181,32 +182,25 @@ pub fn load_league(
     conn: &mut Connection,
     wrapper: LeagueWrapper,
 ) -> Result<(), rusqlite::Error> {
+    // We destructure the LeagueWrapper
     let LeagueWrapper {
         league_id,
         mut league,
     } = wrapper;
-
+    
     let era = league.era;
-    /*let stmt_string = format!(
-        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
-        league_id
-    );*/
-
-    /*let stmt_string = format!(
-        "SELECT id,abrv,team_name,team_score,wins,losses FROM teams WHERE league_id = ?1",
-
-    );*/
-
-    // We select the teams from the database that matchch the league id
+    // We query the database to select all teams in the database that belong to the league via the league_id car
     let mut stmt = conn.prepare(
         "SELECT id,abrv,team_name,team_score,wins,losses 
         FROM teams 
         WHERE league_id = ?1",
     )?;
-
-    let league_iter = stmt.query_map([league_id], |row| {
+    
+    let team_iter = stmt.query_map([league_id], |row| {
+        // For each time that    
         Ok(TeamWrapper {
             team_id: row.get(0)?,
+            // We use the remaing rows to deseriale the team
             team: Team {
                 abrv: row.get(1)?,
                 name: row.get(2)?,
@@ -216,6 +210,7 @@ pub fn load_league(
                 lineup: Vec::new(),
                 bench: Vec::new(),
                 starting_pitching: Vec::new(),
+                //Ancient Era teams do not have a bullpen, while Modern Era teams do.
                 bullpen: match era {
                     Era::Ancient => None,
                     Era::Modern => Some(Vec::new()),
@@ -224,7 +219,7 @@ pub fn load_league(
         })
     })?;
 
-    let wrappers: Vec<TeamWrapper> = league_iter.map(|x| x.unwrap()).collect();
+    let wrappers: Vec<TeamWrapper> = team_iter.map(|x| x.unwrap()).collect();
     // We drop stmt so we can borrw conn later.
     drop(stmt);
     for wrapper in wrappers {
@@ -259,6 +254,7 @@ impl fmt::Display for LeagueWrapper {
     }
 }
 
+//This function queries the database for all leagues. If there are no leagues in the database, the user is prompted to create one.
 pub fn league_check(
     conn: &mut Connection,
     thread: &mut ThreadRng,
@@ -303,10 +299,12 @@ pub fn league_check(
             Select::new("Select an existing league", options).prompt();
         match ans {
             Ok(select) => match input {
+                //If the users decided they wanted to create a new team earlierm they are taken to the prompt to create a new team
                 MenuInput::CreateNewTeam => {
                     load_league(thread, conn, select)?;
                     Ok(())
                 }
+                //Otherwise, the league is saved to the users disk.
                 MenuInput::RefreshLeague => {
                     println!("Refreshing league.");
                     save_league(&select.league, conn, thread).unwrap();

@@ -5,7 +5,7 @@ use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
 use crate::{league::create_new_league, league_check};
-
+// MenuInput contains all the valid choices a user can use at the main menu.
 #[derive(Copy, Clone, Debug)]
 pub enum MenuInput {
     CreateNewLeague,
@@ -28,13 +28,15 @@ impl fmt::Display for MenuInput {
 }
 
 pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+   
+    // We load a vector of the possible options a view can pick in the main menu.
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
         MenuInput::CreateNewTeam,
         MenuInput::RefreshLeague,
         MenuInput::Exit,
     ];
-
+    // We prompt the user via Inquire.
     let starting_choice: Result<MenuInput, InquireError> =
         Select::new("What would you like to do?", starting_options).prompt();
 
@@ -42,7 +44,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::
         Ok(choice) => match choice {
             MenuInput::CreateNewLeague => create_new_league(thread, conn),
             MenuInput::Exit => Ok(()),
-            _ => {
+            MenuInput::CreateNewTeam| MenuInput::RefreshLeague=> {
                 league_check(conn, thread, choice).unwrap();
                 Ok(())
             }

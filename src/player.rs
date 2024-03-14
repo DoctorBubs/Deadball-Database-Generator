@@ -225,7 +225,7 @@ impl Player {
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
-        let _pd_int_string = self.get_base_pd().to_int().to_string();
+        // We destruce the players BTraits to make it easier to instert into the database 
         let BTraits {
             contact,
             speed,
@@ -233,7 +233,7 @@ impl Player {
             toughness,
             defense,
         } = &self.b_traits;
-
+        
         let pd_int = self.pd.map(|die| die.to_int());
         conn.execute(
             "INSERT INTO players(
@@ -292,7 +292,7 @@ impl Player {
 
         Ok(())
     }
-
+    // Used to rank pitchers.
     pub fn get_pitcher_rank_info(&self) -> PitcherRankInfo {
         let pd_num = self.get_base_pd().to_int();
         PitcherRankInfo {
