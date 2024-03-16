@@ -1,0 +1,24 @@
+Name:Test, Abrv:TEST, Team Score: 48
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Dillon Albertina,CF,24,R,28,35
+Monte Nadeen,SS,33,R,28,34
+Nathanil Maryangelyn,C,20,L,26,31
+Robinson Bridie,3B,25,R,26,28
+Mohammad Clemmy,RF,19,R,22,24
+Sebastien Dela,LF,19,R,20,24
+Martyn Phillis,2B,22,R,19,24
+Page Janka,1B,21,R,18,23
+Bench:
+Name Pos Age Hand BT OBT Traits
+Ehud Prudence,INF,38,L,22,27,S+
+Waverly Leorah,OF,23,R,22,28
+Morris Ashely,UT,33,R,19,22,D+
+Wilburt Lia,C,20,R,14,18
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Brandon Bambi,P,19,R,d12, 21,29
+Alf Edwina,P,19,L,d6,CN+, 16,20
+Giles Fredrika,P,20,R,d6, 16,21
+Waleed Bernice,P,24,L,d4, 22,26
+Abdul Cristen,P,23,R,d4, 19,25

@@ -1,0 +1,32 @@
+-- database: c:\Users\joshu\Documents\rust_projects\deadball_league_generator\deadball.db
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+
+
+
+WITH pd_info AS(
+    SELECT 
+        teams.id AS team_id, 
+        floor(AVG(players.pd_int)) AS avg_pd 
+    FROM teams
+    INNER JOIN players ON players.team_id = teams.id
+    WHERE players.PD IS NOT NULL
+    GROUP BY team_id
+
+)
+
+SELECT 
+teams.team_name AS team_name,
+leagues.era AS era, 
+FLOOR(avg(players.bt)) as avg_bt, 
+FLOOR(avg(players.obt)) AS avg_obt, 
+pd_info.avg_pd AS avg_PD, 
+teams.team_score AS team_score
+FROM teams
+INNER JOIN leagues on leagues.id = teams.league_id
+INNER JOIN pd_info on pd_info.team_id = teams.id
+INNER JOIN players on players.team_id = teams.id
+WHERE players.PD is NULL
+GROUP BY team_name
+ORDER BY team_score DESC, avg_PD DESC, avg_obt DESC, avg_bt DESC;

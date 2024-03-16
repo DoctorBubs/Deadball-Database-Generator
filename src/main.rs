@@ -105,6 +105,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
              speed_enum TEXT NOT NULL,
              toughness TEXT,
              toughness_enum TEXT NOT NULL,
+             trade_value INTEGER NOT NULL,
              FOREIGN KEY(team_id) REFERENCES teams(id)
          )",
         (),

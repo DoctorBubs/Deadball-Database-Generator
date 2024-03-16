@@ -1,3 +1,4 @@
+use crate::b_traits;
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
@@ -151,6 +152,7 @@ pub struct Player {
     // This is sumulated using an option.
     pub b_traits: BTraits,
     pub pitcher_trait: Option<PitcherTrait>,
+    pub trade_value :i32
 }
 
 impl Player {
@@ -240,7 +242,7 @@ impl Player {
                 team_id,player_name,age,pos,hand,
                 bt,obt_mod,obt,
                 pd,pd_int,pitcher_trait,team_spot,
-                contact,contact_enum,defense,defense_enum,power,power_enum,speed,speed_enum,toughness,toughness_enum) 
+                contact,contact_enum,defense,defense_enum,power,power_enum,speed,speed_enum,toughness,toughness_enum,trade_value) 
             VALUES(:team_id, 
                 :player_name, 
                 :age, 
@@ -262,7 +264,8 @@ impl Player {
                 :speed,
                 :speed_enum, 
                 :toughness,
-                :toughness_enum
+                :toughness_enum,
+                :trade_value
             )", 
             named_params![
                 ":team_id": &team_id,
@@ -286,7 +289,8 @@ impl Player {
                 ":speed": trait_to_sql_text(speed),
                 ":speed_enum":serde_json::to_string(speed).unwrap(), 
                 ":toughness": trait_to_sql_text(toughness),
-                ":toughness_enum":serde_json::to_string(toughness).unwrap()
+                ":toughness_enum":serde_json::to_string(toughness).unwrap(),
+                ":trade_value": self.trade_value
             ],
         )?;
 
@@ -327,6 +331,16 @@ impl Player {
         let hand = Hand::new(thread, &quality);
         let age_cat = AgeCat::random(thread);
         let age = age_cat.new_age(thread);
+        let trade_value = match pd{
+            None => bt + b_traits.get_trade_value(),
+            Some(pd) => {
+                let base = pd.to_int();
+                match pitcher_trait{
+                    Some(_) => (base + 1) * 5,
+                    None => base * 5
+                } 
+            }
+        };
 
         Player {
             name,
@@ -339,6 +353,7 @@ impl Player {
             pd,
             b_traits,
             pitcher_trait,
+            trade_value
         }
     }
 }

@@ -102,7 +102,7 @@ impl Team {
         for starter in &self.starting_pitching {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
         }
-
+        // As not every team has a bullpen, we do a check to make suyre.
         match &self.bullpen {
             Some(pen) => {
                 for reliever in pen {
@@ -193,7 +193,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact_enum,defense_enum,power_enum,speed_enum,toughness_enum 
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact_enum,defense_enum,power_enum,speed_enum,toughness_enum,trade_value
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -221,6 +221,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                     speed: serde_json::from_value(row.get(13)?).unwrap(),
                     toughness: serde_json::from_value(row.get(14)?).unwrap(),
                 },
+                trade_value: row.get(15)?
             },
         })
     })?;

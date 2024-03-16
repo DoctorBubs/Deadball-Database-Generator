@@ -42,6 +42,8 @@ fn above_average(b_trait: impl PlayerTrait) -> bool {
     b_trait.to_int() > 0
 }
 
+
+
 impl BTraits {
     pub fn get_above_average(&self) -> BTraitAboveAverage {
         BTraitAboveAverage {
@@ -62,6 +64,16 @@ impl BTraits {
             speed: Speed::S0,
             toughness: Toughness::T0,
         }
+    }
+
+    pub fn get_trade_value(&self) -> i32{
+        (self.contact.to_int() 
+            + self.defense.to_int() 
+            + self.power.to_int() 
+            + self.speed.to_int() 
+            + self.toughness.to_int()
+        )
+        * 5
     }
 
     pub fn get_rbi_score(&self) -> i32 {
