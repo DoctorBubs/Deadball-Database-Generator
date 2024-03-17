@@ -1,0 +1,34 @@
+Name:Portland Oaks, Abrv:PORT, Team Score: 77
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Sanford Robinetta,SS,21,R,30,36
+Dallas Teddi,2B,19,R,32,37,P+
+Denis Caitrin,RF,35,R,31,34
+Morse Jayme,1B,26,R,29,33,D+
+Wang Nissie,LF,32,L,23,30,S+
+Foster Allyson,3B,19,L,26,33,P+
+Thorny Jillayne,CF,22,R,27,31
+Sheldon Josey,C,25,R,22,27
+Bench:
+Name Pos Age Hand BT OBT Traits
+Rene Eddy,OF,28,L,22,29
+Monroe Dani,INF,22,R,24,27,S-
+Stuart Harriette,INF,38,R,22,27
+Armond Katheryn,OF,23,S,20,25
+Wayland Charmane,C,23,L,14,18,P++
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Owen Lynsey,SP,29,R,d12, 23,26
+Mohamad Dorelia,SP,35,L,d8, 16,18
+Cristopher Marcie,SP,19,R,d8, 17,23
+Brewster Darice,SP,32,L,d4,CN-, 20,26
+Frazier Doloritas,SP,36,R,d4, 19,21
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Sanders Kathleen,RP,19,L,d12, 16,23
+Juan Phaedra,RP,36,R,d8, 18,20
+Yardley Nissie,RP,32,R,d8, 18,24
+Thomas Suellen,RP,25,L,d4,K+, 21,25
+Butch Robyn,RP,22,R,d4, 17,21
+Franky Hettie,RP,24,R,-d4, 19,26
+Orion Alica,RP,21,R,-d4, 18,26

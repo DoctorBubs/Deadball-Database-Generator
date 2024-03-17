@@ -10,6 +10,7 @@ mod player_quality;
 mod team;
 mod traits;
 use crate::era::Era;
+use crate::main_menu::run_main_menu;
 use crate::pd::PD;
 use crate::player::Player;
 use crate::player::PlayerGender;
@@ -22,11 +23,10 @@ use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
-use crate::main_menu::run_main_menu;
+use league::league_check;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
-use league::league_check;
 use std::fmt;
 
 fn main() -> std::io::Result<()> {
@@ -110,6 +110,30 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
+    /*
+    conn.execute("CREATE TABLE IF NOT EXISTS league_seasons(
+
+        league_season_id INTEGER PRIMARY KEY,
+        league_id INTEGER NOT NULL,
+        champion_id INTEGER,
+        FOREIGN KEY(league_id) REFERENCES leagues(id),
+        FOREIGN KEY(champion_id) REFERENCES teams(id))",
+        ()
+
+
+
+    )?;
+
+    conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
+        team_season_id INTEGER PRIMARY KEY,
+        league_season_id INTEGER,
+        team_id INTEGER,
+        wins INTEGER DEFAULT 0,
+        losses INTEGER DEFAULT 0,
+
+
+        ", params)
+        */
 
     // If no errors occured, the database is returned.
     Ok(conn)

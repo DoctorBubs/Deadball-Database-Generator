@@ -113,8 +113,6 @@ impl Team {
         };
         Ok(())
     }
-
-    
 }
 
 impl fmt::Display for Team {
@@ -221,7 +219,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                     speed: serde_json::from_value(row.get(13)?).unwrap(),
                     toughness: serde_json::from_value(row.get(14)?).unwrap(),
                 },
-                trade_value: row.get(15)?
+                trade_value: row.get(15)?,
             },
         })
     })?;
@@ -238,7 +236,9 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
             TeamSpot::StartingPitcher => team.starting_pitching.push(player),
             TeamSpot::Bullpen => match &mut team.bullpen {
                 Some(pen) => pen.push(player),
-                None => panic!("Attemped to add a reliever to an  Ancient era team with no bullpen"),
+                None => {
+                    panic!("Attemped to add a reliever to an  Ancient era team with no bullpen")
+                }
             },
         }
     }
@@ -408,7 +408,7 @@ pub fn add_new_team(
         };
         /* The leuge takes the new team name and abbreviation created.  If there is already a team with the same name and/or abbreviation, an error is returned and the user is prompted to enter in something else.
             There is also a check to see if there is an error adding the team to the database, and returns a nerror if it does.
-            Otherwwise, the function will return OK. 
+            Otherwwise, the function will return OK.
         */
         match league.new_team(&abrv, &team_name, thread, league_id, conn) {
             Err(message) => {

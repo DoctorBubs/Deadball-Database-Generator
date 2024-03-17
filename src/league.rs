@@ -35,7 +35,7 @@ pub struct League {
     pub teams: Vec<Team>,
     pub gender: PlayerGender,
     pub era: Era,
-    //bench_quality:BatterQuality
+    pub league_id: i64, //bench_quality:BatterQuality
 }
 #[derive(Debug)]
 //Possible Errors that oculd arrise from adding a team to a league
@@ -45,14 +45,81 @@ pub enum AddTeamError {
     DatabaseError,
 }
 
+struct StandingWrapper {
+    name: String,
+    team_score: i32,
+    wins: i32,
+    losses: i32,
+    games_behind: i32,
+}
 impl League {
-    pub fn new(name: &String, gender: PlayerGender, era: Era) -> League {
+    pub fn new(name: &String, gender: PlayerGender, era: Era, league_id: i64) -> League {
         League {
             name: name.to_string(),
             teams: Vec::new(),
             gender,
             era,
+            league_id,
         }
+    }
+
+    pub fn display_standings(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
+        let mut stmt = conn.prepare(
+            "
+        WITH first_place AS(
+            SELECT 
+                leagues.id AS league_id, 
+                MAX(teams.wins) AS wins
+            FROM 
+                leagues
+            INNER JOIN 
+                teams ON teams.league_id = leagues.id
+            GROUP BY 
+                leagues.id
+        )
+        
+        SELECT 
+            teams.team_name, 
+            teams.team_score,
+            teams.wins, 
+            teams.losses,
+            (first_place.wins - teams.wins) AS games_behind 
+        FROM 
+            teams
+        INNER JOIN 
+            first_place ON first_place.league_id = teams.league_id
+        WHERE 
+            teams.league_id = ?1
+        ORDER BY 
+            games_behind ASC, teams.team_score DESC;
+        ",
+        )?;
+
+        let rows = stmt.query_map([self.league_id], |row| {
+            Ok({
+                StandingWrapper {
+                    name: row.get(0)?,
+                    team_score: row.get(1)?,
+                    wins: row.get(2)?,
+                    losses: row.get(3)?,
+                    games_behind: row.get(4)?,
+                }
+            })
+        })?;
+
+        for row in rows {
+            let standing = row.unwrap();
+            println!(
+                "{} {} {} {} {}",
+                standing.name,
+                standing.team_score,
+                standing.wins,
+                standing.losses,
+                standing.games_behind
+            )
+        }
+
+        Ok(())
     }
     /*  Take a new abbrevaiton and name for a team, a thread for random number, a league id and connection to the the database.
         If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it is succesfull, an Ok is returned
@@ -98,10 +165,7 @@ impl League {
         // And we inster the team struct into the league's team vector.
         self.teams.push(new_team);
         Ok(())
-        
     }
-
-  
 }
 
 fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
@@ -166,7 +230,7 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
     // We then create a leage struct in rust.
-    let mut new_league = League::new(&league_name, gender, era);
+    let mut new_league = League::new(&league_name, gender, era, league_id);
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
     add_new_team(&mut new_league, thread, conn, league_id, true)
@@ -189,7 +253,8 @@ pub fn load_league(
         league_id,
         mut league,
     } = wrapper;
-    
+
+    league.display_standings(conn)?;
     let era = league.era;
     // We query the database to select all teams in the database that belong to the league via the league_id car
     let mut stmt = conn.prepare(
@@ -197,9 +262,9 @@ pub fn load_league(
         FROM teams 
         WHERE league_id = ?1",
     )?;
-    
+
     let team_iter = stmt.query_map([league_id], |row| {
-        // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.  
+        // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
         Ok(TeamWrapper {
             // We set the team id field to the team id from the database
             team_id: row.get(0)?,
@@ -235,7 +300,7 @@ pub fn load_league(
         // And add the team to the league's teams vector.
         league.teams.push(loaded_team)
     }
-    
+
     // Now that we have loaded the existing league from the database, it is time to generate a new team.
     add_new_team(&mut league, thread, conn, league_id, true).unwrap();
     Ok(())
@@ -277,6 +342,7 @@ pub fn league_check(
 
                     //
                     gender: serde_json::from_value(row.get(3)?).unwrap(),
+                    league_id: row.get(0)?,
 
                     //PlayerGender::from_string(row.get(3)?),
                     teams: Vec::new(),

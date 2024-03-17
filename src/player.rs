@@ -152,7 +152,7 @@ pub struct Player {
     // This is sumulated using an option.
     pub b_traits: BTraits,
     pub pitcher_trait: Option<PitcherTrait>,
-    pub trade_value :i32
+    pub trade_value: i32,
 }
 
 impl Player {
@@ -227,7 +227,7 @@ impl Player {
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
-        // We destruce the players BTraits to make it easier to instert into the database 
+        // We destruce the players BTraits to make it easier to instert into the database
         let BTraits {
             contact,
             speed,
@@ -235,7 +235,7 @@ impl Player {
             toughness,
             defense,
         } = &self.b_traits;
-        
+
         let pd_int = self.pd.map(|die| die.to_int());
         conn.execute(
             "INSERT INTO players(
@@ -331,14 +331,14 @@ impl Player {
         let hand = Hand::new(thread, &quality);
         let age_cat = AgeCat::random(thread);
         let age = age_cat.new_age(thread);
-        let trade_value = match pd{
+        let trade_value = match pd {
             None => bt + b_traits.get_trade_value(),
             Some(pd) => {
                 let base = pd.to_int();
-                match pitcher_trait{
+                match pitcher_trait {
                     Some(_) => (base + 1) * 5,
-                    None => base * 5
-                } 
+                    None => base * 5,
+                }
             }
         };
 
@@ -353,7 +353,7 @@ impl Player {
             pd,
             b_traits,
             pitcher_trait,
-            trade_value
+            trade_value,
         }
     }
 }

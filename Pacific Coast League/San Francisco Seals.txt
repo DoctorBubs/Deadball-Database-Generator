@@ -1,0 +1,34 @@
+Name:San Francisco Seals, Abrv:SF, Team Score: 65
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Antone Alfie,CF,26,L,30,37
+Meade Aila,3B,34,R,29,36,P+
+Taddeo Larisa,LF,23,R,28,33,D+
+Noach Liane,C,23,L,27,33
+Derrin Jolynn,SS,22,S,25,32
+Dougie Tammie,RF,30,R,26,30,C+S+
+Ehud Margaretha,2B,24,R,22,25,D+S-
+Burnaby Kandy,1B,23,L,18,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Gale Merola,INF,24,S,18,24,D-
+Rees Jobye,INF,26,L,21,23
+Amery Gertruda,OF,32,R,18,23
+Thedrick Janel,C,20,R,16,23,C-
+Clayborn Daryl,OF,28,R,17,19
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Micah Wren,SP,25,L,d8, 17,18
+Courtney Garland,SP,35,R,d4, 15,22
+Lazarus Kariotta,SP,33,R,d4, 20,27
+Mose Angeline,SP,24,R,d4, 18,19
+Dick Joelle,SP,24,L,-d4, 24,32
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Park Sosanna,RP,26,R,d8, 24,32
+Wendell Raychel,RP,24,R,d8, 16,21
+Morton Lynsey,RP,35,R,d4, 21,24
+Merrel Tamiko,RP,35,R,d4, 16,17
+Caspar Taffy,RP,27,R,d4, 18,22
+Rochester Joete,RP,22,R,d4, 16,19
+Quincy Tabbatha,RP,22,R,d4, 21,27
