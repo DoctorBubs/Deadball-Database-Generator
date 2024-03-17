@@ -96,15 +96,10 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
              pitcher_trait TEXT , --Pitchers
              team_spot TEXT NOT NULL, -- Repreresents a player's rolke 
              contact TEXT ,
-             contact_enum TEXT NOT NULL,
              defense TEXT,
-             defense_enum TEXT NOT NULL,
              power TEXT ,
-             power_enum TEXT NOT NULL,
              speed TEXT ,
-             speed_enum TEXT NOT NULL,
              toughness TEXT,
-             toughness_enum TEXT NOT NULL,
              trade_value INTEGER NOT NULL,
              FOREIGN KEY(team_id) REFERENCES teams(id)
          )",

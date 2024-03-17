@@ -1,0 +1,34 @@
+Name:Oakland Oaks, Abrv:OAK, Team Score: 80
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Dimitry Valencia,3B,24,R,32,39
+Llewellyn Bidget,1B,22,S,29,37
+Paten Lila,C,27,L,29,35
+Davide Dorcas,LF,27,S,27,33
+Javier Silva,2B,20,L,28,30
+Trevor Lilian,RF,23,S,24,30,S-
+Ajai Blondelle,CF,26,R,22,29,P+T+
+Armstrong Hephzibah,SS,27,R,20,24,P+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Kyle Kristine,OF,30,R,27,34,C+
+Remington Miriam,OF,19,L,25,29
+Carsten Joyce,INF,19,R,20,24
+Hunter Jacquenetta,INF,23,R,21,23
+Ambrose Karmen,C,24,R,20,22
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Gian Adelaide,SP,25,L,d12, 18,24
+Pepillo Fionna,SP,27,R,d8, 24,27
+Phillipe Marne,SP,24,R,d8, 17,20
+Myles Olivie,SP,25,R,d4,K+, 17,18
+Harrison E'Lane,SP,23,L,d4, 17,21
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Pierson Billi,RP,37,L,d8, 15,21
+Neall Sydney,RP,25,R,d8, 15,16
+Neddy Rebekkah,RP,22,L,d8, 21,26
+Holly Chelsie,RP,32,L,d4, 24,27
+Mauritz Blondy,RP,24,L,d4, 22,27
+Darryl Patrice,RP,20,R,d4, 19,25
+Chase Dawna,RP,21,L,-d4,CN-, 20,24

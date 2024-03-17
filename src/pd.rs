@@ -16,8 +16,11 @@ Inversely, a pitcher with a PD of -D4 rolls a 4 sided die, the the number genera
 
 // To reflect Die notation the PD enum is organized via the following pattern: D[i] is equivalant to d[i], while DM[i] is equivilant to -d[i]
 pub enum PD {
+    #[serde(rename="d20")]
     D20,
+    #[serde(rename="d12")]
     D12,
+    #[serde(rename="d8")]
     D8,
     D6,
     D4,

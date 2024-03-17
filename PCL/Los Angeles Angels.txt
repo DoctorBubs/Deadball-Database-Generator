@@ -1,0 +1,34 @@
+Name:Los Angeles Angels, Abrv:LA, Team Score: 96
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Ruddy Kerstin,2B,26,L,29,36
+Apollo Emmalee,C,38,R,30,35
+Wallas Kirbie,CF,24,R,31,36,P+
+Renard Joana,RF,22,R,28,32,D+
+Euclid Louisa,3B,22,R,26,31
+Deane Nicole,LF,22,S,24,28
+Steward Ibby,SS,25,R,20,25,D+
+Rufe Marisa,1B,22,R,21,23
+Bench:
+Name Pos Age Hand BT OBT Traits
+Nickie Sheelagh,OF,25,R,27,35
+Pepillo Feliza,OF,24,R,26,32,P+
+Pepito Cecile,INF,31,R,25,29,D-
+Chuck Sharl,INF,22,R,19,25,P++
+Dieter Tamera,C,28,R,19,23
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Mohan Valene,SP,20,R,d12, 18,26
+Del Miquela,SP,26,R,d4,K+, 17,20
+Hallam Aphrodite,SP,29,R,d4, 22,30
+Nick Mabel,SP,27,R,d4, 19,22
+Archon Tildie,SP,25,R,d4, 16,22
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Finn Rickie,RP,37,R,d12,CN-, 21,24
+Benjamen Dorene,RP,37,R,d12, 19,22
+Dimitrou Garland,RP,32,R,d12, 19,25
+Michele Marsiella,RP,24,L,d12, 23,27
+Bronson Arlena,RP,25,L,d8, 14,19
+Barth Jemmie,RP,24,L,d4,St+, 18,25
+Hamilton Engracia,RP,22,L,d4, 16,18

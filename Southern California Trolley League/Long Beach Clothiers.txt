@@ -1,0 +1,24 @@
+Name:Long Beach Clothiers, Abrv:LB, Team Score: 46
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Clyde Heloise,SS,24,R,35,40
+Lanny Kandace,LF,23,S,33,38
+Taylor Ivonne,2B,20,L,31,38
+Warren Ola,RF,24,S,33,37
+John Sarine,1B,19,R,24,29,C+
+Zachery Dorey,3B,19,L,22,26
+Urbain Annadiana,C,37,L,23,25,C-P-
+Tim Atlante,CF,24,L,17,24
+Bench:
+Name Pos Age Hand BT OBT Traits
+Fidel Arlana,C,37,R,22,30
+Jonah Ilene,OF,24,R,20,28
+Randi Christina,UT,23,L,25,29,C+
+Omar Sophi,INF,25,R,21,24,P+
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Royce Angelina,P,24,L,d12, 17,20
+Jo Gill,P,24,R,d6, 17,24
+Giffy Fiann,P,38,R,d4, 19,24
+Winton Jere,P,22,L,d4, 20,23
+Luce Tobi,P,26,R,-d4, 19,20

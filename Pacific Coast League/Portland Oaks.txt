@@ -1,34 +1,34 @@
-Name:Portland Oaks, Abrv:PORT, Team Score: 77
+Name:Portland Oaks, Abrv:PORT, Team Score: 56
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Sanford Robinetta,SS,21,R,30,36
-Dallas Teddi,2B,19,R,32,37,P+
-Denis Caitrin,RF,35,R,31,34
-Morse Jayme,1B,26,R,29,33,D+
-Wang Nissie,LF,32,L,23,30,S+
-Foster Allyson,3B,19,L,26,33,P+
-Thorny Jillayne,CF,22,R,27,31
-Sheldon Josey,C,25,R,22,27
+Davis Gwyneth,SS,23,S,35,37,D-P-
+Sascha Gilbertina,RF,26,R,28,33
+Monroe Lauretta,2B,27,L,25,30,S+
+Aldric Devi,3B,24,S,26,29
+Rinaldo Dulcinea,1B,25,R,24,28,S-
+Stan Fedora,C,24,S,21,26
+Jabez Andrei,LF,20,L,21,25,P+
+Chrissy Myriam,CF,22,L,20,23
 Bench:
 Name Pos Age Hand BT OBT Traits
-Rene Eddy,OF,28,L,22,29
-Monroe Dani,INF,22,R,24,27,S-
-Stuart Harriette,INF,38,R,22,27
-Armond Katheryn,OF,23,S,20,25
-Wayland Charmane,C,23,L,14,18,P++
+Esau Jaleh,OF,24,R,29,35
+Tulley Genny,OF,24,R,22,28
+Silvan Goldarina,INF,25,R,19,25
+Fernando Melony,C,19,L,23,26,P++
+Ross Lishe,INF,29,R,18,23,C+
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Owen Lynsey,SP,29,R,d12, 23,26
-Mohamad Dorelia,SP,35,L,d8, 16,18
-Cristopher Marcie,SP,19,R,d8, 17,23
-Brewster Darice,SP,32,L,d4,CN-, 20,26
-Frazier Doloritas,SP,36,R,d4, 19,21
+Joe Josie,SP,29,R,d8,K+, 16,19
+Remington Becca,SP,22,L,d4, 19,24
+Stew Angy,SP,21,R,d4, 20,21
+Wyatan Nessi,SP,33,R,-d4,CN+, 20,24
+Hercule Brandi,SP,32,L,-d4, 22,28
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Sanders Kathleen,RP,19,L,d12, 16,23
-Juan Phaedra,RP,36,R,d8, 18,20
-Yardley Nissie,RP,32,R,d8, 18,24
-Thomas Suellen,RP,25,L,d4,K+, 21,25
-Butch Robyn,RP,22,R,d4, 17,21
-Franky Hettie,RP,24,R,-d4, 19,26
-Orion Alica,RP,21,R,-d4, 18,26
+Leif Lucine,RP,37,L,d12, 15,16
+Nikita Lianna,RP,23,R,d4,GB, 20,28
+Calvin Carlin,RP,19,R,d4,CN+, 15,16
+Robbie Margeaux,RP,34,R,d4, 18,19
+Barney Bonnie,RP,22,L,d4, 21,26
+Mort Danyette,RP,19,L,d4, 21,29
+Wells Juditha,RP,19,R,-d4,GB, 19,27

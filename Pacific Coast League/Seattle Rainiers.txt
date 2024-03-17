@@ -1,0 +1,34 @@
+Name:Seattle Rainiers, Abrv:SEA, Team Score: 71
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Winton Emily,RF,23,L,35,41,P+
+Harley Emilie,C,25,R,32,36
+Harry Sharra,CF,24,R,31,33
+Pattie Aeriell,1B,24,R,27,32,D-
+Glenn Cate,SS,23,R,26,32,P-
+Penny Miguela,3B,26,R,27,29
+Karel Janessa,LF,27,L,23,29
+Arvy Almeda,2B,22,S,21,25
+Bench:
+Name Pos Age Hand BT OBT Traits
+Rayner Margalo,INF,27,L,26,31
+Corky Randi,OF,28,S,20,25
+Serge Trenna,C,30,S,20,24,S-
+Barth Karina,INF,33,L,18,22
+Clayton Mable,OF,20,R,17,22
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Gregg Gayle,SP,35,R,d8, 21,23
+Patrick Freddy,SP,32,R,d4,GB, 24,26
+Vilhelm Rubie,SP,23,R,d4,St+, 17,24
+Saunder Elfrieda,SP,22,L,d4,CN-, 19,25
+Che Diane,SP,36,R,d4, 17,24
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Joao Marga,RP,27,L,d8,St+, 18,23
+Che Friederike,RP,31,R,d4,CN+, 18,21
+Hadrian Latrena,RP,22,L,d4,GB, 16,24
+Sandor Genevra,RP,21,L,d4,CN-, 19,26
+Ricky Helene,RP,27,L,d4, 18,22
+Tanny Philippa,RP,24,R,d4, 16,18
+Kaspar Havivah,RP,23,R,d4, 16,24

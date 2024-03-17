@@ -4,7 +4,7 @@ use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
-
+use crate::traits::player_trait_option;
 use crate::team::TeamSpot;
 
 use crate::traits::trait_to_sql_text;
@@ -236,13 +236,19 @@ impl Player {
             defense,
         } = &self.b_traits;
 
+        let contact_option = player_trait_option(contact);
+        let defense_option = player_trait_option(defense);
+        let power_option = player_trait_option(power);
+        let speed_option = player_trait_option(speed);
+        let toughness_option = player_trait_option(toughness);
+
         let pd_int = self.pd.map(|die| die.to_int());
         conn.execute(
             "INSERT INTO players(
                 team_id,player_name,age,pos,hand,
                 bt,obt_mod,obt,
                 pd,pd_int,pitcher_trait,team_spot,
-                contact,contact_enum,defense,defense_enum,power,power_enum,speed,speed_enum,toughness,toughness_enum,trade_value) 
+                contact,defense,power,speed,toughness,trade_value) 
             VALUES(:team_id, 
                 :player_name, 
                 :age, 
@@ -256,15 +262,10 @@ impl Player {
                 :pitcher_trait, 
                 :team_spot, 
                 :contact,
-                :contact_enum, 
                 :defense,
-                :defense_enum, 
                 :power,
-                :power_enum, 
                 :speed,
-                :speed_enum, 
                 :toughness,
-                :toughness_enum,
                 :trade_value
             )", 
             named_params![
@@ -280,16 +281,11 @@ impl Player {
                 ":pd_int": serde_json::to_value(pd_int).unwrap(),
                 ":pitcher_trait": serde_json::to_value(self.pitcher_trait).unwrap(),
                 ":team_spot":serde_json::to_string(&team_spot).unwrap(),
-                ":contact": serde_json::to_value(trait_to_sql_text(contact)).unwrap(),
-                ":contact_enum":serde_json::to_string(contact).unwrap(),
-                ":defense":trait_to_sql_text(defense),
-                ":defense_enum":serde_json::to_string(defense).unwrap(),
-                ":power": trait_to_sql_text(power),
-                ":power_enum":serde_json::to_value(power).unwrap(),
-                ":speed": trait_to_sql_text(speed),
-                ":speed_enum":serde_json::to_string(speed).unwrap(), 
-                ":toughness": trait_to_sql_text(toughness),
-                ":toughness_enum":serde_json::to_string(toughness).unwrap(),
+                ":contact": serde_json::to_value(contact_option).unwrap(),
+                ":defense":serde_json::to_value(defense_option).unwrap(),
+                ":power": serde_json::to_value(power_option).unwrap(),
+                ":speed": serde_json::to_value(speed_option).unwrap(),
+                ":toughness": serde_json::to_value(toughness_option).unwrap(),
                 ":trade_value": self.trade_value
             ],
         )?;

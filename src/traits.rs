@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use crate::player;
 //use crate::greater_trait;
 //use crate::greater_trait as other_greater_trait;
 use crate::Deserialize;
@@ -23,12 +24,27 @@ pub fn trait_to_sql_text<T: PlayerTrait + Display>(player_trait: &T) -> Option<S
     }
 }
 
+// Takes a plert trait. If the result of converting the trait to an int is 0, None is returned, else an option with hte trait is returned.
+pub fn player_trait_option<T: PlayerTrait>(player_trait: &T) -> Option<&T>{
+    match player_trait.to_int() {
+        0 => None,
+        _ => Some(player_trait)
+
+    }
+}
+
+
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum Power {
+    #[serde(rename="P++")]
     P2,
+    #[serde(rename="P+")]
     P1,
+    #[serde(rename="")]
     P0,
+    #[serde(rename="P-")]
     PM1,
+    #[serde(rename="P--")]
     PM2,
 }
 
@@ -71,9 +87,13 @@ impl fmt::Display for Power {
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum Speed {
+    #[serde(rename="S++")]
     S2,
+    #[serde(rename="S+")]
     S1,
+    #[serde(rename="")]
     S0,
+    #[serde(rename="S++")]
     SM1,
 }
 
@@ -103,8 +123,11 @@ impl fmt::Display for Speed {
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum Contact {
+    #[serde(rename="C+")]
     C1,
+    #[serde(rename="")]
     C0,
+    #[serde(rename="C-")]
     CM1,
 }
 
@@ -136,8 +159,11 @@ impl fmt::Display for Contact {
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum Defense {
+    #[serde(rename="D+")]
     D1,
+    #[serde(rename="")]
     D0,
+    #[serde(rename="C-")]
     DM1,
 }
 
@@ -166,7 +192,9 @@ impl fmt::Display for Defense {
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 
 pub enum Toughness {
+    #[serde(rename="T+")]
     T1,
+    #[serde(rename="")]
     T0,
 }
 
@@ -192,10 +220,15 @@ impl fmt::Display for Toughness {
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum PitcherTrait {
+    #[serde(rename="CN-")]
     CNM,
+    #[serde(rename="K+")]
     K,
+    #[serde(rename="GB+")]
     GB,
+    #[serde(rename="CN+")]
     CN,
+    #[serde(rename="ST+")]
     ST,
 }
 

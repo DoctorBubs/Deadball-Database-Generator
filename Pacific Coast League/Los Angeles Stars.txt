@@ -1,0 +1,34 @@
+Name:Los Angeles Stars, Abrv:LA, Team Score: 67
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Pen Josephina,CF,26,R,34,38
+Rad Octavia,3B,32,R,23,30
+Geoffry Quintana,C,20,S,26,29
+Graig Donnajean,2B,27,L,25,29
+Travers Aurelea,LF,20,R,23,28
+Ty Wilhelmine,SS,21,R,22,27
+Merry Hedy,RF,25,R,22,24
+Nikita Rickie,1B,23,L,18,24,C-
+Bench:
+Name Pos Age Hand BT OBT Traits
+Baillie Doralynne,OF,38,L,23,29
+Brett Merrily,C,30,R,25,30,C+
+Tedrick Tatum,OF,21,L,23,28
+Thorndike Sal,INF,23,R,22,26
+Tremayne Faustine,INF,23,L,21,25,C-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Frankie Rubetta,SP,23,L,d12, 20,26
+Wendall Janette,SP,20,R,d8, 19,20
+Hubert Virgina,SP,30,R,d4,St+, 16,22
+Louie Berri,SP,22,L,d4,K+, 16,21
+Zach Nanci,SP,24,L,-d4,GB, 15,23
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Thadeus Adele,RP,29,R,d12, 18,23
+Julian Elana,RP,23,R,d12, 14,21
+Taylor Lorrayne,RP,24,R,d4, 21,23
+Cesar Jordana,RP,24,R,d4, 16,24
+Oran Libby,RP,22,R,d4, 19,24
+Forest TeresaAnne,RP,19,R,-d4,K+, 22,30
+Hannibal Flora,RP,36,L,-d4, 18,19

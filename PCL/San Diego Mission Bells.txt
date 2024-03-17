@@ -1,0 +1,34 @@
+Name:San Diego Mission Bells, Abrv:SD, Team Score: 96
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Garcon Teddie,1B,32,L,30,36
+Mauritz Sadella,LF,22,S,28,36,P+
+Bubba Rafaelita,CF,22,R,30,33
+Elwyn Benoite,SS,34,R,28,33
+Taber Jamie,3B,33,L,23,30
+Rayner Jen,RF,27,R,22,30
+Jacques Nelly,2B,31,L,27,31,C+
+Hailey Alyse,C,32,S,24,27
+Bench:
+Name Pos Age Hand BT OBT Traits
+Alley Etta,OF,23,L,24,30
+Reynold Lorena,INF,22,L,24,30,C-
+Barde Veda,OF,25,L,23,27
+Giuseppe Patience,C,24,L,22,27
+Rodrique Carolin,INF,31,R,19,27
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Brent Jeannine,SP,25,R,d12, 21,29
+Vergil Georgina,SP,24,R,d8,St+, 24,28
+Theodor Dodie,SP,21,L,d8, 21,22
+Glynn Olympie,SP,23,R,d4,K+, 15,19
+Liam Queada,SP,27,L,d4, 18,21
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Sebastian Corny,RP,24,R,d12,St+, 19,21
+Wyn Alex,RP,34,L,d12, 15,23
+Kent Emmalee,RP,23,L,d12, 18,20
+Jabez Janella,RP,23,L,d8, 22,25
+Patel Sharl,RP,37,L,d4, 22,27
+Kim Yonina,RP,23,L,d4, 17,24
+Kimmo Flower,RP,22,R,d4, 17,18

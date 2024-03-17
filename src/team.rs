@@ -1,5 +1,9 @@
 use crate::b_traits::BTraits;
 use crate::league::AddTeamError;
+use crate::traits::Contact;
+use crate::traits::Power;
+use crate::traits::Speed;
+use crate::traits::Toughness;
 use inquire::validator::MaxLengthValidator;
 use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
@@ -191,7 +195,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact_enum,defense_enum,power_enum,speed_enum,toughness_enum,trade_value
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -213,11 +217,11 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                 pd: serde_json::from_value(row.get(8)?).unwrap(),
                 pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
                 b_traits: BTraits {
-                    contact: serde_json::from_value(row.get(10)?).unwrap(),
-                    defense: serde_json::from_value(row.get(11)?).unwrap(),
-                    power: serde_json::from_value(row.get(12)?).unwrap(),
-                    speed: serde_json::from_value(row.get(13)?).unwrap(),
-                    toughness: serde_json::from_value(row.get(14)?).unwrap(),
+                    contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
+                    defense: serde_json::from_value(row.get(11)?).unwrap_or(crate::traits::Defense::D0),
+                    power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
+                    speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
+                    toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
                 },
                 trade_value: row.get(15)?,
             },

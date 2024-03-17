@@ -1,0 +1,34 @@
+Name:Los Angeles Angels, Abrv:LA, Team Score: 73
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Lamont Gillan,CF,25,L,28,34,T+
+Jeth Theadora,RF,23,R,26,34
+Ken Legra,SS,20,R,27,32
+Dillon Melosa,2B,27,R,25,32,D-T+
+Urbanus Michaelina,LF,22,L,24,31,C-P++
+Fonz Lenee,3B,26,R,23,29
+Che Dorelle,1B,24,L,25,28
+Northrup Kathie,C,38,R,23,29,D+P+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Thedric Jayne,OF,34,L,24,31
+Matthus Marlie,OF,24,R,27,30,C+
+Gibb Raven,INF,23,L,24,27
+Win Leorah,C,30,R,20,25
+Davidde Jolene,INF,25,R,17,23,P++
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Neel Nelle,SP,23,L,d12, 19,23
+Cyrus Rosemarie,SP,24,L,d8, 21,25
+Poul Kerrill,SP,30,L,d4,CN-, 19,24
+Rudiger Belva,SP,27,R,d4, 22,30
+Brent Gael,SP,23,R,-d4, 17,22
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Teddie Nonah,RP,19,R,d12,CN-, 19,23
+Adger Katherina,RP,23,L,d8, 17,21
+Cleveland Tessie,RP,19,L,d8, 22,28
+Cal Natalia,RP,24,R,d4, 21,25
+Ev Marijo,RP,22,R,d4, 20,26
+Dick Inger,RP,22,R,d4, 16,23
+Pablo Augusta,RP,28,L,-d4, 18,26

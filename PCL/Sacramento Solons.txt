@@ -1,0 +1,34 @@
+Name:Sacramento Solons, Abrv:SAC, Team Score: 70
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Fyodor Jaquenetta,C,31,L,31,37,D+
+Lincoln Eloise,CF,23,R,29,33
+Yancy Imogene,1B,27,S,25,33
+Nevile Cabrina,SS,20,L,26,30
+Buck Nollie,3B,38,L,24,30
+Dimitri Thea,2B,23,R,24,26
+Jeb Kaitlin,RF,27,R,19,26,P-
+Sigmund Nancee,LF,31,R,19,23
+Bench:
+Name Pos Age Hand BT OBT Traits
+Spenser Gita,C,27,R,26,33,S+
+Jefry Wilmette,OF,23,L,26,33
+Andrej Agnes,OF,24,S,23,28
+Higgins Karin,INF,30,L,21,26
+Lloyd Wendi,INF,21,L,17,22,D-
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Gunther Chelsey,SP,22,L,d8, 17,20
+Garcon Eadie,SP,23,R,d4,K+, 22,29
+Ty Giacinta,SP,22,L,d4,GB, 23,27
+Penny Meggie,SP,19,R,d4,CN-, 17,18
+Travers Crystal,SP,21,R,d4, 18,21
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Vaclav Parwane,RP,24,L,d12, 21,22
+Terrance Keren,RP,29,L,d8, 21,22
+Lin Nady,RP,23,L,d4, 16,22
+Bayard Ronda,RP,23,R,d4, 16,17
+Ash Morlee,RP,22,R,d4, 20,25
+Thedric Liuka,RP,19,R,d4, 18,26
+Clyde Lydie,RP,28,L,-d4,GB, 16,17

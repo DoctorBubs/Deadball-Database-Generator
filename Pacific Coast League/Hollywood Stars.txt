@@ -1,34 +1,34 @@
-Name:Hollywood Stars, Abrv:HWYD, Team Score: 73
+Name:Hollywood Stars, Abrv:HWYD, Team Score: 82
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Maurie Virgie,RF,24,R,33,39,C+D+
-Scot Dehlia,3B,23,S,31,34,D-S+
-Godart Deeann,SS,33,R,29,37,P+
-Eberhard Damara,2B,21,L,30,36,P+
-Marmaduke Vitoria,LF,19,S,28,33
-Brady Norine,CF,20,L,26,28
-Vern Ronny,C,29,R,24,27,P--S-
-Harley Clotilda,1B,28,L,21,23
+Quinn Kathlin,RF,26,R,34,38
+Townie Lindy,SS,24,S,30,33
+Weston Jinny,C,35,L,27,33
+Gus Cati,1B,34,R,27,32
+Chevalier Maryangelyn,3B,26,S,24,32
+Shamus Merrill,CF,20,R,29,31
+Raleigh Hillary,2B,35,R,24,28
+Emmery Laurie,LF,24,L,22,28
 Bench:
 Name Pos Age Hand BT OBT Traits
-Melvyn Rania,OF,38,R,31,37
-Nester Dena,INF,32,R,27,29,D+
-Bryant Leah,C,36,R,24,29,D-
-Casey Carla,OF,26,L,23,28,S-
-Ely Alys,INF,21,L,15,19
+Vernor Madelle,C,30,L,28,32
+Edmond Adelind,OF,22,L,28,32
+Rawley Olympe,INF,26,L,26,31
+Orren Eartha,OF,35,L,26,29,D-
+Obadiah Clarabelle,INF,22,L,23,28
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Scotti Goldia,SP,25,L,d8, 21,28
-Lewis Larine,SP,37,L,d4, 21,25
-Rustie Mabel,SP,22,L,d4, 19,26
-Bobbie Odette,SP,22,R,d4, 19,26
-Spike Lucine,SP,19,L,d4, 23,29
+Darrel Hannis,SP,37,L,d12,CN-, 20,26
+Wald Brear,SP,25,R,d4, 19,25
+Vern Donna,SP,23,R,d4, 20,28
+Emmanuel Lauralee,SP,23,L,d4, 21,22
+Bartlet Lorena,SP,27,L,-d4, 21,29
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Fyodor Antonella,RP,23,L,d8, 23,31
-Dietrich Vivian,RP,27,L,d4,GB, 22,29
-Lonnie Cicily,RP,38,R,d4, 20,26
-Maynard Godiva,RP,37,L,d4, 20,22
-Berkeley Elyn,RP,25,R,d4, 19,20
-Claybourne Wilone,RP,22,R,d4, 19,24
-Aron Isa,RP,22,L,d4, 18,25
+Rob Tobye,RP,22,R,d12, 19,22
+Rutherford Amelina,RP,21,R,d12, 19,24
+Lon Audie,RP,22,R,d8,GB, 21,24
+Northrop Harmony,RP,24,L,d4,GB, 16,20
+Johan Nadia,RP,27,L,d4, 20,28
+Rickard Juditha,RP,25,R,d4, 19,20
+Orville Frieda,RP,25,R,d4, 21,26
