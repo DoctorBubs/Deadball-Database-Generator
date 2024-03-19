@@ -1,0 +1,34 @@
+Name:Portland Beavers, Abrv:PORT, Team Score: 63
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Bartolomei Alexis,LF,25,R,32,36
+Augustus Pearla,1B,21,R,30,36,P-
+Buster Lani,SS,19,R,28,34
+Alexei Karlene,3B,21,L,28,35,P+
+Rube Antonetta,RF,21,R,24,31
+Giuseppe France,CF,22,L,29,32,P+
+Renado Celeste,C,32,R,25,30
+Hector Selene,2B,30,L,24,29,C+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Carlos Regine,C,19,R,28,34
+Graehme Talya,INF,30,R,24,27,D+
+Hercule Val,OF,20,S,21,28,P+
+Ashley Emmeline,OF,36,R,21,26
+Brett Olivia,INF,24,L,16,22
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Harley Celisse,SP,27,R,d12,GB, 19,24
+Clint Joby,SP,27,R,d8, 14,19
+Padraig Abbe,SP,21,R,d8, 20,27
+Adair Keriann,SP,22,L,d4, 19,23
+Timothy Harrie,SP,19,R,-d4, 20,22
+Bullpen:
+Name Pos Age Hand PD Trait BT OBT
+Elliot Ninetta,RP,28,R,d12, 18,24
+Udall Talya,RP,29,L,d8,K+, 17,24
+Hans Leland,RP,24,L,d4,GB, 19,20
+Ivan Clara,RP,23,R,d4, 17,19
+Lawton Jannel,RP,23,L,-d4, 18,20
+Lawton Marlane,RP,22,R,-d4, 16,21
+Izaak Fancie,RP,22,L,-d4, 15,16

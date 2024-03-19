@@ -42,6 +42,7 @@ pub struct Team {
     pub team_score: i32,
     pub wins: i32,
     pub losses: i32,
+    pub team_id: i32
 }
 
 impl Team {
@@ -53,6 +54,7 @@ impl Team {
         thread: &mut ThreadRng,
     ) -> Team {
         let mut new_team = Team {
+            team_id: 0,
             abrv: abrv.to_string(),
             name: name.to_string(),
             lineup: new_starting_lineup(gender, thread, era),

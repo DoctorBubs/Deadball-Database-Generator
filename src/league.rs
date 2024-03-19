@@ -271,6 +271,7 @@ pub fn load_league(
             // We use the remaing rows to deseriale the team
             team: Team {
                 // We fill out the rest of the fields in the team struct from the database entry.
+                team_id: row.get(0)?,
                 abrv: row.get(1)?,
                 name: row.get(2)?,
                 team_score: row.get(3)?,

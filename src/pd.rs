@@ -14,7 +14,7 @@ For example,when using a pitcher with a PD of D12, a 12 sided die is rolled, and
 Inversely, a pitcher with a PD of -D4 rolls a 4 sided die, the the number generated is negative.
 */
 
-// To reflect Die notation the PD enum is organized via the following pattern: D[i] is equivalant to d[i], while DM[i] is equivilant to -d[i]
+// Via Serde, the pitch die is serialized via traditional dice roation
 pub enum PD {
     #[serde(rename="d20")]
     D20,
@@ -22,13 +22,21 @@ pub enum PD {
     D12,
     #[serde(rename="d8")]
     D8,
+    #[serde(rename="d6")]
     D6,
+    #[serde(rename="d4")]
     D4,
+    #[serde(rename="No dice")]
     D0,
+    #[serde(rename="-d4")]
     DM4,
+    #[serde(rename="-d6")]
     DM6,
+    #[serde(rename="-d8")]
     DM8,
+    #[serde(rename="-d12")]
     DM12,
+    #[serde(rename="d20")]
     DM20,
 }
 

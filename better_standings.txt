@@ -1,0 +1,43 @@
+-- database: c:\Users\joshu\Documents\rust_projects\deadball_league_generator\deadball.db
+
+-- Use the ▷ button in the top right corner to run the entire file.
+
+    WITH winner_table AS (SELECT 
+    games.winner_id as team_id,
+   COUNT(games_id) as wins
+    
+    FROM games
+    GROUP BY team_id
+    ORDER BY wins DESC
+    ),
+    
+    loser_table AS (SELECT 
+        
+        CASE
+        WHEN games.winner_id != games.home_team_id THEN games.home_team_id
+        ELSE games.away_team_id
+        END AS team_id,
+        COUNT (games_id) as losses
+        FROM games
+       -- INNER JOIN 
+            teams on teams.id = team_id
+        --GROUP BY team_id
+       -- ORDER BY losses DESC
+    )
+
+    SELECT
+        teams.team_name as team_name, 
+        teams.team_score,
+        winner_table.wins AS current_wins, 
+        loser_table.losses AS losses,
+        (SELECT MAX(wins) FROM winner_table) - winner_table.wins AS games_behind
+    FROM teams
+    INNER JOIN
+        winner_table ON winner_table.team_id = teams.id
+    INNER JOIN
+        loser_table ON loser_table.team_id = teams.id
+    GROUP BY teams.team_name
+    ORDER BY games_behind ASC,losses DESC;
+
+
+    

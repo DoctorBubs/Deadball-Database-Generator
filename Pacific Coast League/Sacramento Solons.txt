@@ -1,34 +1,34 @@
-Name:Sacramento Solons, Abrv:SAC, Team Score: 76
+Name:Sacramento Solons, Abrv:SAC, Team Score: 53
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Leonerd Loleta,2B,25,R,29,36
-Salem Muriel,LF,23,R,27,35
-Dwane Phaedra,CF,27,R,29,34,P+
-Granville Leslie,RF,27,R,29,33,P++S+
-Clair Meira,SS,35,S,27,30,D-S-
-Woodman Lilias,C,23,R,26,31,C+
-Eugene Genovera,1B,31,R,19,26
-Reginauld Regina,3B,31,R,20,23,P+
+Valentin Cary,RF,24,R,30,36
+Ephrayim Torey,C,19,L,29,35
+Keefe Shelley,1B,27,R,24,30,P+
+Stefano Tabbitha,3B,35,R,24,28
+Chris Prisca,SS,22,R,23,28
+Demosthenis Nerissa,2B,22,R,23,25
+Addie Nichol,LF,27,L,21,25,P--
+Nelson Brandea,CF,37,L,18,24,D-
 Bench:
 Name Pos Age Hand BT OBT Traits
-Sollie Nadya,INF,25,L,26,32
-Keenan Katha,C,20,R,26,31,S-
-Bennett Doralia,OF,25,R,24,28,D+
-Upton Klarrisa,INF,34,R,20,24
-Kyle Norry,OF,24,L,19,21
+Wyn Elana,OF,23,R,31,38,S-
+Eberhard Cat,OF,32,R,26,30,P--
+Esme Junette,C,38,L,23,29,S-
+Ray Gerda,INF,27,R,20,26
+Herby Pansy,INF,37,L,19,23
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Allyn Madelon,SP,34,R,d12,CN+, 19,26
-Oral Malinda,SP,24,L,d12, 21,23
-Westbrook Rey,SP,27,R,d4,CN+, 20,26
-Darrel Maya,SP,38,R,d4, 15,23
-Rocky Jade,SP,22,R,-d4, 20,22
+Rey Oona,SP,22,L,d12,GB, 18,24
+Yardley Astrid,SP,28,R,d4, 20,24
+Sarge Kevyn,SP,23,L,d4, 21,29
+Tracey Dorolisa,SP,29,L,-d4, 19,24
+Javier Deedee,SP,20,R,-d4, 18,23
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Jacob Janel,RP,32,R,d8, 17,22
-Charley Eddie,RP,24,R,d8, 24,26
-Demetre Aprilette,RP,22,L,d8, 19,23
-Lindsey Toinette,RP,21,R,d8, 15,20
-Flem Blondelle,RP,24,R,d4, 21,27
-Taddeo Natka,RP,23,L,d4, 21,22
-Sherlock Johnna,RP,23,L,-d4, 17,21
+Wyatan Cat,RP,24,L,d12, 20,28
+Erwin Berget,RP,27,R,d8, 16,23
+Klaus Liz,RP,26,L,d8, 17,22
+Steffen Nola,RP,24,L,d4, 17,25
+Frederich Shea,RP,23,L,-d4,CN-, 17,19
+Lou Lita,RP,32,R,-d4, 19,26
+Giuseppe Vivie,RP,31,R,-d4, 22,28
