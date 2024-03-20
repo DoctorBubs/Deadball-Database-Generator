@@ -14,7 +14,7 @@ use rusqlite::Connection;
 use crate::era::select_era;
 use crate::main_menu::run_main_menu;
 use crate::main_menu::MenuInput;
-
+use crate::main_menu::LoadLeagueInput;
 use crate::player::select_gender;
 use crate::team::add_new_team;
 use crate::team::load_team;
@@ -140,7 +140,7 @@ impl League {
             };
         }
         // We create a new team
-        let new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
+        let mut new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
         // We get the team score for hte new team.
         let new_team_score = new_team.team_score.to_string();
         // We enter the team into the database.
@@ -155,7 +155,7 @@ impl League {
         );
         // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
         let team_id = conn.last_insert_rowid();
-
+        new_team.team_id = team_id as i32;
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
@@ -328,7 +328,7 @@ impl fmt::Display for LeagueWrapper {
 pub fn league_check(
     conn: &mut Connection,
     thread: &mut ThreadRng,
-    input: MenuInput,
+    input: LoadLeagueInput,
 ) -> Result<(), rusqlite::Error> {
     // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
@@ -371,17 +371,17 @@ pub fn league_check(
         match ans {
             Ok(select) => match input {
                 //If the users decided they wanted to create a new team earlierm they are taken to the prompt to create a new team
-                MenuInput::CreateNewTeam => {
+                LoadLeagueInput::CreateNewTeam => {
                     load_league(thread, conn, select)?;
                     Ok(())
                 }
                 //Otherwise, the league is saved to the users disk.
-                MenuInput::RefreshLeague => {
+                LoadLeagueInput::RefreshLeague => {
                     println!("Refreshing league.");
                     save_league(&select.league, conn, thread).unwrap();
                     Ok(())
                 }
-                _ => panic!("Invalid Menu Input:{:?}", input),
+                
             },
             Err(_) => {
                 println!("Error selecting a new league");

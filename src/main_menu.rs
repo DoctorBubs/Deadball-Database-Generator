@@ -5,12 +5,28 @@ use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
 use crate::{league::create_new_league, league_check};
+#[derive(Copy, Clone, Debug)]
+pub enum LoadLeagueInput{
+    CreateNewTeam,
+    RefreshLeague
+}
+
+impl fmt::Display for LoadLeagueInput {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let chars = match self {
+            Self::CreateNewTeam => "Create a new team.",
+            Self::RefreshLeague => "Refresh an existing league.",
+        };
+
+        write!(f, "{}", chars)
+    }
+}
+
 // MenuInput contains all the valid choices a user can use at the main menu.
 #[derive(Copy, Clone, Debug)]
 pub enum MenuInput {
     CreateNewLeague,
-    CreateNewTeam,
-    RefreshLeague,
+    LoadExistingLeague(LoadLeagueInput),
     Exit,
 }
 
@@ -18,11 +34,14 @@ impl fmt::Display for MenuInput {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = match self {
             Self::CreateNewLeague => "Create a new league.",
-            Self::CreateNewTeam => "Create a new team.",
-            Self::RefreshLeague => "Refresh an existing league.",
-            Self::Exit => "Exit.",
+            Self::LoadExistingLeague(input) => match input{
+                LoadLeagueInput::CreateNewTeam => "Create a new team.",
+                LoadLeagueInput::RefreshLeague => "Refresh an existing league."
+            },
+                
+    
+            Self::Exit => "Exit"
         };
-
         write!(f, "{}", chars)
     }
 }
@@ -31,8 +50,8 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::
     // We load a vector of the possible options a view can pick in the main menu.
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
-        MenuInput::CreateNewTeam,
-        MenuInput::RefreshLeague,
+        MenuInput::LoadExistingLeague(LoadLeagueInput::CreateNewTeam),
+        MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
         MenuInput::Exit,
     ];
     // We prompt the user via Inquire.
@@ -46,7 +65,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::
             // If the user selects exit, the functinon returns Ok, which exit the program
             MenuInput::Exit => Ok(()),
             //Both CreateNewTeam and RefreshLeague are used in the league check function, so a selection of either will call the function.
-            MenuInput::CreateNewTeam | MenuInput::RefreshLeague => {
+            MenuInput::LoadExistingLeague(choice) => {
                 league_check(conn, thread, choice).unwrap();
                 Ok(())
             }
