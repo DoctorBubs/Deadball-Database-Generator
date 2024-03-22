@@ -6,22 +6,16 @@ use rusqlite::Connection;
 
 use crate::{league::create_new_league, league_check};
 #[derive(Copy, Clone, Debug)]
-pub enum LoadLeagueInput{
+pub enum LoadLeagueInput {
+    EditLeague(EditLeagueInput),
+    RefreshLeague,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum EditLeagueInput {
     CreateNewTeam,
-    RefreshLeague
+    CreateSchedule,
 }
-
-impl fmt::Display for LoadLeagueInput {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let chars = match self {
-            Self::CreateNewTeam => "Create a new team.",
-            Self::RefreshLeague => "Refresh an existing league.",
-        };
-
-        write!(f, "{}", chars)
-    }
-}
-
 // MenuInput contains all the valid choices a user can use at the main menu.
 #[derive(Copy, Clone, Debug)]
 pub enum MenuInput {
@@ -34,13 +28,15 @@ impl fmt::Display for MenuInput {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = match self {
             Self::CreateNewLeague => "Create a new league.",
-            Self::LoadExistingLeague(input) => match input{
-                LoadLeagueInput::CreateNewTeam => "Create a new team.",
-                LoadLeagueInput::RefreshLeague => "Refresh an existing league."
+            Self::LoadExistingLeague(input) => match input {
+                LoadLeagueInput::RefreshLeague => "Refresh an existing league.",
+                LoadLeagueInput::EditLeague(edit_input) => match edit_input {
+                    EditLeagueInput::CreateNewTeam => "Create a new team.",
+                    EditLeagueInput::CreateSchedule => "Generate a schedule for an existing league",
+                },
             },
-                
-    
-            Self::Exit => "Exit"
+
+            Self::Exit => "Exit",
         };
         write!(f, "{}", chars)
     }
@@ -48,10 +44,13 @@ impl fmt::Display for MenuInput {
 
 pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
     // We load a vector of the possible options a view can pick in the main menu.
+    let new_team = EditLeagueInput::CreateNewTeam;
+    let new_sched = EditLeagueInput::CreateSchedule;
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
-        MenuInput::LoadExistingLeague(LoadLeagueInput::CreateNewTeam),
+        MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_team)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
+        MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
         MenuInput::Exit,
     ];
     // We prompt the user via Inquire.

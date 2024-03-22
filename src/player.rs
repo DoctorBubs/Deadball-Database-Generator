@@ -4,8 +4,8 @@ use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
-use crate::traits::player_trait_option;
 use crate::team::TeamSpot;
+use crate::traits::player_trait_option;
 
 use crate::traits::trait_to_sql_text;
 use crate::traits::PitcherTrait;
@@ -267,12 +267,12 @@ impl Player {
                 :speed,
                 :toughness,
                 :trade_value
-            )", 
+            )",
             named_params![
                 ":team_id": &team_id,
-                ":player_name":&self.name, 
-                ":age":&self.age.to_string(), 
-                ":pos":&self.pos, 
+                ":player_name":&self.name,
+                ":age":&self.age.to_string(),
+                ":pos":&self.pos,
                 ":hand":serde_json::to_value(&self.hand).unwrap(),
                 ":bt":&self.bt.to_string(),
                 ":obt_mod":&self.obt_mod.to_string(),

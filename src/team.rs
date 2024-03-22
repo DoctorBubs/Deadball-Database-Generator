@@ -42,7 +42,7 @@ pub struct Team {
     pub team_score: i32,
     pub wins: i32,
     pub losses: i32,
-    pub team_id: i32
+    pub team_id: i32,
 }
 
 impl Team {
@@ -220,7 +220,8 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
                 pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
                 b_traits: BTraits {
                     contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
-                    defense: serde_json::from_value(row.get(11)?).unwrap_or(crate::traits::Defense::D0),
+                    defense: serde_json::from_value(row.get(11)?)
+                        .unwrap_or(crate::traits::Defense::D0),
                     power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
                     speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
                     toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),

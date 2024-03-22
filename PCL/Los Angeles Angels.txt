@@ -1,34 +1,34 @@
-Name:Los Angeles Angels, Abrv:LA, Team Score: 96
+Name:Los Angeles Angels, Abrv:LA, Team Score: 73
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Ruddy Kerstin,2B,26,L,29,36
-Apollo Emmalee,C,38,R,30,35
-Wallas Kirbie,CF,24,R,31,36,P+
-Renard Joana,RF,22,R,28,32,D+
-Euclid Louisa,3B,22,R,26,31
-Deane Nicole,LF,22,S,24,28
-Steward Ibby,SS,25,R,20,25,D+
-Rufe Marisa,1B,22,R,21,23
+Stew Lynett,SS,35,L,34,39
+Kenyon Daisi,CF,29,R,28,33
+Lindsey Eydie,C,22,R,27,33
+Cyrill Jan,RF,25,R,29,33,C-D+
+Chane Lacie,1B,23,L,26,33
+Leonardo Jade,3B,28,R,27,32
+Brant Gabie,LF,33,R,24,29
+Henrie Charissa,2B,30,R,23,25,T+
 Bench:
 Name Pos Age Hand BT OBT Traits
-Nickie Sheelagh,OF,25,R,27,35
-Pepillo Feliza,OF,24,R,26,32,P+
-Pepito Cecile,INF,31,R,25,29,D-
-Chuck Sharl,INF,22,R,19,25,P++
-Dieter Tamera,C,28,R,19,23
+Bart Joy,INF,34,R,32,36
+Uriel Murielle,C,35,R,29,34
+Chaddie Rissa,OF,24,L,21,28
+Guillaume Correy,INF,32,R,23,27,D-
+Renado Sophia,OF,36,R,21,27
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Mohan Valene,SP,20,R,d12, 18,26
-Del Miquela,SP,26,R,d4,K+, 17,20
-Hallam Aphrodite,SP,29,R,d4, 22,30
-Nick Mabel,SP,27,R,d4, 19,22
-Archon Tildie,SP,25,R,d4, 16,22
+Francesco Deeann,SP,32,L,d4, 20,21
+Barnard Elianore,SP,26,L,d4, 20,22
+Marion Devondra,SP,23,L,d4, 17,21
+Han Tildie,SP,23,L,d4, 18,24
+Samuel Jordanna,SP,21,L,-d4, 18,25
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Finn Rickie,RP,37,R,d12,CN-, 21,24
-Benjamen Dorene,RP,37,R,d12, 19,22
-Dimitrou Garland,RP,32,R,d12, 19,25
-Michele Marsiella,RP,24,L,d12, 23,27
-Bronson Arlena,RP,25,L,d8, 14,19
-Barth Jemmie,RP,24,L,d4,St+, 18,25
-Hamilton Engracia,RP,22,L,d4, 16,18
+Lew Josi,RP,23,R,d12, 19,25
+Gamaliel Anni,RP,21,R,d8,GB, 14,17
+Herman Laurel,RP,26,R,d8, 21,23
+Agamemnon Tiphani,RP,22,R,d4,GB, 20,22
+Ali Arabel,RP,22,R,d4, 20,21
+Wilfred Sibby,RP,21,R,d4, 15,19
+Merrill Jolynn,RP,21,R,d4, 21,22

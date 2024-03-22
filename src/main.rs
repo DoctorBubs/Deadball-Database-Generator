@@ -7,6 +7,7 @@ mod pd;
 mod pitcher_rank_info;
 mod player;
 mod player_quality;
+mod schedule;
 mod team;
 mod traits;
 use crate::era::Era;
@@ -17,6 +18,7 @@ use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
+use crate::schedule::new_schedule;
 use crate::team::Team;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -73,7 +75,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     /*  The last table to create is the players tables. Teams have a one to many relationship with players, with each player beloning to one team
         Each player has a unique id, and a forein key team_id which refrenceses the id of the team the player belongs to
 
-       
+
     */
     conn.execute(
         "create table if not exists players(
@@ -102,30 +104,51 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
-    /*
-    conn.execute("CREATE TABLE IF NOT EXISTS league_seasons(
 
-        league_season_id INTEGER PRIMARY KEY,
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS seasons(
+
+        season_id INTEGER PRIMARY KEY,
         league_id INTEGER NOT NULL,
         champion_id INTEGER,
         FOREIGN KEY(league_id) REFERENCES leagues(id),
         FOREIGN KEY(champion_id) REFERENCES teams(id))",
-        ()
-
-
-
+        (),
     )?;
 
-    conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
-        team_season_id INTEGER PRIMARY KEY,
-        league_season_id INTEGER,
-        team_id INTEGER,
-        wins INTEGER DEFAULT 0,
-        losses INTEGER DEFAULT 0,
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS rounds(
+        round_id INTEGER PRIMARY KEY,
+        season_id INTEGER NOT NULL,
+        FOREIGN KEY (season_id) REFERENCES seasons(season_id)
+    )",
+        (),
+    )?;
+
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS games(
+        game_id INTEGER PRMIARY KEY,
+        round_id INTEGER NOT NULL,
+        home_team_id INTEGER NOT NULL,
+        home_score INTEGER DEFAULT 0,
+        away_team_id INTEGER NOT NULL,
+        away_score INTEGER DEFAULT 0,
+        FOREIGN KEY (round_id) REFERENCES rounds(round_id),
+        FOREIGN KEY (home_team_id) REFERENCES teams(id),
+        FOREIGN KEY (away_team_id) REFERENCES teams(id)
+    )",
+        (),
+    )?;
+
+    /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
+    team_season_id INTEGER PRIMARY KEY,
+    league_season_id INTEGER,
+    team_id INTEGER,
+    wins INTEGER DEFAULT 0,
+    losses INTEGER DEFAULT 0,
 
 
-        ", params)
-        */
+    ", params) */
 
     // If no errors occured, the database is returned.
     Ok(conn)

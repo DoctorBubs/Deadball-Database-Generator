@@ -1,34 +1,34 @@
-Name:San Diego Mission Bells, Abrv:SD, Team Score: 96
+Name:San Diego Mission Bells, Abrv:SD, Team Score: 70
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Garcon Teddie,1B,32,L,30,36
-Mauritz Sadella,LF,22,S,28,36,P+
-Bubba Rafaelita,CF,22,R,30,33
-Elwyn Benoite,SS,34,R,28,33
-Taber Jamie,3B,33,L,23,30
-Rayner Jen,RF,27,R,22,30
-Jacques Nelly,2B,31,L,27,31,C+
-Hailey Alyse,C,32,S,24,27
+Tannie Sibley,LF,20,L,32,36
+Gregg Daniel,C,34,R,28,36
+Olin Lorenza,2B,22,L,30,34
+Torrance Jillene,3B,32,R,28,33,D-
+Marshall Ann-Marie,1B,26,S,27,31
+Timmy Martica,CF,22,S,19,24,C-
+Tomas Leonanie,SS,20,S,21,25,C+P+
+Wallie Ertha,RF,26,R,19,21
 Bench:
 Name Pos Age Hand BT OBT Traits
-Alley Etta,OF,23,L,24,30
-Reynold Lorena,INF,22,L,24,30,C-
-Barde Veda,OF,25,L,23,27
-Giuseppe Patience,C,24,L,22,27
-Rodrique Carolin,INF,31,R,19,27
+Jef Ardith,INF,20,L,27,30
+Ollie Marybelle,C,27,S,22,30,D-
+Gian Clarinda,OF,25,R,22,28
+Lindy Shoshana,OF,24,L,23,25
+Monte Eugenia,INF,30,R,15,17,C-
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Brent Jeannine,SP,25,R,d12, 21,29
-Vergil Georgina,SP,24,R,d8,St+, 24,28
-Theodor Dodie,SP,21,L,d8, 21,22
-Glynn Olympie,SP,23,R,d4,K+, 15,19
-Liam Queada,SP,27,L,d4, 18,21
+Jacob Marry,SP,35,L,d12, 16,21
+Barnabe Else,SP,21,L,d12, 21,29
+Sting Sarine,SP,31,R,d4, 20,25
+Yehudi Judye,SP,28,L,d4, 22,30
+Shelden Karyl,SP,22,R,-d4, 17,20
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Sebastian Corny,RP,24,R,d12,St+, 19,21
-Wyn Alex,RP,34,L,d12, 15,23
-Kent Emmalee,RP,23,L,d12, 18,20
-Jabez Janella,RP,23,L,d8, 22,25
-Patel Sharl,RP,37,L,d4, 22,27
-Kim Yonina,RP,23,L,d4, 17,24
-Kimmo Flower,RP,22,R,d4, 17,18
+Giraldo Tybi,RP,32,R,d8,K+, 19,23
+Quintin Fenelia,RP,23,R,d8,K+, 18,19
+Zacharias Brit,RP,36,L,d4,GB, 19,23
+Gustave Cristen,RP,27,L,d4,CN+, 21,25
+Pinchas Janna,RP,24,R,d4, 15,21
+Talbot Charisse,RP,22,L,d4, 17,18
+Ave Diane-Marie,RP,22,L,-d4, 22,28

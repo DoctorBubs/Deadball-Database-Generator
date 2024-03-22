@@ -13,8 +13,9 @@ use rusqlite::Connection;
 
 use crate::era::select_era;
 use crate::main_menu::run_main_menu;
-use crate::main_menu::MenuInput;
+use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
+use crate::main_menu::MenuInput;
 use crate::player::select_gender;
 use crate::team::add_new_team;
 use crate::team::load_team;
@@ -27,6 +28,7 @@ use crate::Serialize;
 use crate::Team;
 use crate::ThreadRng;
 
+use crate::schedule::*;
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
 #[derive(Serialize, Deserialize)]
@@ -63,6 +65,10 @@ impl League {
         }
     }
 
+    /*pub fn get_new_schedule(&self, series_length: i32,series_per_matchup:i32) ->  Result<Vec<Round>, ScheduleGenError>{
+        new_schedule(&self.teams,  series_length, series_per_matchup)
+
+    }*/
     pub fn display_standings(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
         let mut stmt = conn.prepare(
             "
@@ -247,6 +253,7 @@ pub fn load_league(
     thread: &mut ThreadRng,
     conn: &mut Connection,
     wrapper: LeagueWrapper,
+    edit_input: EditLeagueInput,
 ) -> Result<(), rusqlite::Error> {
     // We destructure the LeagueWrapper
     let LeagueWrapper {
@@ -302,8 +309,21 @@ pub fn load_league(
         league.teams.push(loaded_team)
     }
 
-    // Now that we have loaded the existing league from the database, it is time to generate a new team.
-    add_new_team(&mut league, thread, conn, league_id, true).unwrap();
+    // Now that we have loaded the existing league from the database, it is time to generate a new team or create a new schedule based off the input
+    match edit_input {
+        EditLeagueInput::CreateNewTeam => {
+            add_new_team(&mut league, thread, conn, league_id, true).unwrap()
+        }
+        EditLeagueInput::CreateSchedule => {
+            match league.teams.len() % 2 == 0 {
+                true => save_schedule_sql(conn, &league, thread),
+                false => {
+                    println!("League must have an even number of teams");
+                    save_league(&league, conn, thread).unwrap()
+                }
+            };
+        }
+    };
     Ok(())
 }
 
@@ -371,8 +391,8 @@ pub fn league_check(
         match ans {
             Ok(select) => match input {
                 //If the users decided they wanted to create a new team earlierm they are taken to the prompt to create a new team
-                LoadLeagueInput::CreateNewTeam => {
-                    load_league(thread, conn, select)?;
+                LoadLeagueInput::EditLeague(edit) => {
+                    load_league(thread, conn, select, edit)?;
                     Ok(())
                 }
                 //Otherwise, the league is saved to the users disk.
@@ -381,7 +401,6 @@ pub fn league_check(
                     save_league(&select.league, conn, thread).unwrap();
                     Ok(())
                 }
-                
             },
             Err(_) => {
                 println!("Error selecting a new league");
