@@ -1,34 +1,34 @@
-Name:Portland Beavers, Abrv:POR, Team Score: 69
+Name:Portland Beavers, Abrv:PORT, Team Score: 80
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Jae Christalle,SS,21,R,32,38
-Washington Cristie,RF,25,L,31,36,S++
-Tony Annemarie,1B,36,R,27,33
-Willdon Amandi,LF,30,L,30,33,P+S++
-Wade Jannel,CF,23,R,27,33,P+
-Rodolfo Ginni,3B,37,R,23,29
-Abby Lauralee,C,32,R,22,24
-Niven Jemimah,2B,24,L,20,22,C-S++
+Ivor Wilone,LF,36,R,31,39,D+
+Worthy Cathlene,1B,32,R,31,34
+Ray Anissa,3B,24,R,31,34
+Irvine Eada,CF,23,S,27,33
+Randolf Rosmunda,2B,33,R,28,31
+Kurtis Anni,SS,27,R,25,29,D+
+Ben Quinta,RF,24,R,23,30,P++
+Sky Austina,C,19,L,21,24,D-
 Bench:
 Name Pos Age Hand BT OBT Traits
-Rudd Annora,INF,23,R,28,34,P+
-Aleksandrs Eba,INF,19,L,25,30
-Ajay Simona,OF,25,R,24,27
-Ripley Ronica,C,27,R,21,26
-Benjamin Hildagarde,OF,37,L,21,26,P+
+Marcello Fanechka,INF,37,S,27,34
+Giovanni Lillian,C,26,R,26,31
+Darius Tobie,INF,19,L,21,28
+Artur Wallie,OF,36,L,23,26
+Rees Licha,OF,24,S,14,19
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Bishop Jilleen,SP,25,L,d12,K+, 18,26
-Corwin Ilyse,SP,32,R,d8,K+, 19,21
-Earl Sydelle,SP,19,R,d4,CN+, 17,22
-Carsten Luelle,SP,19,R,-d4,K+, 21,25
-Robinson Arlyne,SP,29,L,-d4, 17,25
+Solomon Marja,SP,27,R,d8, 16,18
+Stavros Annabella,SP,22,L,d8, 21,25
+Sky Michel,SP,28,R,d4, 15,18
+Sergent Glen,SP,24,R,d4, 17,23
+Ole Nanci,SP,21,R,d4, 16,20
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Ignatius Shena,RP,22,R,d12, 16,19
-Wilhelm Kanya,RP,23,L,d8,CN-, 21,22
-Chancey Lacey,RP,23,L,d8, 18,22
-Christophe Blinni,RP,30,R,d4, 15,19
-Cyril Ajay,RP,23,R,d4, 17,22
-Cosmo Waly,RP,22,L,d4, 19,21
-Fremont Fallon,RP,23,R,-d4, 21,29
+Rochester Lyndsey,RP,23,R,d12, 16,19
+Nevin Binni,RP,32,L,d8,St+, 23,29
+Karl Robina,RP,23,L,d8,CN+, 17,21
+Rad Clarette,RP,31,R,d8, 20,27
+Lazaro Idette,RP,27,R,d4, 16,21
+Karsten Dorine,RP,19,R,d4, 20,28
+Claudio Fiorenze,RP,24,L,-d4, 23,28

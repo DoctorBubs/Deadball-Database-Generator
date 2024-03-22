@@ -1,34 +1,34 @@
-Name:Sacramento Solons, Abrv:SAC, Team Score: 62
+Name:Sacramento Solons, Abrv:SAC, Team Score: 73
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Shell Golda,LF,32,R,30,34
-Lon Bellamy,1B,36,R,29,32
-Thorn Herminia,C,20,L,26,31
-Bryan Vivian,SS,35,R,27,30
-Osmund Zahara,RF,23,L,23,31,C+
-Clancy Coral,CF,24,R,23,30,D+P+
-Wilfrid Amandie,3B,24,R,20,27
-Hersch Dorena,2B,26,R,19,24,S+
+Jervis Glori,C,25,R,32,37,S+
+Orbadiah Shauna,3B,25,L,33,36
+Whitman Faythe,1B,37,L,29,35,D+
+Vernen Latrena,LF,23,L,27,32
+Regen Ikey,SS,21,L,26,32,D+P--
+Bennett Goldy,2B,35,R,22,30
+Drake Kerrill,CF,24,R,23,26,S++
+Munmro Cristen,RF,24,R,21,27
 Bench:
 Name Pos Age Hand BT OBT Traits
-Alex Brea,INF,30,R,30,34
-Erwin Kizzie,OF,20,R,23,29,T+
-Tirrell Annaliese,C,28,R,22,27,P-
-Barnett Alethea,INF,29,S,20,24,C-
-Sandy Suzzy,OF,20,L,22,24,C+
+Udall Marigold,C,30,R,22,27
+Emmet Anita,INF,30,R,21,27
+Jon Sherie,OF,27,R,20,25,P+
+Wayne Tomasine,OF,29,L,21,23
+Beowulf Margarethe,INF,23,R,18,22
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Paco Lou,SP,34,L,d8,GB, 18,23
-Barret Nelie,SP,27,L,d4, 19,24
-Meryl Cora,SP,25,R,d4, 19,23
-Lowell Minerva,SP,19,L,d4, 17,23
-Barret Karol,SP,27,R,-d4, 19,25
+Dillon Sianna,SP,27,R,d12, 17,23
+Clayborn Ame,SP,25,R,d8, 22,26
+Aube Karol,SP,25,R,d8, 15,21
+Marcel Kial,SP,26,R,d4, 22,26
+Beowulf Pietra,SP,22,R,d4, 18,23
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Sebastian Phoebe,RP,37,L,d8, 16,23
-Terrence Nada,RP,30,R,d8, 19,20
-Palmer Charmain,RP,25,R,d4,CN-, 22,24
-Thebault Nanon,RP,23,L,d4,CN+, 18,20
-Meir Umeko,RP,25,R,d4, 18,23
-Darin Vinni,RP,22,R,d4, 16,22
-Leigh Trixie,RP,28,R,-d4, 22,28
+Leonid Veronica,RP,37,L,d12, 15,23
+Derrin Analise,RP,24,L,d8, 16,21
+Torr Cybil,RP,29,L,d4, 19,21
+Kermie Georgianna,RP,27,L,d4, 19,24
+Oren Carmon,RP,19,L,d4, 19,21
+Chauncey Millie,RP,28,R,-d4,K+, 17,22
+Shelden Heda,RP,26,R,-d4, 23,29

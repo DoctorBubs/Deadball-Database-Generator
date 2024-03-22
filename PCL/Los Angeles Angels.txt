@@ -1,34 +1,34 @@
-Name:Los Angeles Angels, Abrv:LA, Team Score: 73
+Name:Los Angeles Angels, Abrv:LA, Team Score: 63
 Lineup:
 Name Pos Age Hand BT OBT Traits
-Stew Lynett,SS,35,L,34,39
-Kenyon Daisi,CF,29,R,28,33
-Lindsey Eydie,C,22,R,27,33
-Cyrill Jan,RF,25,R,29,33,C-D+
-Chane Lacie,1B,23,L,26,33
-Leonardo Jade,3B,28,R,27,32
-Brant Gabie,LF,33,R,24,29
-Henrie Charissa,2B,30,R,23,25,T+
+Thaddeus Josepha,C,20,R,30,38
+Peyter Geneva,2B,19,R,32,37
+Yard Mei,SS,22,R,31,36,P--
+Shep Nonah,1B,21,S,32,35
+Baillie Christabella,CF,30,R,30,35,D+
+Wittie Gratiana,RF,34,R,22,28,D+S++
+Andri Magdalen,3B,19,R,17,24
+Willem Davida,LF,27,R,17,19,S+
 Bench:
 Name Pos Age Hand BT OBT Traits
-Bart Joy,INF,34,R,32,36
-Uriel Murielle,C,35,R,29,34
-Chaddie Rissa,OF,24,L,21,28
-Guillaume Correy,INF,32,R,23,27,D-
-Renado Sophia,OF,36,R,21,27
+Solomon Letty,OF,29,L,30,34
+Theodoric Isahella,C,23,R,27,31,P+
+Caesar Elbertine,OF,28,R,23,29,T+
+Raoul Kylynn,INF,23,L,17,25
+Enoch Lurette,INF,35,R,21,25,C+
 Rotation:
 Name Pos Age Hand PD Trait BT OBT
-Francesco Deeann,SP,32,L,d4, 20,21
-Barnard Elianore,SP,26,L,d4, 20,22
-Marion Devondra,SP,23,L,d4, 17,21
-Han Tildie,SP,23,L,d4, 18,24
-Samuel Jordanna,SP,21,L,-d4, 18,25
+Isaak Phedra,SP,24,L,d8,GB, 23,26
+Herrmann Koren,SP,24,R,d8, 14,15
+Evelyn Christian,SP,22,R,d4,GB, 22,25
+Shelby Kelci,SP,32,R,d4, 21,27
+Preston Constanta,SP,34,L,-d4,St+, 19,22
 Bullpen:
 Name Pos Age Hand PD Trait BT OBT
-Lew Josi,RP,23,R,d12, 19,25
-Gamaliel Anni,RP,21,R,d8,GB, 14,17
-Herman Laurel,RP,26,R,d8, 21,23
-Agamemnon Tiphani,RP,22,R,d4,GB, 20,22
-Ali Arabel,RP,22,R,d4, 20,21
-Wilfred Sibby,RP,21,R,d4, 15,19
-Merrill Jolynn,RP,21,R,d4, 21,22
+Barde Tamera,RP,19,R,d8, 17,23
+Garvey Vilhelmina,RP,38,L,d4,St+, 19,25
+Henry Gabriell,RP,38,R,d4, 16,18
+Reg Felipa,RP,35,R,d4, 19,26
+Mohamad Harli,RP,35,R,d4, 22,29
+Guido Amanda,RP,23,R,d4, 18,25
+Horacio Piper,RP,27,L,-d4, 20,26

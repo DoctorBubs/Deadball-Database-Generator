@@ -1,0 +1,24 @@
+Name:Santa Monica Saints, Abrv:SA, Team Score: 55
+Lineup:
+Name Pos Age Hand BT OBT Traits
+Whitaker Barbette,CF,22,L,32,35
+Zack Kelsi,SS,20,L,27,33
+Thorn Jeanelle,3B,24,R,25,33
+Goddart Damita,RF,23,R,26,32,D-
+Mohammed Conchita,1B,26,R,24,32
+Joaquin Rahal,LF,32,L,22,29,P--
+Nikita Agatha,C,23,R,25,28
+Tymothy Horatia,2B,26,R,22,29,C+P+
+Bench:
+Name Pos Age Hand BT OBT Traits
+Brook Van,INF,19,R,27,33
+Hailey Erda,OF,23,L,26,30,D+
+Timmy Cicely,UT,24,L,22,28,C-
+Dewitt Terrye,C,19,L,24,27
+Rotation:
+Name Pos Age Hand PD Trait BT OBT
+Alonso Mildrid,P,35,R,d20,K+, 20,26
+Valdemar Melloney,P,32,R,d8,St+, 19,24
+Grant Indira,P,20,L,d8, 21,28
+Rog Rebeca,P,23,R,d4, 19,22
+Shelton Ofilia,P,27,R,-d4, 23,31

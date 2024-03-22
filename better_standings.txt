@@ -14,15 +14,15 @@
     loser_table AS (SELECT 
         
         CASE
-        WHEN games.winner_id != games.home_team_id THEN games.home_team_id
-        ELSE games.away_team_id
+            WHEN games.winner_id != games.home_team_id THEN games.home_team_id
+            ELSE games.away_team_id
         END AS team_id,
         COUNT (games_id) as losses
         FROM games
-       -- INNER JOIN 
-            teams on teams.id = team_id
-        --GROUP BY team_id
-       -- ORDER BY losses DESC
+        --INNER JOIN 
+            --teams on teams.id = team_id
+        GROUP BY team_id
+       ORDER BY losses DESC
     )
 
     SELECT

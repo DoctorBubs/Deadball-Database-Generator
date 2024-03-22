@@ -11,13 +11,14 @@ use rusqlite::Connection;
 //Ok, to generate a whole season, we will start with hte smaller elemnts and build up from there.
 
 //First we have the game strruct, which represents an idvidual game that is scheduled
-#[derive(Clone)]
+#[derive(Clone,Debug)]
 pub struct Game {
     home_team_id: i32,
     away_team_id: i32,
 }
 
 // NExt we have a series, which is a small collection of games.
+#[derive(Clone,Debug)]
 pub struct Series {
     home_team_id: i32,
     away_team_id: i32,
@@ -128,7 +129,7 @@ pub fn get_home_schedules(
         .map(|x| new_home_season(x, &ids, series_length, series_per_matchup))
         .collect()
 }
-*/
+*/#[derive(Clone,Debug)]
 pub struct Round {
     home_team_ids: Vec<i32>,
     away_team_ids: Vec<i32>,
@@ -195,7 +196,7 @@ fn compare_vec_hash(vec: Vec<i32>, map: HashMap<i32,i32>) -> bool{
 // The next 2 fn are the ones that work.
 pub fn round_from_vec(vec: Vec<i32>, series_length: i32) -> Round {
     let half_point = vec.len() / 2;
-    let home_team_ids = vec[..(half_point - 1)].to_vec();
+    let home_team_ids = vec[..half_point].to_vec();
     let away_team_ids = vec[half_point..].to_vec();
     let mut away_team_clone = away_team_ids.clone();
     let series = home_team_ids
@@ -220,7 +221,7 @@ pub enum ScheduleGenError {
 pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i32) -> Vec<Round> {
     let ids: Vec<i32> = teams.iter().map(|team| team.team_id).collect();
     //let total_game_per_team = (series_length * series_per_matchup * ((ids.len() - 1) as i32)) * 2;
-
+    //println!("{:?}",ids);
     let team_size = ids.len();
     let team_num = ids.len() as i32;
 
@@ -250,7 +251,10 @@ fn get_valid_series_number() -> i32 {
         .unwrap();
         match input % 2 == 0 {
             true => return input,
-            false => (),
+            false => {
+                println!("\nThe number of series must be even.");
+                ()
+            },
         }
     }
 }
@@ -273,10 +277,13 @@ pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut Th
         .unwrap();
     let season_id = conn.last_insert_rowid();
     for round in sched {
+        //println!("{:?}", round);
         conn.execute("INSERT INTO rounds(season_id) VALUES(?1)", [season_id]).unwrap();
         let round_id = conn.last_insert_rowid();
         for series in round.series {
+            //println!("{:?}", series);
             for game in series.games {
+               // println!("{:?}",game);
                 let home_id = game.home_team_id as i64;
                 let away_id = game.away_team_id as i64;
                 conn.execute(

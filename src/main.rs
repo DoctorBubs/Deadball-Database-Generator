@@ -127,7 +127,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS games(
-        game_id INTEGER PRMIARY KEY,
+        game_id INTEGER PRIMARY KEY,
         round_id INTEGER NOT NULL,
         home_team_id INTEGER NOT NULL,
         home_score INTEGER DEFAULT 0,
