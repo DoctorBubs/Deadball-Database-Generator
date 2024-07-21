@@ -59,7 +59,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::
 
     match starting_choice {
         Ok(choice) => match choice {
-            // And we tuse the input to direct the user to where they would like to go first.
+            // And we use the input to direct the user to where they would like to go first.
             MenuInput::CreateNewLeague => create_new_league(thread, conn),
             // If the user selects exit, the functinon returns Ok, which exit the program
             MenuInput::Exit => Ok(()),

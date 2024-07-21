@@ -15,7 +15,6 @@ use crate::era::select_era;
 use crate::main_menu::run_main_menu;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
-use crate::main_menu::MenuInput;
 use crate::player::select_gender;
 use crate::team::add_new_team;
 use crate::team::load_team;
