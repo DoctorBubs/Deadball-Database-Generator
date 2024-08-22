@@ -1,6 +1,6 @@
-use std::fmt::Display;
 
-use crate::player;
+
+
 //use crate::greater_trait;
 //use crate::greater_trait as other_greater_trait;
 use crate::Deserialize;
@@ -16,13 +16,7 @@ pub trait PlayerTrait {
     }
 }
 
-pub fn trait_to_sql_text<T: PlayerTrait + Display>(player_trait: &T) -> Option<String> {
-    let trait_string = player_trait.to_string();
-    match trait_string.as_str() {
-        "" => None,
-        _ => Some(trait_string),
-    }
-}
+
 
 // Takes a plert trait. If the result of converting the trait to an int is 0, None is returned, else an option with hte trait is returned.
 pub fn player_trait_option<T: PlayerTrait>(player_trait: &T) -> Option<&T> {

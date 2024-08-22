@@ -18,7 +18,7 @@ use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
-use crate::schedule::new_schedule;
+
 use crate::team::Team;
 use crate::traits::Contact;
 use crate::traits::Defense;

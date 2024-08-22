@@ -389,7 +389,7 @@ pub fn league_check(
             Select::new("Select an existing league", options).prompt();
         match ans {
             Ok(select) => match input {
-                //If the users decided they wanted to create a new team earlierm they are taken to the prompt to create a new team
+                //If the users decided they wanted to create a new team earlier they are taken to the prompt to create a new team
                 LoadLeagueInput::EditLeague(edit) => {
                     load_league(thread, conn, select, edit)?;
                     Ok(())

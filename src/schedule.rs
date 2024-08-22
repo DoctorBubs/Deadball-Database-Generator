@@ -1,4 +1,4 @@
-use crate::league::{self, save_league, League};
+use crate::league::{ save_league, League};
 use crate::team::Team;
 //use std::collections::HashMap;
 use itertools::Itertools;
@@ -20,8 +20,6 @@ pub struct Game {
 // NExt we have a series, which is a small collection of games.
 #[derive(Clone,Debug)]
 pub struct Series {
-    home_team_id: i32,
-    away_team_id: i32,
     games: Vec<Game>,
 }
 
@@ -40,8 +38,7 @@ fn new_series(home_team_id: i32, away_team_id: i32, series_length: i32) -> Serie
 
     result */
     Series {
-        home_team_id,
-        away_team_id,
+       
         games: vec![new_game(home_team_id, away_team_id); series_length as usize],
     }
 }
@@ -131,9 +128,8 @@ pub fn get_home_schedules(
 }
 */#[derive(Clone,Debug)]
 pub struct Round {
-    home_team_ids: Vec<i32>,
-    away_team_ids: Vec<i32>,
-    series: Vec<Series>,
+   
+    series: Vec<Series>
 }
 /*
 fn unique_series_filter(series_vec: Vec<Series>,number_of_teams; ) -> bool {
@@ -207,23 +203,19 @@ pub fn round_from_vec(vec: Vec<i32>, series_length: i32) -> Round {
         })
         .collect();
     Round {
-        home_team_ids,
-        away_team_ids,
-        series,
+       
+        series
     }
 }
 
-pub enum ScheduleGenError {
-    UnevenNumberOfTeams(i32),
-    UnevenNumberOfGames(i32),
-}
 
-pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i32) -> Vec<Round> {
+
+pub fn new_schedule(teams: &Vec<Team>, series_length: i32) -> Vec<Round> {
     let ids: Vec<i32> = teams.iter().map(|team| team.team_id).collect();
     //let total_game_per_team = (series_length * series_per_matchup * ((ids.len() - 1) as i32)) * 2;
     //println!("{:?}",ids);
     let team_size = ids.len();
-    let team_num = ids.len() as i32;
+
 
     let mut rounds: Vec<Round> = ids
         .into_iter()
@@ -260,14 +252,14 @@ fn get_valid_series_number() -> i32 {
 }
 
 pub fn schedule_from_input(league: &League) -> Vec<Round> {
-    let series_per_matchup = get_valid_series_number() / 2;
+
     let series_length =
         CustomType::<i32>::new("Please enter how many games should be played in each series.")
             .with_error_message("Please type a valid number")
             .prompt()
             .unwrap();
     let teams = &league.teams;
-    new_schedule(teams, series_length, series_per_matchup)
+    new_schedule(teams, series_length)
 }
 
 pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) {

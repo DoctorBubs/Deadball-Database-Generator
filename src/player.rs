@@ -1,4 +1,4 @@
-use crate::b_traits;
+
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
 use crate::lineup_score::LineupScore;
@@ -7,7 +7,7 @@ use crate::player_quality::PlayerQuality;
 use crate::team::TeamSpot;
 use crate::traits::player_trait_option;
 
-use crate::traits::trait_to_sql_text;
+
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
 use crate::Era;
