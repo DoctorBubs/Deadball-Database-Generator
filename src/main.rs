@@ -39,7 +39,7 @@ fn main() -> std::io::Result<()> {
     let mut r_thread = rand::thread_rng();
 
     println!("Welcome to the Deadball league generator!");
-    println!("This tool is based off the Deadball tabletop game by W.M. Akers");
+    println!("This tool is based off the Deadball tabletop game by W.M. Akers.");
     // We then go to the main menu.
     let mut user_input = run_main_menu(&mut conn, &mut r_thread);
     loop {

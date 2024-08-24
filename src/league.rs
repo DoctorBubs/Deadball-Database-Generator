@@ -5,14 +5,14 @@ use std::io::Write;
 use std::path::Path;
 
 use inquire::validator::MinLengthValidator;
-use inquire::Confirm;
+
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
 use rusqlite::Connection;
 
 use crate::era::select_era;
-use crate::main_menu::run_main_menu;
+
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
 use crate::player::select_gender;
@@ -412,8 +412,8 @@ pub fn league_check(
 // Once a league is saved, we save a copy of the league data in a folder.
 pub fn save_league(
     league: &League,
-    conn: &mut Connection,
-    thread: &mut ThreadRng,
+    _conn: &mut Connection,
+    _thread: &mut ThreadRng,
 ) -> std::io::Result<()> {
     println!();
     let flder_path_string = league.name.to_string();
