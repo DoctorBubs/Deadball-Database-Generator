@@ -427,12 +427,5 @@ pub fn save_league(
         file.write_all(team.to_string().as_bytes())?;
     }
     println!("League saved succesfully.");
-    //We then prompt the user if they would like to return to the main menu
-    let ans = Confirm::new("Would you like to return to the main menu?")
-        .with_default(true)
-        .prompt();
-    match ans {
-        Ok(true) => run_main_menu(conn, thread),
-        _ => Ok(()),
-    }
+    Ok(())
 }

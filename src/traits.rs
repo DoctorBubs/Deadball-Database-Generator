@@ -1,6 +1,3 @@
-
-
-
 //use crate::greater_trait;
 //use crate::greater_trait as other_greater_trait;
 use crate::Deserialize;
@@ -15,8 +12,6 @@ pub trait PlayerTrait {
         0
     }
 }
-
-
 
 // Takes a plert trait. If the result of converting the trait to an int is 0, None is returned, else an option with hte trait is returned.
 pub fn player_trait_option<T: PlayerTrait>(player_trait: &T) -> Option<&T> {

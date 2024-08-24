@@ -25,6 +25,7 @@ use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
+use inquire::Confirm;
 use league::league_check;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
@@ -38,8 +39,24 @@ fn main() -> std::io::Result<()> {
     let mut r_thread = rand::thread_rng();
 
     println!("Welcome to the Deadball league generator!");
+    println!("This tool is based off the Deadball tabletop game by W.M. Akers");
     // We then go to the main menu.
-    run_main_menu(&mut conn, &mut r_thread)
+    let mut user_input = run_main_menu(&mut conn, &mut r_thread);
+    loop {
+        match user_input {
+            Err(_) => break,
+            _ => {}
+        };
+        //We then prompt the user if they would like to return to the main menu
+        let ans = Confirm::new("Would you like to return to the main menu?")
+            .with_default(true)
+            .prompt();
+        match ans {
+            Ok(true) => user_input = run_main_menu(&mut conn, &mut r_thread),
+            _ => break,
+        };
+    }
+    user_input
 }
 
 fn load_database() -> Result<Connection, rusqlite::Error> {
