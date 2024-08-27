@@ -40,18 +40,20 @@ fn main() -> std::io::Result<()> {
 
     println!("Welcome to the Deadball league generator!");
     println!("This tool is based off the Deadball tabletop game by W.M. Akers.");
-    // We then go to the main menu.
+   // We go to the main menu.
     let mut user_input = run_main_menu(&mut conn, &mut r_thread);
     loop {
+        // We take the result of what the user choose. If there is an error, we break
         match user_input {
             Err(_) => break,
             _ => {}
         };
-        //We then prompt the user if they would like to return to the main menu
+        //If there was no error, we ask the user if they would like to retun to the main menu.
         let ans = Confirm::new("Would you like to return to the main menu?")
             .with_default(true)
             .prompt();
         match ans {
+            // If the user selects yes, we go back to the main menu, otherwise we break the loop
             Ok(true) => user_input = run_main_menu(&mut conn, &mut r_thread),
             _ => break,
         };

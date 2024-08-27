@@ -29,7 +29,7 @@ use core::fmt;
 use std::fmt::Write;
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
-Team's als ohave a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
+Team's also have a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Team {
     pub abrv: String,
@@ -75,7 +75,7 @@ impl Team {
         let batter_score = team_score_from_vec(&self.lineup) + team_score_from_vec(&self.bench);
         //Next, we add the the team score contribution from the pitching rotation to get a pitching score.
         let mut pitcher_score = team_score_from_vec(&self.starting_pitching);
-        //If a team has a bullepen, the pitchers in the bullpen add to the pitching score.
+        //If a team has a bullpen, the pitchers in the bullpen add to the pitching score.
         match &self.bullpen {
             Some(bullpen) => {
                 pitcher_score += team_score_from_vec(bullpen);
@@ -85,12 +85,12 @@ impl Team {
         };
         // Next, we multiply the pitcher score by 7.
         pitcher_score *= 7;
-        // Finally, the team score is caluclated by adding the batter score to the pitcher score and divide by 10.
+        // Finally, the team score is calculated by adding the batter score to the pitcher score and divide by 10.
         self.team_score = (batter_score + pitcher_score) / 10;
     }
 
     /* For each player in a team, we create a new entry in the database with a provided team id.
-    The TeamSpot enum is used to distnguish each players role on the team in its entry in the database.
+    The TeamSpot enum is used to distinguish each players role on the team in its entry in the database.
     */
     pub fn save_players_sql(
         &self,
@@ -244,7 +244,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
             TeamSpot::Bullpen => match &mut team.bullpen {
                 Some(pen) => pen.push(player),
                 None => {
-                    panic!("Attemped to add a reliever to an  Ancient era team with no bullpen")
+                    panic!("Attempted to add a reliever to an  Ancient era team with no bullpen")
                 }
             },
         }
@@ -272,7 +272,7 @@ fn new_starting_lineup(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -
     new_player_vec(base, gender, thread, BatterQuality::TopProspect, era)
 }
 
-// The bench consist of all non starters. The Ancient and Modern era's have different quantities and posiions on the bech, so we use the Era enum to keep track.
+// The bench consist of all non starters. The Ancient and Modern era's have different quantities and positions on the bench, so we use the Era enum to keep track.
 fn new_bench(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = match era {
         Era::Ancient => vec!["C", "INF", "OF", "UT"],
@@ -320,7 +320,7 @@ fn get_pitcher_info_string(desc: String, vec: &[Player]) -> String {
     format!("{}{}\n", header, sorted_pitcher_pool(vec))
 }
 
-// Declare if a player is in hte starting lineup, on the bench, in the starting roation, or in the bullpen.
+// Declare if a player is in hte starting lineup, on the bench, in the starting rotation, or in the bullpen.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum TeamSpot {
     StartingLineup,
@@ -355,7 +355,7 @@ pub fn add_team_check(
     match ans {
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
-        //If not, we save the leauge.
+        //If not, we save the league.
         Ok(false) => save_league(league, conn, thread)?,
         Err(_) => {
             panic!("Error on add team prompt");
@@ -413,9 +413,9 @@ pub fn add_new_team(
             Ok(input) => input.trim().to_string(),
             Err(_) => panic!("Error creating team abbreviation."),
         };
-        /* The leuge takes the new team name and abbreviation created.  If there is already a team with the same name and/or abbreviation, an error is returned and the user is prompted to enter in something else.
+        /* The league takes the new team name and abbreviation created.  If there is already a team with the same name and/or abbreviation, an error is returned and the user is prompted to enter in something else.
             There is also a check to see if there is an error adding the team to the database, and returns a nerror if it does.
-            Otherwwise, the function will return OK.
+            Otherwise, the function will return OK.
         */
         match league.new_team(&abrv, &team_name, thread, league_id, conn) {
             Err(message) => {
