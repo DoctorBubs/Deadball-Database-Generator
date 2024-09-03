@@ -8,7 +8,7 @@ use rand::rngs::ThreadRng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rusqlite::Connection;
-use inquire::validator::{I, Validation};
+//use inquire::validator::{I, Validation};
 //Ok, to generate a whole season, we will start with the smaller elements and build up from there.
 
 //First we have the game struct, which represents an individual game that is scheduled
@@ -58,9 +58,10 @@ pub struct Round {
     series: Vec<Series>,
 }
 
+/// SeriesListing is a struct that contains a refrence to a series, as well as an index field that marks under what position the series is in a vector.
 #[derive(Debug)]
-struct SeriesListing {
-    series: Series,
+struct SeriesListing<'a> {
+    series: &'a Series,
     index: usize,
 }
 
@@ -74,35 +75,33 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
         let mut new_round_vec = vec![];
         //We create a vector of forbidden team id's that have already been used.
         let mut forbidden_numbers = vec![];
-        // We clone all_series.
-        let series_clone = all_series.clone();
-        // And choose a random series from the vector.
-        let (i, first_series) = series_clone
+
+        //First, we choose a random series from all series
+        let (i, _) = all_series
             .iter()
             .enumerate()
             .choose(&mut thread_rng())
             .unwrap();
-        // We remove the index of the series.
-        all_series.remove(i);
-        // And add the sereis home team and away team id to the forbidden numbers.
+
+        let first_series = all_series.remove(i);
+        // And add the series home team and away team id to the forbidden numbers.
         forbidden_numbers.push(first_series.home_team_id);
         forbidden_numbers.push(first_series.away_team_id);
         // we then add the series to the round vec
-        new_round_vec.push(first_series.clone());
-        // We then loop untill the lenght of the new round vec is equal to matchups per round
+        new_round_vec.push(first_series);
+        // We remove the index of the series
+
+        // We then loop untill the length of the new round vec is equal to matchups per round.
         while new_round_vec.len() < matchups_per_round {
             // We create an index variable.
             let mut index = 0;
             // We clone series again.
-            let series_clone = all_series.clone();
-            let filtered_series_listing: Vec<SeriesListing> = series_clone
+            //let series_clone = all_series.clone();
+            let filtered_series_listing: Vec<SeriesListing> = all_series
                 .iter()
                 //From the clone we map to create a series listing. The listing contains an index, which represents the index of the series in all series
                 .map(|x| {
-                    let result = SeriesListing {
-                        series: x.clone(),
-                        index,
-                    };
+                    let result = SeriesListing { series: x, index };
                     index += 1;
                     result
                 })
@@ -116,12 +115,11 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
                 .enumerate()
                 .choose(&mut thread_rng())
                 .unwrap();
-            // We take the series listig index
+            // We take the series listing index
             let current_index = current_series_listing.index;
-            // And clone the series we need.
-            let current_series = series_clone[current_index].clone();
-            // We remove the series from all_series via the index
-            all_series.remove(current_index);
+            // And use that index to get the series from all_series
+            let current_series = all_series.remove(current_index);
+
             // We add the series home and away team ids to the forbidden numbers.
             forbidden_numbers.push(current_series.home_team_id);
             forbidden_numbers.push(current_series.away_team_id);
@@ -135,7 +133,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
         // We then add the round to the result.
         result.push(new_round);
     }
-    
+
     result
 }
 
@@ -160,8 +158,7 @@ pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i
     rounds
 }
 
-
-// Determines how 
+// Determines how
 fn get_valid_series_number() -> i32 {
     //
     loop {
