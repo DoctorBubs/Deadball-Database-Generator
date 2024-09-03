@@ -34,22 +34,17 @@ pub struct Series {
 }
 
 impl Series {
-    fn is_valid(&self, forbidden_numbers: &Vec<i32>) -> bool {
-        if forbidden_numbers.contains(&self.home_team_id)
+    fn is_valid(&self, forbidden_numbers: &[i32]) -> bool {
+        forbidden_numbers.contains(&self.home_team_id)
             | forbidden_numbers.contains(&self.away_team_id)
-        {
-            return true;
-        } else {
-            return false;
-        }
     }
 }
 
 fn new_series(home_team_id: i32, away_team_id: i32, series_length: i32) -> Series {
     Series {
         games: vec![new_game(home_team_id, away_team_id); series_length as usize],
-        home_team_id: home_team_id,
-        away_team_id: away_team_id,
+        home_team_id,
+        away_team_id,
     }
 }
 
@@ -70,7 +65,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
     let mut result = vec![];
 
     // We loop untill the length of all series is 0
-    while all_series.len() > 0 {
+    while !all_series.is_empty() {
         // We create a vector for the new round.
         let mut new_round_vec = vec![];
         //We create a vector of forbidden team id's that have already been used.
@@ -137,7 +132,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
     result
 }
 
-pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i32) -> Vec<Round> {
+pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32) -> Vec<Round> {
     let ids: Vec<i32> = teams.iter().map(|team| team.team_id).collect();
 
     let team_size = ids.len();
@@ -172,7 +167,6 @@ fn get_valid_series_number() -> i32 {
             true => return input,
             false => {
                 println!("Input must be an even positive whole number.");
-                ()
             }
         }
     }

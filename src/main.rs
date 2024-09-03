@@ -44,10 +44,9 @@ fn main() -> std::io::Result<()> {
     let mut user_input = run_main_menu(&mut conn, &mut r_thread);
     loop {
         // We take the result of what the user choose. If there is an error, we break
-        match user_input {
-            Err(_) => break,
-            _ => {}
-        };
+        if user_input.is_err() {
+            break;
+        }
         //If there was no error, we ask the user if they would like to retun to the main menu.
         let ans = Confirm::new("Would you like to return to the main menu?")
             .with_default(true)
