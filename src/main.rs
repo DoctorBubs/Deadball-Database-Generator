@@ -33,14 +33,14 @@ use serde::{Deserialize, Serialize};
 use std::fmt;
 
 fn main() -> std::io::Result<()> {
-    // First, we load the databse, or create one if it doesn't exist.
+    // First, we load the databsae, or create one if it doesn't exist.
     let mut conn = load_database().unwrap();
     //Next we generate a thread for the random numbers we will need to generate.
     let mut r_thread = rand::thread_rng();
 
     println!("Welcome to the Deadball league generator!");
     println!("This tool is based off the Deadball tabletop game by W.M. Akers.");
-   // We go to the main menu.
+    // We go to the main menu.
     let mut user_input = run_main_menu(&mut conn, &mut r_thread);
     loop {
         // We take the result of what the user choose. If there is an error, we break
@@ -64,7 +64,7 @@ fn main() -> std::io::Result<()> {
 fn load_database() -> Result<Connection, rusqlite::Error> {
     // We look for the database, and create a new one if it doesn't exist. If no database exists and there we are unable to create a new database in the folder, the function returns an error
     let conn = Connection::open("deadball.db")?;
-    // We create the league table in the database. Eeach league has an ID and a unique name. Each league also has an era and gender, which are used in creating teams and players withing the league.
+    // We create the league table in the database. Each league has an ID and a unique name. Each league also has an era and gender, which are used in creating teams and players withing the league.
     conn.execute(
         "create table if not exists leagues (
              id INTEGER PRIMARY KEY,
@@ -92,7 +92,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
         (),
     )?;
     /*  The last table to create is the players tables. Teams have a one to many relationship with players, with each player beloning to one team
-        Each player has a unique id, and a forein key team_id which refrenceses the id of the team the player belongs to
+        Each player has a unique id, and a foreign key team_id which references the id of the team the player belongs to
 
 
     */
@@ -104,15 +104,15 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
              age INTEGER NOT NULL, --Players Age
              pos TEXT NOT NULL, --Player's position, E.G Shortstop, Right Fielder, Pitcher, etc.
              hand TEXT NOT NULL, --Notes if a player bats left handed, right handed, or if the player is not a pitcher, bats as a switch hitter.
-             bt INTEGER NOT NULL, -- Players batting target, which is an apporximation of a players batting average.
+             bt INTEGER NOT NULL, -- Players batting target, which is an approximation of a players batting average.
              obt_mod INTEGER NOT NULL, --OBT Modifier, which is used to calculate a players on base target by addition to a player batter target
              obt INTEGER NOT NULL, -- On base Target, indicates how often a player get's on base. Correlates to a player on base percentage in real life.
              PD TEXT , -- If a player is a pitcher, they are assigned a pitch die, which represents the stand rpg die, E.G. d12, d4. Pitch die can be negative.
-             pd_int INTEGER , /*If a player has a ptich die, PD_int represents the outcome of a pitch die roll that is the fartherst away from 0.
+             pd_int INTEGER , /*If a player has a pitch die, PD_int represents the outcome of a pitch die roll that is the fartherst away from 0.
              For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
             */
              pitcher_trait TEXT , --Pitchers
-             team_spot TEXT NOT NULL, -- Repreresents a player's rolke 
+             team_spot TEXT NOT NULL, -- Represents where 
              contact TEXT ,
              defense TEXT,
              power TEXT ,

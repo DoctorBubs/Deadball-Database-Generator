@@ -1,5 +1,3 @@
-//use crate::greater_trait;
-//use crate::greater_trait as other_greater_trait;
 use crate::Deserialize;
 
 use crate::fmt;
