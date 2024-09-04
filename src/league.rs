@@ -28,6 +28,8 @@ use crate::Team;
 use crate::ThreadRng;
 
 use crate::schedule::*;
+use std::collections::HashMap;
+
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
 #[derive(Serialize, Deserialize)]
@@ -36,7 +38,8 @@ pub struct League {
     pub teams: Vec<Team>,
     pub gender: PlayerGender,
     pub era: Era,
-    pub league_id: i64, //bench_quality:BatterQuality
+    pub league_id: i64 //bench_quality:BatterQuality,
+    
 }
 #[derive(Debug)]
 //Possible Errors that oculd arrise from adding a team to a league
@@ -60,7 +63,8 @@ impl League {
             teams: Vec::new(),
             gender,
             era,
-            league_id,
+            league_id
+            
         }
     }
 
@@ -171,6 +175,15 @@ impl League {
         self.teams.push(new_team);
         Ok(())
     }
+
+    pub fn new_team_hash(&self) -> HashMap<i32,&Team>{
+        let mut result = HashMap::new();
+        for team in self.teams.iter(){
+            result.insert(team.team_id,team);
+        }
+        result
+    }
+
 }
 
 fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
@@ -365,7 +378,8 @@ pub fn league_check(
                     league_id: row.get(0)?,
 
                     //PlayerGender::from_string(row.get(3)?),
-                    teams: Vec::new(),
+                    teams: Vec::new()
+                    
                 },
             })
         })
