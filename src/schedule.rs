@@ -151,16 +151,14 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
     rounds
 }
 
-// Determines how
-fn get_valid_series_number() -> i32 {
+// Asks the user for a number, but ensures the number is positive and even.
+fn get_valid_even_number(message: &str) -> i32 {
     //
     loop {
-        let input = CustomType::<i32>::new(
-            "Please enter how many series between each team should be scheduled.",
-        )
-        .with_error_message("Please type a valid number")
-        .prompt()
-        .unwrap();
+        let input = CustomType::<i32>::new(message)
+            .with_error_message("Please type a valid number")
+            .prompt()
+            .unwrap();
         match (input % 2 == 0) & (input > 0) {
             true => return input,
             false => {
@@ -171,12 +169,10 @@ fn get_valid_series_number() -> i32 {
 }
 
 pub fn schedule_from_input(league: &League) -> Vec<Round> {
-    let series_number = get_valid_series_number();
+    let series_number =
+        get_valid_even_number("Please enter how many series should be played between each team.");
     let series_length =
-        CustomType::<i32>::new("Please enter how many games should be played in each series.")
-            .with_error_message("Please type a valid number")
-            .prompt()
-            .unwrap();
+        get_valid_even_number("Please enter how many games should be played in each series.");
     let teams = &league.teams;
     new_schedule(teams, series_length, series_number)
 }
