@@ -89,17 +89,15 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
         // We then loop untill the length of the new round vec is equal to matchups per round.
         while new_round_vec.len() < matchups_per_round {
             // We create an index variable.
-            let mut index = 0;
+
             // We clone series again.
             //let series_clone = all_series.clone();
             let filtered_series_listing: Vec<SeriesListing> = all_series
                 .iter()
+                // We set the iter to enumerate, as we need the index to generate a SeriesListing.
+                .enumerate()
                 //From the clone we map to create a series listing. The listing contains an index, which represents the index of the series in all series
-                .map(|x| {
-                    let result = SeriesListing { series: x, index };
-                    index += 1;
-                    result
-                })
+                .map(|(index, series)| SeriesListing { series, index })
                 // We then filter for only series listing that series is valid based off the current forbidden numbers
                 .filter(|x| x.series.is_valid(&forbidden_numbers))
                 // And we collect the new vector.
