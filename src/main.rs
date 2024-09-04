@@ -144,16 +144,24 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     )?;
 
     conn.execute(
+        "CREATE TABLE IF NOT EXISTS series(
+    series_id INTEGER PRIMARY KEY,
+    round_id INTEGER NOT NULL,
+    home_team_id INTEGER NOT NULL,
+    away_team_id INTEGER NOT NULL,
+    FOREIGN KEY (round_id) REFERENCES rounds(round_id),
+    FOREIGN KEY (home_team_id) REFERENCES teams(id),
+    FOREIGN KEY (away_team_id) REFERENCES teams(id)
+    )",
+        (),
+    )?;
+    conn.execute(
         "CREATE TABLE IF NOT EXISTS games(
         game_id INTEGER PRIMARY KEY,
-        round_id INTEGER NOT NULL,
-        home_team_id INTEGER NOT NULL,
+        series_id INTEGER NOT NULL,
         home_score INTEGER DEFAULT 0,
-        away_team_id INTEGER NOT NULL,
         away_score INTEGER DEFAULT 0,
-        FOREIGN KEY (round_id) REFERENCES rounds(round_id),
-        FOREIGN KEY (home_team_id) REFERENCES teams(id),
-        FOREIGN KEY (away_team_id) REFERENCES teams(id)
+        FOREIGN KEY (series_id) REFERENCES series(series_id)
     )",
         (),
     )?;

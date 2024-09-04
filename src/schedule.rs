@@ -179,6 +179,13 @@ pub fn schedule_from_input(league: &League) -> Vec<Round> {
 
 pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) {
     let sched = schedule_from_input(league);
+    let first_round = &sched[0];
+    for series in first_round.series.iter() {
+        println!(
+            "\nhome_team:{} away_team:{}",
+            series.home_team_id, series.away_team_id
+        )
+    }
     let league_id = league.league_id;
     conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])
         .unwrap();
@@ -188,14 +195,17 @@ pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut Th
             .unwrap();
         let round_id = conn.last_insert_rowid();
         for series in round.series {
-            for game in series.games {
-                let home_id = game.home_team_id as i64;
-                let away_id = game.away_team_id as i64;
-                conn.execute(
-                    "INSERT INTO games(round_id,home_team_id,away_team_id) VALUES(?1, ?2, ?3)",
-                    [round_id, home_id, away_id],
-                )
-                .unwrap();
+            let home_id = series.home_team_id as i64;
+            let away_id = series.away_team_id as i64;
+            conn.execute(
+                "INSERT INTO series(round_id,home_team_id,away_team_id) VALUES(?1, ?2, ?3)",
+                [round_id, home_id, away_id],
+            )
+            .unwrap();
+            let series_id = conn.last_insert_rowid();
+            for _game in series.games {
+                conn.execute("INSERT INTO games(series_id) VALUES(?1)", [series_id])
+                    .unwrap();
             }
         }
     }

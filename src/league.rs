@@ -38,8 +38,7 @@ pub struct League {
     pub teams: Vec<Team>,
     pub gender: PlayerGender,
     pub era: Era,
-    pub league_id: i64 //bench_quality:BatterQuality,
-    
+    pub league_id: i64, //bench_quality:BatterQuality,
 }
 #[derive(Debug)]
 //Possible Errors that oculd arrise from adding a team to a league
@@ -63,8 +62,7 @@ impl League {
             teams: Vec::new(),
             gender,
             era,
-            league_id
-            
+            league_id,
         }
     }
 
@@ -176,14 +174,13 @@ impl League {
         Ok(())
     }
 
-    pub fn new_team_hash(&self) -> HashMap<i32,&Team>{
+    pub fn new_team_hash(&self) -> HashMap<i32, &Team> {
         let mut result = HashMap::new();
-        for team in self.teams.iter(){
-            result.insert(team.team_id,team);
+        for team in self.teams.iter() {
+            result.insert(team.team_id, team);
         }
         result
     }
-
 }
 
 fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
@@ -378,8 +375,7 @@ pub fn league_check(
                     league_id: row.get(0)?,
 
                     //PlayerGender::from_string(row.get(3)?),
-                    teams: Vec::new()
-                    
+                    teams: Vec::new(),
                 },
             })
         })
