@@ -34,9 +34,10 @@ pub struct Series {
 }
 
 impl Series {
+    /// When given a vector of ints, this function returns true if the series home team and away team id are no in the vector.
     fn is_valid(&self, forbidden_numbers: &[i32]) -> bool {
-        forbidden_numbers.contains(&self.home_team_id)
-            | forbidden_numbers.contains(&self.away_team_id)
+        !(forbidden_numbers.contains(&self.home_team_id)
+            | forbidden_numbers.contains(&self.away_team_id))
     }
 }
 
@@ -84,10 +85,9 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
         forbidden_numbers.push(first_series.away_team_id);
         // we then add the series to the round vec
         new_round_vec.push(first_series);
-        // We remove the index of the series
 
-        // We then loop untill the length of the new round vec is equal to matchups per round.
-        while new_round_vec.len() < matchups_per_round {
+        //We loops from 1 to matchup_per_round. This previously checked the length of the new round, however this casued bugs that loopingl ike this might fix
+        for _ in 1..matchups_per_round {
             // We create an index variable.
 
             // We clone series again.
@@ -103,11 +103,15 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
                 // And we collect the new vector.
                 .collect();
             // We select a random series listing  and it's index
-            let (_i, current_series_listing) = filtered_series_listing
+            if filtered_series_listing.len() < 1 {
+                panic!("Schedule generation tried to run when there are no possible combos left for the roudn.")
+            }
+            let (i, current_series_listing) = filtered_series_listing
                 .iter()
                 .enumerate()
                 .choose(&mut thread_rng())
                 .unwrap();
+
             // We take the series listing index
             let current_index = current_series_listing.index;
             // And use that index to get the series from all_series
@@ -134,7 +138,7 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
     let ids: Vec<i32> = teams.iter().map(|team| team.team_id).collect();
 
     let team_size = ids.len();
-
+    let matchups_per_round = team_size / 2;
     let all_series: Vec<Series> = ids
         .into_iter()
         // We create a permutation of home team and away id.
@@ -146,7 +150,7 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
             }
             acc
         });
-    let mut rounds = new_round_generator(all_series, team_size / 2);
+    let mut rounds = new_round_generator(all_series, matchups_per_round);
     rounds.shuffle(&mut thread_rng());
     rounds
 }
@@ -179,13 +183,8 @@ pub fn schedule_from_input(league: &League) -> Vec<Round> {
 
 pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) {
     let sched = schedule_from_input(league);
-    let first_round = &sched[0];
-    for series in first_round.series.iter() {
-        println!(
-            "\nhome_team:{} away_team:{}",
-            series.home_team_id, series.away_team_id
-        )
-    }
+
+
     let league_id = league.league_id;
     conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])
         .unwrap();

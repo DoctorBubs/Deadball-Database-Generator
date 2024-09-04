@@ -309,7 +309,7 @@ fn new_bullpen(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Option
     }
 }
 
-// When we save team to a txt file, we print out the batter in an optimized order, with a header for their relevnat stats.
+// When we save team to a txt file, we print out the batter in an optimized order, with a header for their relevant stats.
 fn get_batter_info_string(desc: String, vec: &[Player]) -> String {
     let header = format!("{}:\nName Pos Age Hand BT OBT Traits", desc);
     format!("{}{}\n", header, get_sorted_batter_strings(vec))
