@@ -426,6 +426,6 @@ pub fn save_league(
         let mut file = File::create(file_path)?;
         file.write_all(team.to_string().as_bytes())?;
     }
-    println!("League saved succesfully.");
+    println!("League saved successfully.");
     Ok(())
 }
