@@ -10,3 +10,5 @@
 .README.md
 /deadball.db
 .vscode
+/test.db
+/sql_querys

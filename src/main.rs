@@ -66,7 +66,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     // We create the league table in the database. Each league has an ID and a unique name. Each league also has an era and gender, which are used in creating teams and players withing the league.
     conn.execute(
         "create table if not exists leagues (
-             id INTEGER PRIMARY KEY,
+             league_id INTEGER PRIMARY KEY,
              league_name TEXT NOT NULL UNIQUE,
              era TEXT NOT NULL,
              gender TEXT NOT NULL
@@ -79,14 +79,13 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     Teams also have a team score, which is a number that summarizes how good a team is based off the quality of their players, as well as current wins and losses*/
     conn.execute(
         "create table if not exists teams (
-             id INTEGER PRIMARY KEY,
+             team_id INTEGER PRIMARY KEY,
              league_id INTEGER NOT NULL,
              team_name TEXT NOT NULL,
              abrv TEXT NOT NULL,
-             team_score INTEGER NOT NULL,
              wins INTEGER DEFAULT 0,
              losses INTEGER DEFAULT 0,
-             FOREIGN KEY(league_id) REFERENCES leagues(id)
+             FOREIGN KEY(league_id) REFERENCES leagues(league_id)
          )",
         (),
     )?;
@@ -97,7 +96,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     */
     conn.execute(
         "create table if not exists players(
-             id INTEGER PRIMARY KEY,
+             player_id INTEGER PRIMARY KEY,
              team_id INTEGER NOT NULL,
              player_name TEXT NOT NULL, -- Player's Name
              age INTEGER NOT NULL, --Players Age
@@ -118,7 +117,7 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
              speed TEXT ,
              toughness TEXT,
              trade_value INTEGER NOT NULL,
-             FOREIGN KEY(team_id) REFERENCES teams(id)
+             FOREIGN KEY(team_id) REFERENCES teams(team_id)
          )",
         (),
     )?;
@@ -129,8 +128,8 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
         season_id INTEGER PRIMARY KEY,
         league_id INTEGER NOT NULL,
         champion_id INTEGER,
-        FOREIGN KEY(league_id) REFERENCES leagues(id),
-        FOREIGN KEY(champion_id) REFERENCES teams(id))",
+        FOREIGN KEY(league_id) REFERENCES leagues(league_id),
+        FOREIGN KEY(champion_id) REFERENCES teams(team_id))",
         (),
     )?;
 
@@ -150,8 +149,8 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
     home_team_id INTEGER NOT NULL,
     away_team_id INTEGER NOT NULL,
     FOREIGN KEY (round_id) REFERENCES rounds(round_id),
-    FOREIGN KEY (home_team_id) REFERENCES teams(id),
-    FOREIGN KEY (away_team_id) REFERENCES teams(id)
+    FOREIGN KEY (home_team_id) REFERENCES teams(team_id),
+    FOREIGN KEY (away_team_id) REFERENCES teams(team_id)
     )",
         (),
     )?;

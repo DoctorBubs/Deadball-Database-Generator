@@ -73,21 +73,66 @@ impl League {
     pub fn display_standings(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
         let mut stmt = conn.prepare(
             "
-        WITH first_place AS(
+         WITH batter_scores AS(
             SELECT 
-                leagues.id AS league_id, 
+                teams.team_id AS team_id,
+                SUM(players.bt) AS bt_score
+            FROM
+                players
+            INNER JOIN 
+                teams ON teams.team_id = players.team_id
+            WHERE
+                teams.league_id = ?1
+                AND players.PD IS NULL
+            GROUP BY teams.team_id
+        ),
+        
+        pitcher_scores AS(
+            SELECT 
+                teams.team_id as team_id,
+                SUM(players.pd_int) * 7 as pd_score
+                
+            FROM
+                players
+            INNER JOIN 
+                teams ON teams.team_id = players.team_id
+            WHERE
+                teams.league_id = ?1
+                AND
+                players.PD IS NOT NULL
+            GROUP BY teams.team_id
+        
+        ),
+
+        team_scores AS(
+            SELECT
+                teams.team_id AS team_id,
+                (batter_scores.bt_score + pitcher_scores.pd_score) / 10 AS team_score
+                FROM 
+                    teams
+                INNER JOIN
+                    batter_scores ON batter_scores.team_id = teams.team_id
+                INNER JOIN pitcher_scores ON pitcher_scores.team_id = teams.team_id
+               
+        ),
+        
+        first_place AS(
+            SELECT 
+                leagues.league_id AS league_id, 
                 MAX(teams.wins) AS wins
             FROM 
                 leagues
             INNER JOIN 
-                teams ON teams.league_id = leagues.id
+                teams ON teams.league_id = leagues.league_id
+            WHERE 
+                leagues.league_id = ?1
             GROUP BY 
-                leagues.id
+                leagues.league_id
         )
         
         SELECT 
             teams.team_name, 
-            teams.team_score,
+            team_scores.team_score,
             teams.wins, 
             teams.losses,
             (first_place.wins - teams.wins) AS games_behind 
@@ -95,10 +140,12 @@ impl League {
             teams
         INNER JOIN 
             first_place ON first_place.league_id = teams.league_id
+        INNER JOIN
+            team_scores ON teams.team_id = team_scores.team_id
         WHERE 
             teams.league_id = ?1
         ORDER BY 
-            games_behind ASC, teams.team_score DESC;
+            games_behind ASC, team_scores.team_score DESC;
         ",
         )?;
 
@@ -149,24 +196,20 @@ impl League {
         // We create a new team
         let mut new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
         // We get the team score for hte new team.
-        let new_team_score = new_team.team_score.to_string();
         // We enter the team into the database.
-        let team_enter_result = conn.execute(
-            "INSERT INTO teams(team_name,abrv, league_id, team_score) VALUES(?1,?2, ?3,?4)",
-            [
-                &new_name,
-                &new_abrv,
-                &league_id.to_string(),
-                &new_team_score,
-            ],
-        );
+        let team_enter_result = conn
+            .execute(
+                "INSERT INTO teams(team_name,abrv, league_id) VALUES(?1,?2, ?3)",
+                [&new_name, &new_abrv, &league_id.to_string()],
+            )
+            .unwrap();
         // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
         let team_id = conn.last_insert_rowid();
         new_team.team_id = team_id as i32;
-        match team_enter_result {
-            Ok(_) => (),
-            Err(_message) => return Err(AddTeamError::DatabaseError),
-        };
+        //match team_enter_result {
+        //Ok(_) => (),
+        // Err(_message) => return Err(AddTeamError::DatabaseError),
+        // };
         //If all has gone well, we save the players that have been generated into the database
         new_team.save_players_sql(conn, team_id).unwrap();
         // And we inster the team struct into the league's team vector.
@@ -274,7 +317,7 @@ pub fn load_league(
     let era = league.era;
     // We query the database to select all teams in the database that belong to the league via the league_id car
     let mut stmt = conn.prepare(
-        "SELECT id,abrv,team_name,team_score,wins,losses 
+        "SELECT team_id,abrv,team_name,wins,losses 
         FROM teams 
         WHERE league_id = ?1",
     )?;
@@ -290,9 +333,8 @@ pub fn load_league(
                 team_id: row.get(0)?,
                 abrv: row.get(1)?,
                 name: row.get(2)?,
-                team_score: row.get(3)?,
-                wins: row.get(4)?,
-                losses: row.get(5)?,
+                wins: row.get(3)?,
+                losses: row.get(4)?,
                 // We create a vector for each player pool that a team has.
                 lineup: Vec::new(),
                 bench: Vec::new(),
@@ -302,6 +344,7 @@ pub fn load_league(
                     Era::Ancient => None,
                     Era::Modern => Some(Vec::new()),
                 },
+                team_score: 0,
             },
         })
     })?;
