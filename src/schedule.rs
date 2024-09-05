@@ -155,35 +155,43 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
     rounds
 }
 
-// Asks the user for a number, but ensures the number is positive and even.
-fn get_valid_even_number(message: &str) -> i32 {
+// Asks the user for a number. It ensures the number is positive, and if force_even is true ensures the number is even
+fn get_valid_number(message: &str, force_even: bool) -> i32 {
     //
     loop {
         let input = CustomType::<i32>::new(message)
             .with_error_message("Please type a valid number")
             .prompt()
             .unwrap();
-        match (input % 2 == 0) & (input > 0) {
+        match (!force_even | (input % 2 == 0)) & (input > 0) {
             true => return input,
             false => {
-                println!("Input must be an even positive whole number.");
+                let error_message = match force_even {
+                    true => "\nInput must be an even positive whole number.",
+                    false => "\nInput must be a positive whole number.",
+                };
+                println!("{}", error_message);
             }
         }
     }
 }
 
 pub fn schedule_from_input(league: &League) -> Vec<Round> {
-    let series_number =
-        get_valid_even_number("Please enter how many series should be played between each team.");
-    let series_length =
-        get_valid_even_number("Please enter how many games should be played in each series.");
+    let series_number = get_valid_number(
+        "Please enter how many series should be played between each team.",
+        true,
+    );
+    println!("");
+    let series_length = get_valid_number(
+        "Please enter how many games should be played in each series.",
+        false,
+    );
     let teams = &league.teams;
     new_schedule(teams, series_length, series_number)
 }
 
 pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) {
     let sched = schedule_from_input(league);
-
 
     let league_id = league.league_id;
     conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])
