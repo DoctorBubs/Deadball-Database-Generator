@@ -10,5 +10,10 @@
 .README.md
 /deadball.db
 .vscode
+<<<<<<< Updated upstream
 /test.db
 /sql_querys
+=======
+/sql_querys
+/test.db
+>>>>>>> Stashed changes
