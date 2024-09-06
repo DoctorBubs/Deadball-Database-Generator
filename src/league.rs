@@ -16,10 +16,10 @@ use rusqlite::Connection;
 use rusqlite::Row;
 
 use crate::era::select_era;
-use crate::sched_view::view_schedule;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
 use crate::player::select_gender;
+use crate::sched_view::view_schedule;
 use crate::team;
 use crate::team::add_new_team;
 use crate::team::load_team;
@@ -400,8 +400,6 @@ pub fn load_league(
  It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
 */
 
-
-
 //This function queries the database for all leagues. If there are no leagues in the database, the user is prompted to create one.
 pub fn league_check(
     conn: &mut Connection,
@@ -464,7 +462,7 @@ pub fn league_check(
                     view_schedule(&select.league, conn)?;
                     Ok(())
                 }
-            }
+            },
             Err(_) => {
                 println!("Error selecting a new league");
                 Ok(())

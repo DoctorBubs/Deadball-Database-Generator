@@ -5,7 +5,6 @@ use rusqlite::Connection;
 
 use crate::league::League;
 
-
 fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
     let mut seasons_stmt =
         conn.prepare("SELECT seasons.season_id FROM seasons WHERE seasons.league_id = ?1 ")?;
@@ -114,8 +113,6 @@ fn get_game_vec(conn: &Connection, wrapper: &SeriesWrapper) -> Result<Vec<i64>, 
     return Ok(result_vec);
 }
 
-
-
 struct RoundChoiceListing {
     index: usize,
     value: i64,
@@ -126,7 +123,6 @@ impl fmt::Display for RoundChoiceListing {
         write!(f, "{}", self.index + 1)
     }
 }
-
 
 pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite::Error> {
     let sched_vec = get_season_vec(league, conn)?;
