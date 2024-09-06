@@ -8,6 +8,7 @@ mod pitcher_rank_info;
 mod player;
 mod player_quality;
 mod schedule;
+mod sched_view;
 mod team;
 mod traits;
 use crate::era::Era;

@@ -1,3 +1,10 @@
+use core::fmt;
+
+use inquire::Select;
+use rusqlite::Connection;
+
+use crate::league::League;
+
 
 fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
     let mut seasons_stmt =
@@ -36,7 +43,7 @@ pub struct SeriesWrapper {
 
 impl fmt::Display for SeriesWrapper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}@{}", self.away_team_name, self.home_team_name)
+        write!(f, "{} @ {}", self.away_team_name, self.home_team_name)
     }
 }
 
@@ -107,17 +114,7 @@ fn get_game_vec(conn: &Connection, wrapper: &SeriesWrapper) -> Result<Vec<i64>, 
     return Ok(result_vec);
 }
 
-pub struct LeagueWrapper {
-    league_id: i64,
-    league: League,
-}
 
-// We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
-impl fmt::Display for LeagueWrapper {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}_{}", self.league_id, self.league.name)
-    }
-}
 
 struct RoundChoiceListing {
     index: usize,
@@ -128,4 +125,35 @@ impl fmt::Display for RoundChoiceListing {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.index + 1)
     }
+}
+
+
+pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite::Error> {
+    let sched_vec = get_season_vec(league, conn)?;
+    if sched_vec.is_empty() {
+        println!("No schedule generated");
+        return Ok(());
+    }
+    let season_choice = Select::new("Choose a season to view.", sched_vec)
+        .prompt()
+        .unwrap();
+    //println!("{:?}",sched_vec?);
+    let round_vec = get_round_vec(conn, season_choice)?
+        .into_iter()
+        .enumerate()
+        .map(|(index, value)| RoundChoiceListing { index, value })
+        .collect();
+
+    //println!("{:?}",round_vec);
+    let round_choice = Select::new("Choose a round to view.", round_vec)
+        .prompt()
+        .unwrap();
+    let series_vec = get_series_vec(conn, round_choice.value)?;
+    //println!("{:?}",series_vec);
+    let series_choice = Select::new("Choose a series from the round", series_vec)
+        .prompt()
+        .unwrap();
+    let game_vec = get_game_vec(conn, &series_choice)?;
+    println!("{:?}", game_vec);
+    Ok(())
 }

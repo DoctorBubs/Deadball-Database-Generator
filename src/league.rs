@@ -16,7 +16,7 @@ use rusqlite::Connection;
 use rusqlite::Row;
 
 use crate::era::select_era;
-
+use crate::sched_view::view_schedule;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
 use crate::player::select_gender;
@@ -45,6 +45,19 @@ pub struct League {
     pub era: Era,
     pub league_id: i64, //bench_quality:BatterQuality,
 }
+
+pub struct LeagueWrapper {
+    league_id: i64,
+    league: League,
+}
+
+// We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
+impl fmt::Display for LeagueWrapper {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}_{}", self.league_id, self.league.name)
+    }
+}
+
 #[derive(Debug)]
 //Possible Errors that oculd arrise from adding a team to a league
 pub enum AddTeamError {
@@ -448,35 +461,10 @@ pub fn league_check(
                 }
 
                 LoadLeagueInput::ViewSchedule => {
-                    let sched_vec = get_season_vec(&select.league, conn)?;
-                    if sched_vec.is_empty() {
-                        println!("No schedule generated");
-                        return Ok(());
-                    }
-                    let season_choice = Select::new("Choose a season to view.", sched_vec)
-                        .prompt()
-                        .unwrap();
-                    //println!("{:?}",sched_vec?);
-                    let round_vec = get_round_vec(conn, season_choice)?
-                        .into_iter()
-                        .enumerate()
-                        .map(|(index, value)| RoundChoiceListing { index, value })
-                        .collect();
-
-                    //println!("{:?}",round_vec);
-                    let round_choice = Select::new("Choose a round to view.", round_vec)
-                        .prompt()
-                        .unwrap();
-                    let series_vec = get_series_vec(conn, round_choice.value)?;
-                    //println!("{:?}",series_vec);
-                    let series_choice = Select::new("Choose a series from the round", series_vec)
-                        .prompt()
-                        .unwrap();
-                    let game_vec = get_game_vec(conn, &series_choice)?;
-                    println!("{:?}", game_vec);
+                    view_schedule(&select.league, conn)?;
                     Ok(())
                 }
-            },
+            }
             Err(_) => {
                 println!("Error selecting a new league");
                 Ok(())
