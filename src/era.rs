@@ -59,7 +59,7 @@ impl fmt::Display for Era {
 }
 
 //Prompts a user to select  new era.
-pub fn select_era() -> Result<Era,InquireError> {
+pub fn select_era() -> Result<Era, InquireError> {
     let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
     let ans: Result<Era, InquireError> =
         Select::new("Select the era for the league", options).prompt();

@@ -128,9 +128,8 @@ impl fmt::Display for PlayerGender {
 pub fn select_gender() -> Result<PlayerGender, InquireError> {
     let options: Vec<PlayerGender> =
         vec![PlayerGender::Male, PlayerGender::Female, PlayerGender::Coed];
-     
-        Select::new("Select the league gender,", options).prompt()
-    
+
+    Select::new("Select the league gender,", options).prompt()
 }
 
 #[derive(Serialize, Deserialize, Debug)]

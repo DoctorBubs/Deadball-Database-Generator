@@ -157,7 +157,7 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
 }
 
 // Asks the user for a number. It ensures the number is positive, and if force_even is true ensures the number is even
-fn get_valid_number(message: &str, force_even: bool) -> Result<i32,InquireError> {
+fn get_valid_number(message: &str, force_even: bool) -> Result<i32, InquireError> {
     //
     loop {
         let input = CustomType::<i32>::new(message)
@@ -176,7 +176,7 @@ fn get_valid_number(message: &str, force_even: bool) -> Result<i32,InquireError>
     }
 }
 
-pub fn schedule_from_input(league: &League) -> Result<Vec<Round>,InquireError> {
+pub fn schedule_from_input(league: &League) -> Result<Vec<Round>, InquireError> {
     let series_number = get_valid_number(
         "Please enter how many series should be played between each team.",
         true,
@@ -190,11 +190,15 @@ pub fn schedule_from_input(league: &League) -> Result<Vec<Round>,InquireError> {
     Ok(new_schedule(teams, series_length, series_number))
 }
 
-pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) -> Result<(),rusqlite::Error> {
+pub fn save_schedule_sql(
+    conn: &mut Connection,
+    league: &League,
+    thread: &mut ThreadRng,
+) -> Result<(), rusqlite::Error> {
     let sched_input = schedule_from_input(league);
-    let sched = match sched_input{
+    let sched = match sched_input {
         Ok(rounds) => rounds,
-        Err(message) => return inquire_check(message)
+        Err(message) => return inquire_check(message),
     };
     let league_id = league.league_id;
     conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])

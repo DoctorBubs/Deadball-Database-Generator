@@ -124,20 +124,17 @@ impl fmt::Display for RoundChoiceListing {
     }
 }
 
-
-
 pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite::Error> {
     let sched_vec = get_season_vec(league, conn)?;
     if sched_vec.is_empty() {
         println!("No schedule generated");
         return Ok(());
     }
-    let season_choice = Select::new("Choose a season to view.", sched_vec)
-        .prompt();
+    let season_choice = Select::new("Choose a season to view.", sched_vec).prompt();
     let season_id;
-    match season_choice{
+    match season_choice {
         Ok(num) => season_id = num,
-        Err(message) => return inquire_check(message)
+        Err(message) => return inquire_check(message),
     }
     //println!("{:?}",sched_vec?);
     let round_vec = get_round_vec(conn, season_id)?
@@ -147,20 +144,18 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         .collect();
 
     //println!("{:?}",round_vec);
-    let round_choice = Select::new("Choose a round to view.", round_vec)
-        .prompt();
+    let round_choice = Select::new("Choose a round to view.", round_vec).prompt();
 
-    let round_id = match round_choice{
+    let round_id = match round_choice {
         Ok(listing) => listing.value,
-        Err(message) => return inquire_check(message)
+        Err(message) => return inquire_check(message),
     };
     let series_vec = get_series_vec(conn, round_id)?;
     //println!("{:?}",series_vec);
-    let series_choice = Select::new("Choose a series from the round", series_vec)
-        .prompt();
-    let choosed_wrapper = match series_choice{
+    let series_choice = Select::new("Choose a series from the round", series_vec).prompt();
+    let choosed_wrapper = match series_choice {
         Ok(wrapper) => wrapper,
-        Err(message) => return inquire_check(message)
+        Err(message) => return inquire_check(message),
     };
 
     let game_vec = get_game_vec(conn, &choosed_wrapper)?;

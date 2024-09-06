@@ -44,7 +44,7 @@ impl fmt::Display for MenuInput {
     }
 }
 
-pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(),rusqlite::Error> {
+pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rusqlite::Error> {
     // We load a vector of the possible options a view can pick in the main menu.
     let new_team = EditLeagueInput::CreateNewTeam;
     let new_sched = EditLeagueInput::CreateSchedule;
@@ -73,8 +73,6 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
             }
         },
 
-        Err(message) => return inquire_check(message)
-            
-        
+        Err(message) => return inquire_check(message),
     }
 }

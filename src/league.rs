@@ -4,16 +4,12 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-
-
 use inquire::validator::MinLengthValidator;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
 
-
 use rusqlite::Connection;
-
 
 use crate::era::select_era;
 use crate::inquire_check;
@@ -256,7 +252,10 @@ fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
 }
 
 // Creates a new leagues, and saves the league in the database
-pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Result<(),rusqlite::Error> {
+pub fn create_new_league(
+    thread: &mut ThreadRng,
+    conn: &mut Connection,
+) -> Result<(), rusqlite::Error> {
     let _validator = MinLengthValidator::new(3);
 
     let league_name: String;
@@ -271,11 +270,10 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Resul
             }
         };
 
-        let potential_name_choice = Text::new("Please enter a name for the new league")
-            .prompt();
-        let potential_name = match potential_name_choice{
+        let potential_name_choice = Text::new("Please enter a name for the new league").prompt();
+        let potential_name = match potential_name_choice {
             Ok(input) => input,
-            Err(message) => return inquire_check(message)
+            Err(message) => return inquire_check(message),
         };
         if !taken_names.contains(&potential_name) {
             league_name = potential_name;
@@ -285,15 +283,15 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Resul
 
     // We have the user select the era for the league.
     let era_choice = select_era();
-    let era = match era_choice{
+    let era = match era_choice {
         Ok(input) => input,
-        Err(message) => return inquire_check(message)
+        Err(message) => return inquire_check(message),
     };
     // As well as the gender of the players for the league.
     let gender_choice = select_gender();
-    let gender = match gender_choice{
+    let gender = match gender_choice {
         Ok(input) => input,
-        Err(message) => return inquire_check(message)
+        Err(message) => return inquire_check(message),
     };
     // We then create a league struct.
 
@@ -307,9 +305,9 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Resul
         [&league_name, &era_json, &gender_json],
     )?;
 
-   // if league_entry.is_err() {
-       // println!("Error creating a new league in the database.");
-       // return Ok(());
+    // if league_entry.is_err() {
+    // println!("Error creating a new league in the database.");
+    // return Ok(());
     //};
     // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
@@ -318,7 +316,6 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Resul
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
     add_new_team(&mut new_league, thread, conn, league_id, true)
-    
 }
 
 #[derive(Debug)]
@@ -399,7 +396,6 @@ pub fn load_league(
                 false => {
                     println!("League must have an even number of teams");
                     save_league(&league, conn, thread).unwrap();
-                    
                 }
             };
         }
@@ -475,7 +471,7 @@ pub fn league_check(
                     Ok(())
                 }
             },
-            Err(message) => return inquire_check(message)
+            Err(message) => return inquire_check(message),
         }
     }
 }
