@@ -191,9 +191,8 @@ struct PlayerWrapper {
     player: Player,
 }
 
-pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, rusqlite::Error> {
-    //We destructure the team wrapper.
-    let TeamWrapper { team_id, mut team } = wrapper;
+pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite::Error> {
+    
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
@@ -202,7 +201,7 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
         WHERE team_id = ?1"
     )?;
     // We use the statment to query the database
-    let player_iter = stmt.query_map([team_id], |row| {
+    let player_iter = stmt.query_map([team.team_id], |row| {
         //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
         Ok(PlayerWrapper {
             // Team spot is deserialized from the team spot row.

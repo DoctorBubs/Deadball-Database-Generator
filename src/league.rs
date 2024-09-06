@@ -16,6 +16,7 @@ use crate::era::select_era;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
 use crate::player::select_gender;
+use crate::team;
 use crate::team::add_new_team;
 use crate::team::load_team;
 use crate::Deserialize;
@@ -321,13 +322,11 @@ pub fn load_league(
         WHERE league_id = ?1",
     )?;
 
-    let team_iter = stmt.query_map([league_id], |row| {
+    let team_iter: Vec<Team> = stmt.query_map([league_id], |row| {
         // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
-        Ok(TeamWrapper {
-            // We set the team id field to the team id from the database
-            team_id: row.get(0)?,
+        Ok(
             // We use the remaing rows to deseirialize the team
-            team: Team {
+            Team {
                 // We fill out the rest of the fields in the team struct from the database entry.
                 team_id: row.get(0)?,
                 abrv: row.get(1)?,
@@ -344,17 +343,20 @@ pub fn load_league(
                     Era::Modern => Some(Vec::new()),
                 },
                 team_score: 0,
-            },
-        })
-    })?;
-    // We make a vector of TeamWrapper that are no longer in an ok.
-    let wrappers: Vec<TeamWrapper> = team_iter.map(|x| x.unwrap()).collect();
+            })
+    })?
+    .map(|x| x.unwrap())
+    .collect();
+    
+
+    
+    
     // We drop stmt so we can borrw conn later.
     drop(stmt);
     // We then loa
-    for wrapper in wrappers {
+    for team in team_iter {
         // We load the team from the database in the form of a Rust struct.
-        let loaded_team = load_team(conn, wrapper)?;
+        let loaded_team = load_team(conn,team)?;
 
         // And add the team to the league's teams vector.
         league.teams.push(loaded_team)
