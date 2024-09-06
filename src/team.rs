@@ -249,6 +249,8 @@ pub fn load_team(conn: &mut Connection, wrapper: TeamWrapper) -> Result<Team, ru
             },
         }
     }
+    // We then have the team calculate it's team score
+    team.calc_team_score();
     Ok(team)
 }
 

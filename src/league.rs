@@ -201,15 +201,14 @@ impl League {
             .execute(
                 "INSERT INTO teams(team_name,abrv, league_id) VALUES(?1,?2, ?3)",
                 [&new_name, &new_abrv, &league_id.to_string()],
-            )
-            .unwrap();
+            );
         // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
         let team_id = conn.last_insert_rowid();
         new_team.team_id = team_id as i32;
-        //match team_enter_result {
-        //Ok(_) => (),
-        // Err(_message) => return Err(AddTeamError::DatabaseError),
-        // };
+        match team_enter_result {
+        Ok(_) => (),
+         Err(_message) => return Err(AddTeamError::DatabaseError),
+         };
         //If all has gone well, we save the players that have been generated into the database
         new_team.save_players_sql(conn, team_id).unwrap();
         // And we inster the team struct into the league's team vector.
@@ -327,7 +326,7 @@ pub fn load_league(
         Ok(TeamWrapper {
             // We set the team id field to the team id from the database
             team_id: row.get(0)?,
-            // We use the remaing rows to deseriale the team
+            // We use the remaing rows to deseirialize the team
             team: Team {
                 // We fill out the rest of the fields in the team struct from the database entry.
                 team_id: row.get(0)?,
@@ -381,7 +380,7 @@ pub fn load_league(
 
 /*  The League Wrapper struct is used when the program checks to see what leagues are saved in the database.
 
- It contains the ID which the leagues is saved in the database, as well a desrtialzied League struct from the database
+ It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
 */
 
 pub struct LeagueWrapper {
@@ -431,7 +430,7 @@ pub fn league_check(
     }
     // We drop the stmt so we can borrow conn later.
     drop(stmt);
-    // If there are no leagues in the database, tthe user is prompted to create a league
+    // If there are no leagues in the database, the user is prompted to create a league
     if options.is_empty() {
         println!("No Leagues created yet! Let's create a new league to get started.");
         create_new_league(thread, conn).unwrap();
