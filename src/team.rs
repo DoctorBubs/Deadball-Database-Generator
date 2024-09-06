@@ -4,6 +4,7 @@ use crate::traits::Contact;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
+use crate::traits::Defense;
 use inquire::validator::MaxLengthValidator;
 use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
@@ -12,7 +13,7 @@ use rusqlite::Connection;
 
 use crate::league::save_league;
 use crate::league::League;
-use crate::league::TeamWrapper;
+
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::BatterQuality;
@@ -220,7 +221,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
                 b_traits: BTraits {
                     contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
                     defense: serde_json::from_value(row.get(11)?)
-                        .unwrap_or(crate::traits::Defense::D0),
+                        .unwrap_or(Defense::D0),
                     power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
                     speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
                     toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
@@ -243,7 +244,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
             TeamSpot::Bullpen => match &mut team.bullpen {
                 Some(pen) => pen.push(player),
                 None => {
-                    panic!("Attempted to add a reliever to an  Ancient era team with no bullpen")
+                    panic!("Attempted to add a reliever to an Ancient era team with no bullpen!")
                 }
             },
         }
