@@ -1,8 +1,9 @@
+use crate::inquire_check;
 use crate::league::{save_league, League};
 use crate::team::Team;
 use itertools::Itertools;
 //use serde::ser;
-use inquire::CustomType;
+use inquire::{CustomType, InquireError};
 use rand::prelude::IteratorRandom;
 use rand::rngs::ThreadRng;
 use rand::seq::SliceRandom;
@@ -156,15 +157,14 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
 }
 
 // Asks the user for a number. It ensures the number is positive, and if force_even is true ensures the number is even
-fn get_valid_number(message: &str, force_even: bool) -> i32 {
+fn get_valid_number(message: &str, force_even: bool) -> Result<i32,InquireError> {
     //
     loop {
         let input = CustomType::<i32>::new(message)
             .with_error_message("Please type a valid number")
-            .prompt()
-            .unwrap();
+            .prompt()?;
         match (!force_even | (input % 2 == 0)) & (input > 0) {
-            true => return input,
+            true => return Ok(input),
             false => {
                 let error_message = match force_even {
                     true => "\nInput must be an even positive whole number.",
@@ -176,23 +176,26 @@ fn get_valid_number(message: &str, force_even: bool) -> i32 {
     }
 }
 
-pub fn schedule_from_input(league: &League) -> Vec<Round> {
+pub fn schedule_from_input(league: &League) -> Result<Vec<Round>,InquireError> {
     let series_number = get_valid_number(
         "Please enter how many series should be played between each team.",
         true,
-    );
+    )?;
     println!();
     let series_length = get_valid_number(
         "Please enter how many games should be played in each series.",
         false,
-    );
+    )?;
     let teams = &league.teams;
-    new_schedule(teams, series_length, series_number)
+    Ok(new_schedule(teams, series_length, series_number))
 }
 
-pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) {
-    let sched = schedule_from_input(league);
-
+pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut ThreadRng) -> Result<(),rusqlite::Error> {
+    let sched_input = schedule_from_input(league);
+    let sched = match sched_input{
+        Ok(rounds) => rounds,
+        Err(message) => return inquire_check(message)
+    };
     let league_id = league.league_id;
     conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])
         .unwrap();
@@ -216,5 +219,6 @@ pub fn save_schedule_sql(conn: &mut Connection, league: &League, thread: &mut Th
             }
         }
     }
-    save_league(league, conn, thread).unwrap()
+    save_league(league, conn, thread).unwrap();
+    Ok(())
 }

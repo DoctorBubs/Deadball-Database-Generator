@@ -290,8 +290,11 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Resul
         Err(message) => return inquire_check(message)
     };
     // As well as the gender of the players for the league.
-    let gender = select_gender();
-
+    let gender_choice = select_gender();
+    let gender = match gender_choice{
+        Ok(input) => input,
+        Err(message) => return inquire_check(message)
+    };
     // We then create a league struct.
 
     // We then serialize the era and jender to json.
@@ -350,7 +353,7 @@ pub fn load_league(
         .query_map([league_id], |row| {
             // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
             Ok(
-                // We use the remaing rows to deseirialize the team
+                // We use the remaining rows to deseirialize the team
                 Team {
                     // We fill out the rest of the fields in the team struct from the database entry.
                     team_id: row.get(0)?,
@@ -392,10 +395,11 @@ pub fn load_league(
         }
         EditLeagueInput::CreateSchedule => {
             match league.teams.len() % 2 == 0 {
-                true => save_schedule_sql(conn, &league, thread),
+                true => save_schedule_sql(conn, &league, thread).unwrap(),
                 false => {
                     println!("League must have an even number of teams");
-                    save_league(&league, conn, thread).unwrap()
+                    save_league(&league, conn, thread).unwrap();
+                    
                 }
             };
         }

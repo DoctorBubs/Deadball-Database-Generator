@@ -373,7 +373,7 @@ pub fn add_new_team(
     league_id: i64,
     first_team: bool,
 ) -> Result<(),rusqlite::Error> {
-    let mut result: Result<(),rusqlite::Error>;
+    let result: Result<(),rusqlite::Error>;
     // If this is the first team generated for the league, we display a different prompt to the user.
     let mut prompt_string = match first_team {
         true => "Enter the name of the first team",
