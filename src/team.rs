@@ -1,10 +1,10 @@
 use crate::b_traits::BTraits;
 use crate::league::AddTeamError;
 use crate::traits::Contact;
+use crate::traits::Defense;
 use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
-use crate::traits::Defense;
 use inquire::validator::MaxLengthValidator;
 use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
@@ -193,7 +193,6 @@ struct PlayerWrapper {
 }
 
 pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite::Error> {
-    
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
@@ -220,8 +219,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
                 pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
                 b_traits: BTraits {
                     contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
-                    defense: serde_json::from_value(row.get(11)?)
-                        .unwrap_or(Defense::D0),
+                    defense: serde_json::from_value(row.get(11)?).unwrap_or(Defense::D0),
                     power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
                     speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
                     toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),

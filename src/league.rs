@@ -3,13 +3,17 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::result;
+use std::thread;
 
 use inquire::validator::MinLengthValidator;
-
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
+use rusqlite::Error;
+
 use rusqlite::Connection;
+use rusqlite::Row;
 
 use crate::era::select_era;
 
@@ -198,18 +202,17 @@ impl League {
         let mut new_team = Team::new(new_abrv, new_name, self.gender, self.era, thread);
         // We get the team score for hte new team.
         // We enter the team into the database.
-        let team_enter_result = conn
-            .execute(
-                "INSERT INTO teams(team_name,abrv, league_id) VALUES(?1,?2, ?3)",
-                [&new_name, &new_abrv, &league_id.to_string()],
-            );
+        let team_enter_result = conn.execute(
+            "INSERT INTO teams(team_name,abrv, league_id) VALUES(?1,?2, ?3)",
+            [&new_name, &new_abrv, &league_id.to_string()],
+        );
         // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
         let team_id = conn.last_insert_rowid();
         new_team.team_id = team_id as i32;
         match team_enter_result {
-        Ok(_) => (),
-         Err(_message) => return Err(AddTeamError::DatabaseError),
-         };
+            Ok(_) => (),
+            Err(_message) => return Err(AddTeamError::DatabaseError),
+        };
         //If all has gone well, we save the players that have been generated into the database
         new_team.save_players_sql(conn, team_id).unwrap();
         // And we inster the team struct into the league's team vector.
@@ -322,41 +325,40 @@ pub fn load_league(
         WHERE league_id = ?1",
     )?;
 
-    let team_iter: Vec<Team> = stmt.query_map([league_id], |row| {
-        // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
-        Ok(
-            // We use the remaing rows to deseirialize the team
-            Team {
-                // We fill out the rest of the fields in the team struct from the database entry.
-                team_id: row.get(0)?,
-                abrv: row.get(1)?,
-                name: row.get(2)?,
-                wins: row.get(3)?,
-                losses: row.get(4)?,
-                // We create a vector for each player pool that a team has.
-                lineup: Vec::new(),
-                bench: Vec::new(),
-                starting_pitching: Vec::new(),
-                //Ancient Era teams do not have a bullpen, while Modern Era teams do.
-                bullpen: match era {
-                    Era::Ancient => None,
-                    Era::Modern => Some(Vec::new()),
+    let team_iter: Vec<Team> = stmt
+        .query_map([league_id], |row| {
+            // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
+            Ok(
+                // We use the remaing rows to deseirialize the team
+                Team {
+                    // We fill out the rest of the fields in the team struct from the database entry.
+                    team_id: row.get(0)?,
+                    abrv: row.get(1)?,
+                    name: row.get(2)?,
+                    wins: row.get(3)?,
+                    losses: row.get(4)?,
+                    // We create a vector for each player pool that a team has.
+                    lineup: Vec::new(),
+                    bench: Vec::new(),
+                    starting_pitching: Vec::new(),
+                    //Ancient Era teams do not have a bullpen, while Modern Era teams do.
+                    bullpen: match era {
+                        Era::Ancient => None,
+                        Era::Modern => Some(Vec::new()),
+                    },
+                    team_score: 0,
                 },
-                team_score: 0,
-            })
-    })?
-    .map(|x| x.unwrap())
-    .collect();
-    
+            )
+        })?
+        .map(|x| x.unwrap())
+        .collect();
 
-    
-    
     // We drop stmt so we can borrw conn later.
     drop(stmt);
     // We then loa
     for team in team_iter {
         // We load the team from the database in the form of a Rust struct.
-        let loaded_team = load_team(conn,team)?;
+        let loaded_team = load_team(conn, team)?;
 
         // And add the team to the league's teams vector.
         league.teams.push(loaded_team)
@@ -385,6 +387,114 @@ pub fn load_league(
  It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
 */
 
+fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
+    let mut seasons_stmt =
+        conn.prepare("SELECT seasons.season_id FROM seasons WHERE seasons.league_id = ?1 ")?;
+    let season_iter = seasons_stmt.query_map([league.league_id], |row| Ok(row.get(0)?))?;
+
+    let mut result_vec = Vec::new();
+    for num in season_iter {
+        result_vec.push(num?)
+    }
+
+    Ok(result_vec)
+}
+
+fn get_round_vec(conn: &Connection, season_id: i64) -> Result<Vec<i64>, rusqlite::Error> {
+    let mut rounds_stmt =
+        conn.prepare("SELECT rounds.round_id FROM rounds WHERE rounds.season_id = ?1")?;
+    let round_iter = rounds_stmt.query_map([season_id], |row| Ok(row.get(0)?))?;
+
+    let mut result_vec = Vec::new();
+
+    for num in round_iter {
+        result_vec.push(num?)
+    }
+
+    Ok(result_vec)
+}
+#[derive(Debug)]
+pub struct SeriesWrapper {
+    series_id: i64,
+    home_team_name: String,
+    home_team_id: i64,
+    away_team_name: String,
+    away_team_id: i64,
+}
+
+impl fmt::Display for SeriesWrapper {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}@{}", self.away_team_name, self.home_team_name)
+    }
+}
+
+fn get_series_vec(conn: &Connection, round_id: i64) -> Result<Vec<SeriesWrapper>, rusqlite::Error> {
+    let mut series_stmt = conn.prepare(
+        "
+        WITH home_teams AS(
+            SELECT 
+                teams.team_name AS team_name,
+                teams.team_id AS team_id ,
+                series.series_id AS series_id
+            FROM
+                series
+            INNER JOIN 
+                teams on series.home_team_id = teams.team_id
+            WHERE
+                series.round_id = ?1        
+        )
+
+        SELECT
+            series.series_id,
+            home_teams.team_name,
+            home_teams.team_id,
+            teams.team_name,
+            teams.team_id
+        FROM 
+            series
+        INNER JOIN 
+            home_teams ON home_teams.series_id = series.series_id
+        INNER JOIN
+            teams on series.away_team_id = teams.team_id
+        WHERE
+            series.round_id = ?1
+
+    
+    
+    ",
+    )?;
+
+    let series_iter = series_stmt.query_map([round_id], |row| {
+        Ok(SeriesWrapper {
+            series_id: row.get(0)?,
+            home_team_name: row.get(1)?,
+            home_team_id: row.get(2)?,
+            away_team_name: row.get(3)?,
+            away_team_id: row.get(4)?,
+        })
+    })?;
+
+    let mut result_vec = Vec::new();
+
+    for s_wrapper in series_iter {
+        result_vec.push(s_wrapper?)
+    }
+
+    Ok(result_vec)
+}
+
+fn get_game_vec(conn: &Connection, wrapper: &SeriesWrapper) -> Result<Vec<i64>, rusqlite::Error> {
+    let mut games_stmt =
+        conn.prepare("SELECT games.game_id FROM games WHERE games.series_id = ?1")?;
+    let games_iter = games_stmt.query_map([wrapper.series_id], |row| Ok(row.get(0)?))?;
+    let mut result_vec = Vec::new();
+    for num in games_iter {
+        result_vec.push(num?)
+    }
+
+    return Ok(result_vec);
+}
+
 pub struct LeagueWrapper {
     league_id: i64,
     league: League,
@@ -394,6 +504,17 @@ pub struct LeagueWrapper {
 impl fmt::Display for LeagueWrapper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}_{}", self.league_id, self.league.name)
+    }
+}
+
+struct RoundChoiceListing {
+    index: usize,
+    value: i64,
+}
+
+impl fmt::Display for RoundChoiceListing {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.index + 1)
     }
 }
 
@@ -452,6 +573,36 @@ pub fn league_check(
                 LoadLeagueInput::RefreshLeague => {
                     println!("Refreshing league.");
                     save_league(&select.league, conn, thread).unwrap();
+                    Ok(())
+                }
+
+                LoadLeagueInput::ViewSchedule => {
+                    let sched_vec = get_season_vec(&select.league, conn)?;
+                    if sched_vec.is_empty() {
+                        println!("No schedule generated");
+                        return Ok(());
+                    }
+                    let season_choice = Select::new("Choose a season to view.", sched_vec)
+                        .prompt()
+                        .unwrap();
+                    //println!("{:?}",sched_vec?);
+                    let round_vec = get_round_vec(conn, season_choice)?
+                        .into_iter()
+                        .enumerate()
+                        .map(|(index, value)| RoundChoiceListing { index, value })
+                        .collect();
+
+                    //println!("{:?}",round_vec);
+                    let round_choice = Select::new("Choose a round to view.", round_vec)
+                        .prompt()
+                        .unwrap();
+                    let series_vec = get_series_vec(conn, round_choice.value)?;
+                    //println!("{:?}",series_vec);
+                    let series_choice = Select::new("Choose a series from the round", series_vec)
+                        .prompt()
+                        .unwrap();
+                    let game_vec = get_game_vec(conn, &series_choice)?;
+                    println!("{:?}", game_vec);
                     Ok(())
                 }
             },

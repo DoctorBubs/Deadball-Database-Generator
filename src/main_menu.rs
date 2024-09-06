@@ -9,6 +9,7 @@ use crate::{league::create_new_league, league_check};
 pub enum LoadLeagueInput {
     EditLeague(EditLeagueInput),
     RefreshLeague,
+    ViewSchedule,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -34,6 +35,7 @@ impl fmt::Display for MenuInput {
                     EditLeagueInput::CreateNewTeam => "Create a new team.",
                     EditLeagueInput::CreateSchedule => "Generate a schedule for an existing league",
                 },
+                LoadLeagueInput::ViewSchedule => "View schedule.",
             },
 
             Self::Exit => "Exit",
@@ -51,6 +53,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_team)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
+        MenuInput::LoadExistingLeague(LoadLeagueInput::ViewSchedule),
         MenuInput::Exit,
     ];
     // We prompt the user via Inquire.
