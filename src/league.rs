@@ -3,24 +3,25 @@ use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
-use std::result;
-use std::thread;
+
+
 
 use inquire::validator::MinLengthValidator;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
-use rusqlite::Error;
+
 
 use rusqlite::Connection;
-use rusqlite::Row;
+
 
 use crate::era::select_era;
+use crate::inquire_check;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
 use crate::player::select_gender;
 use crate::sched_view::view_schedule;
-use crate::team;
+
 use crate::team::add_new_team;
 use crate::team::load_team;
 use crate::Deserialize;
@@ -255,7 +256,7 @@ fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
 }
 
 // Creates a new leagues, and saves the league in the database
-pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::io::Result<()> {
+pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> Result<(),rusqlite::Error> {
     let _validator = MinLengthValidator::new(3);
 
     let league_name: String;
@@ -270,10 +271,12 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
             }
         };
 
-        let potential_name = Text::new("Please enter a name for the new league")
-            .prompt()
-            .unwrap();
-
+        let potential_name_choice = Text::new("Please enter a name for the new league")
+            .prompt();
+        let potential_name = match potential_name_choice{
+            Ok(input) => input,
+            Err(message) => return inquire_check(message)
+        };
         if !taken_names.contains(&potential_name) {
             league_name = potential_name;
             break;
@@ -281,7 +284,11 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     }
 
     // We have the user select the era for the league.
-    let era = select_era();
+    let era_choice = select_era();
+    let era = match era_choice{
+        Ok(input) => input,
+        Err(message) => return inquire_check(message)
+    };
     // As well as the gender of the players for the league.
     let gender = select_gender();
 
@@ -295,12 +302,12 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     let league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
-    );
+    )?;
 
-    if league_entry.is_err() {
-        println!("Error creating a new league in the database.");
-        return Ok(());
-    };
+   // if league_entry.is_err() {
+       // println!("Error creating a new league in the database.");
+       // return Ok(());
+    //};
     // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
     // We then create a leage struct in rust.
@@ -308,6 +315,7 @@ pub fn create_new_league(thread: &mut ThreadRng, conn: &mut Connection) -> std::
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
     add_new_team(&mut new_league, thread, conn, league_id, true)
+    
 }
 
 #[derive(Debug)]
@@ -463,10 +471,7 @@ pub fn league_check(
                     Ok(())
                 }
             },
-            Err(_) => {
-                println!("Error selecting a new league");
-                Ok(())
-            }
+            Err(message) => return inquire_check(message)
         }
     }
 }

@@ -19,7 +19,6 @@ use crate::player::PlayerGender;
 use crate::player_quality::BatterQuality;
 use crate::player_quality::PitcherQuality;
 use crate::player_quality::PlayerQuality;
-
 use crate::team::Team;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -32,8 +31,18 @@ use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 use std::fmt;
+use inquire::InquireError;
 
-fn main() -> std::io::Result<()> {
+// Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
+pub fn inquire_check<E>(err: InquireError)-> Result<(),E>{
+    
+    match err{
+        inquire::InquireError::OperationCanceled => return Ok(()),
+        _ => panic!("{:?}",err)
+    }
+}
+
+fn main() -> Result<(),rusqlite::Error> {
     // First, we load the databsae, or create one if it doesn't exist.
     let mut conn = load_database().unwrap();
     //Next we generate a thread for the random numbers we will need to generate.

@@ -103,10 +103,10 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
                 // And we collect the new vector.
                 .collect();
             // We select a random series listing  and it's index
-            if filtered_series_listing.len() < 1 {
+            if filtered_series_listing.is_empty() {
                 panic!("Schedule generation tried to run when there are no possible combos left for the roudn.")
             }
-            let (i, current_series_listing) = filtered_series_listing
+            let (_i, current_series_listing) = filtered_series_listing
                 .iter()
                 .enumerate()
                 .choose(&mut thread_rng())
@@ -181,7 +181,7 @@ pub fn schedule_from_input(league: &League) -> Vec<Round> {
         "Please enter how many series should be played between each team.",
         true,
     );
-    println!("");
+    println!();
     let series_length = get_valid_number(
         "Please enter how many games should be played in each series.",
         false,

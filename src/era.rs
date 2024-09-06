@@ -1,3 +1,4 @@
+use crate::inquire_check;
 use crate::Deserialize;
 use crate::PitcherQuality;
 use crate::Serialize;
@@ -58,12 +59,9 @@ impl fmt::Display for Era {
 }
 
 //Prompts a user to select  new era.
-pub fn select_era() -> Era {
+pub fn select_era() -> Result<Era,InquireError> {
     let options: Vec<Era> = vec![Era::Ancient, Era::Modern];
     let ans: Result<Era, InquireError> =
         Select::new("Select the era for the league", options).prompt();
-    match ans {
-        Ok(era) => era,
-        Err(_) => panic!("Error selecting era"),
-    }
+    ans
 }

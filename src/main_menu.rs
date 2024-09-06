@@ -4,7 +4,7 @@ use inquire::{InquireError, Select};
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
-use crate::{league::create_new_league, league_check};
+use crate::{inquire_check, league::create_new_league, league_check};
 #[derive(Copy, Clone, Debug)]
 pub enum LoadLeagueInput {
     EditLeague(EditLeagueInput),
@@ -44,7 +44,7 @@ impl fmt::Display for MenuInput {
     }
 }
 
-pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::Result<()> {
+pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(),rusqlite::Error> {
     // We load a vector of the possible options a view can pick in the main menu.
     let new_team = EditLeagueInput::CreateNewTeam;
     let new_sched = EditLeagueInput::CreateSchedule;
@@ -73,9 +73,8 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> std::io::
             }
         },
 
-        Err(_) => {
-            println!("Error matching first choice");
-            Ok(())
-        }
+        Err(message) => return inquire_check(message)
+            
+        
     }
 }

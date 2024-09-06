@@ -1,14 +1,14 @@
 use core::fmt;
 
-use inquire::Select;
+use inquire::{InquireError, Select};
 use rusqlite::Connection;
 
-use crate::league::League;
+use crate::{era, inquire_check, league::League};
 
 fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
     let mut seasons_stmt =
         conn.prepare("SELECT seasons.season_id FROM seasons WHERE seasons.league_id = ?1 ")?;
-    let season_iter = seasons_stmt.query_map([league.league_id], |row| Ok(row.get(0)?))?;
+    let season_iter = seasons_stmt.query_map([league.league_id], |row| row.get(0))?;
 
     let mut result_vec = Vec::new();
     for num in season_iter {
@@ -21,7 +21,7 @@ fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqli
 fn get_round_vec(conn: &Connection, season_id: i64) -> Result<Vec<i64>, rusqlite::Error> {
     let mut rounds_stmt =
         conn.prepare("SELECT rounds.round_id FROM rounds WHERE rounds.season_id = ?1")?;
-    let round_iter = rounds_stmt.query_map([season_id], |row| Ok(row.get(0)?))?;
+    let round_iter = rounds_stmt.query_map([season_id], |row| row.get(0))?;
 
     let mut result_vec = Vec::new();
 
@@ -104,13 +104,13 @@ fn get_series_vec(conn: &Connection, round_id: i64) -> Result<Vec<SeriesWrapper>
 fn get_game_vec(conn: &Connection, wrapper: &SeriesWrapper) -> Result<Vec<i64>, rusqlite::Error> {
     let mut games_stmt =
         conn.prepare("SELECT games.game_id FROM games WHERE games.series_id = ?1")?;
-    let games_iter = games_stmt.query_map([wrapper.series_id], |row| Ok(row.get(0)?))?;
+    let games_iter = games_stmt.query_map([wrapper.series_id], |row| row.get(0))?;
     let mut result_vec = Vec::new();
     for num in games_iter {
         result_vec.push(num?)
     }
 
-    return Ok(result_vec);
+    Ok(result_vec)
 }
 
 struct RoundChoiceListing {
@@ -124,6 +124,8 @@ impl fmt::Display for RoundChoiceListing {
     }
 }
 
+
+
 pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite::Error> {
     let sched_vec = get_season_vec(league, conn)?;
     if sched_vec.is_empty() {
@@ -131,10 +133,14 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         return Ok(());
     }
     let season_choice = Select::new("Choose a season to view.", sched_vec)
-        .prompt()
-        .unwrap();
+        .prompt();
+    let season_id;
+    match season_choice{
+        Ok(num) => season_id = num,
+        Err(message) => return inquire_check(message)
+    }
     //println!("{:?}",sched_vec?);
-    let round_vec = get_round_vec(conn, season_choice)?
+    let round_vec = get_round_vec(conn, season_id)?
         .into_iter()
         .enumerate()
         .map(|(index, value)| RoundChoiceListing { index, value })
@@ -142,14 +148,22 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
 
     //println!("{:?}",round_vec);
     let round_choice = Select::new("Choose a round to view.", round_vec)
-        .prompt()
-        .unwrap();
-    let series_vec = get_series_vec(conn, round_choice.value)?;
+        .prompt();
+
+    let round_id = match round_choice{
+        Ok(listing) => listing.value,
+        Err(message) => return inquire_check(message)
+    };
+    let series_vec = get_series_vec(conn, round_id)?;
     //println!("{:?}",series_vec);
     let series_choice = Select::new("Choose a series from the round", series_vec)
-        .prompt()
-        .unwrap();
-    let game_vec = get_game_vec(conn, &series_choice)?;
+        .prompt();
+    let choosed_wrapper = match series_choice{
+        Ok(wrapper) => wrapper,
+        Err(message) => return inquire_check(message)
+    };
+
+    let game_vec = get_game_vec(conn, &choosed_wrapper)?;
     println!("{:?}", game_vec);
     Ok(())
 }

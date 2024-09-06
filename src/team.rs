@@ -1,4 +1,5 @@
 use crate::b_traits::BTraits;
+use crate::inquire_check;
 use crate::league::AddTeamError;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -347,7 +348,7 @@ pub fn add_team_check(
     conn: &mut Connection,
     thread: &mut ThreadRng,
     league_id: i64,
-) -> std::io::Result<()> {
+) -> Result<(),rusqlite::Error> {
     let ans = Confirm::new("Would you like to create another team?")
         .with_default(true)
         .prompt();
@@ -356,7 +357,7 @@ pub fn add_team_check(
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
         //If not, we save the league.
-        Ok(false) => save_league(league, conn, thread)?,
+        Ok(false) => save_league(league, conn, thread).unwrap(),
         Err(_) => {
             panic!("Error on add team prompt");
         }
@@ -371,8 +372,8 @@ pub fn add_new_team(
     conn: &mut Connection,
     league_id: i64,
     first_team: bool,
-) -> std::io::Result<()> {
-    let result: std::io::Result<()>;
+) -> Result<(),rusqlite::Error> {
+    let mut result: Result<(),rusqlite::Error>;
     // If this is the first team generated for the league, we display a different prompt to the user.
     let mut prompt_string = match first_team {
         true => "Enter the name of the first team",
@@ -400,7 +401,7 @@ pub fn add_new_team(
 
         let team_name = match name_input {
             Ok(name) => name.trim().to_string(),
-            Err(_) => panic!("Error creating team name."),
+            Err(message) => return inquire_check(message)
         };
 
         let abrv_input = Text::new("Please enter an abbreviation for the new team.")
@@ -411,7 +412,7 @@ pub fn add_new_team(
 
         let abrv = match abrv_input {
             Ok(input) => input.trim().to_string(),
-            Err(_) => panic!("Error creating team abbreviation."),
+            Err(message)=> return inquire_check(message)
         };
         /* The league takes the new team name and abbreviation created.  If there is already a team with the same name and/or abbreviation, an error is returned and the user is prompted to enter in something else.
             There is also a check to see if there is an error adding the team to the database, and returns a nerror if it does.
