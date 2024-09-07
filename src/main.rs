@@ -1,6 +1,7 @@
 mod b_traits;
 mod era;
 mod league;
+mod league_template;
 mod lineup_score;
 mod main_menu;
 mod pd;

@@ -251,6 +251,7 @@ fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     Ok(names)
 }
 
+
 // Creates a new leagues, and saves the league in the database
 pub fn create_new_league(
     thread: &mut ThreadRng,
@@ -260,7 +261,7 @@ pub fn create_new_league(
 
     let league_name: String;
 
-    let taken_names = check_name_vec(conn).unwrap();
+    let taken_names = check_name_vec(conn)?;
 
     loop {
         if !taken_names.is_empty() {
