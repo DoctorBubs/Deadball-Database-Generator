@@ -1,15 +1,14 @@
 use core::fmt;
-use std::{cmp::max, thread::Thread};
+
 
 use crate::{
     era::Era,
     inquire_check,
-    league::{check_name_vec, save_league, AddTeamError, League},
+    league::{check_name_vec, save_league, League},
     player::PlayerGender,
-    team::{self, Team},
 };
-use chrono;
-use name_maker::Gender;
+
+
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
@@ -121,7 +120,7 @@ fn new_league_from_template(
 
     let gender_json = serde_json::to_string(&template.gender).unwrap();
     // And we create a new entry in the sql databse.
-    let league_entry = conn.execute(
+    let _league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
     )?;

@@ -6,7 +6,7 @@ use rusqlite::Connection;
 
 use crate::{
     inquire_check,
-    league::{create_new_league, save_league},
+    league::{create_new_league},
     league_check,
     league_template::load_new_template,
 };

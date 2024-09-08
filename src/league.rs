@@ -300,7 +300,7 @@ pub fn create_new_league(
 
     let gender_json = serde_json::to_string(&gender).unwrap();
     // And we create a new entry in the sql databse.
-    let league_entry = conn.execute(
+    let _league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
     )?;

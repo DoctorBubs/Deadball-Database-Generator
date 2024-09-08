@@ -1,9 +1,9 @@
 use core::fmt;
 
-use inquire::{InquireError, Select};
+use inquire::{Select};
 use rusqlite::Connection;
 
-use crate::{era, inquire_check, league::League};
+use crate::{inquire_check, league::League};
 
 fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
     let mut seasons_stmt =

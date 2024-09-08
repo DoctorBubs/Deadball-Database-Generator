@@ -1,4 +1,4 @@
-use crate::inquire_check;
+
 use crate::Deserialize;
 use crate::PitcherQuality;
 use crate::Serialize;
