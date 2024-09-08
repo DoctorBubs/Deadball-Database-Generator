@@ -37,7 +37,7 @@ use std::fmt;
 // Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
 pub fn inquire_check<E>(err: InquireError) -> Result<(), E> {
     match err {
-        inquire::InquireError::OperationCanceled => return Ok(()),
+        inquire::InquireError::OperationCanceled => Ok(()),
         _ => panic!("{:?}", err),
     }
 }

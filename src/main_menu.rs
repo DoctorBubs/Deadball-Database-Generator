@@ -84,6 +84,6 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
             }
         },
 
-        Err(message) => return inquire_check(message),
+        Err(message) => inquire_check(message),
     }
 }

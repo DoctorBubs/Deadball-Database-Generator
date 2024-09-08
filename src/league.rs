@@ -471,7 +471,7 @@ pub fn league_check(
                     Ok(())
                 }
             },
-            Err(message) => return inquire_check(message),
+            Err(message) => inquire_check(message),
         }
     }
 }

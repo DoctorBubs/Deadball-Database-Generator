@@ -131,11 +131,11 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         return Ok(());
     }
     let season_choice = Select::new("Choose a season to view.", sched_vec).prompt();
-    let season_id;
-    match season_choice {
-        Ok(num) => season_id = num,
+    
+    let season_id = match season_choice {
+        Ok(num) => num,
         Err(message) => return inquire_check(message),
-    }
+    };
     //println!("{:?}",sched_vec?);
     let round_vec = get_round_vec(conn, season_id)?
         .into_iter()

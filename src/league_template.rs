@@ -85,7 +85,7 @@ fn new_league_from_template(
     
     // First, we query to see what league has the largest id.
     let mut max_id_stmt = conn.prepare("SELECT MAX(leagues.league_id) FROM leagues")?;
-    let max_id_iter = max_id_stmt.query_map([], |row| Ok(row.get(0)?))?;
+    let max_id_iter = max_id_stmt.query_map([], |row| row.get(0))?;
     // We then put the max id in a vector
     let mut max_id_vec: Vec<i64> = Vec::new();
     for value in max_id_iter {
