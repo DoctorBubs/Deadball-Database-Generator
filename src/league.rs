@@ -239,7 +239,7 @@ impl League {
     }
 }
 
-fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
+pub fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     let mut stmt = conn.prepare("SELECT league_name FROM leagues")?;
     let rows = stmt.query_map([], |row| row.get(0))?;
 
@@ -250,7 +250,6 @@ fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
 
     Ok(names)
 }
-
 
 // Creates a new leagues, and saves the league in the database
 pub fn create_new_league(

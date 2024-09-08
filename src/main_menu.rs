@@ -4,7 +4,12 @@ use inquire::{InquireError, Select};
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
-use crate::{inquire_check, league::create_new_league, league_check};
+use crate::{
+    inquire_check,
+    league::{create_new_league, save_league},
+    league_check,
+    league_template::load_new_template,
+};
 #[derive(Copy, Clone, Debug)]
 pub enum LoadLeagueInput {
     EditLeague(EditLeagueInput),
@@ -22,6 +27,7 @@ pub enum EditLeagueInput {
 pub enum MenuInput {
     CreateNewLeague,
     LoadExistingLeague(LoadLeagueInput),
+    LoadLeagueFromTemplate,
     Exit,
 }
 
@@ -37,7 +43,7 @@ impl fmt::Display for MenuInput {
                 },
                 LoadLeagueInput::ViewSchedule => "View schedule.",
             },
-
+            Self::LoadLeagueFromTemplate => "Create a new league from a template.",
             Self::Exit => "Exit",
         };
         write!(f, "{}", chars)
@@ -54,6 +60,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::ViewSchedule),
+        MenuInput::LoadLeagueFromTemplate,
         MenuInput::Exit,
     ];
     // We prompt the user via Inquire.
@@ -69,6 +76,10 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
             //Both CreateNewTeam and RefreshLeague are used in the league check function, so a selection of either will call the function.
             MenuInput::LoadExistingLeague(choice) => {
                 league_check(conn, thread, choice).unwrap();
+                Ok(())
+            }
+            MenuInput::LoadLeagueFromTemplate => {
+                load_new_template(conn, thread).unwrap();
                 Ok(())
             }
         },

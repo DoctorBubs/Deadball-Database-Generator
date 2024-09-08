@@ -1,11 +1,17 @@
-use core::panicking::panic_nounwind;
-use std::thread::Thread;
+use core::fmt;
+use std::{cmp::max, thread::Thread};
 
+use crate::{
+    era::Era,
+    inquire_check,
+    league::{check_name_vec, save_league, AddTeamError, League},
+    player::PlayerGender,
+    team::{self, Team},
+};
+use chrono;
 use name_maker::Gender;
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
-use chrono;
-use crate::{era::Era, league::{AddTeamError, League}, player::PlayerGender, team::{self, Team}};
 
 struct TeamTemplate {
     name: String,
@@ -21,6 +27,11 @@ pub struct LeagueTemplate {
     teams_templates: Vec<TeamTemplate>,
 }
 
+impl fmt::Display for LeagueTemplate {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.name)
+    }
+}
 pub fn load_league_templates() -> Vec<LeagueTemplate> {
     vec![LeagueTemplate {
         name: "PCL".to_string(),
@@ -65,10 +76,47 @@ pub fn load_league_templates() -> Vec<LeagueTemplate> {
     }]
 }
 
-
-fn new_league_from_template(conn: &mut Connection, thread: &mut ThreadRng, template: &LeagueTemplate) -> Result<(),rusqlite::Error>{
-    let date_string = chrono::offset::Local::now().to_string();
-    let league_name = format!("{}_{}",template.name,date_string);
+fn new_league_from_template(
+    conn: &mut Connection,
+    thread: &mut ThreadRng,
+    template: &LeagueTemplate,
+) -> Result<(), rusqlite::Error> {
+    // let date_string = chrono::offset::Local::now().to_string();
+    //let league_name = format!("{}_{}",template.name,date_string);
+    
+    // First, we query to see what league has the largest id.
+    let mut max_id_stmt = conn.prepare("SELECT MAX(leagues.league_id) FROM leagues")?;
+    let max_id_iter = max_id_stmt.query_map([], |row| Ok(row.get(0)?))?;
+    // We then put the max id in a vector
+    let mut max_id_vec: Vec<i64> = Vec::new();
+    for value in max_id_iter {
+        let sql_result = value?;
+        max_id_vec.push(sql_result);
+    }
+    // To determine the league name, we check ifg htere are any id's
+    let league_name = match max_id_vec.is_empty() {
+        false => {
+            // If there alreeady leagues i nteh database, first we retireve the id number.
+            let mut id_num = max_id_vec[0];
+            let result;
+            // We then query for a vector of leauge names
+            let name_vec = check_name_vec(conn)?;
+            loop {
+                let potential_name = format!("{}_{}", template.name, id_num + 1);
+                match name_vec.contains(&potential_name) {
+                    true => id_num += 1,
+                    false => {
+                        result = potential_name;
+                        break;
+                    }
+                }
+            }
+            result
+        }
+        true => format!("{}_1", template.name),
+    };
+    println!("League_name = {}", league_name);
+    drop(max_id_stmt);
     let era_json = serde_json::to_string(&template.era).unwrap();
 
     let gender_json = serde_json::to_string(&template.gender).unwrap();
@@ -84,13 +132,33 @@ fn new_league_from_template(conn: &mut Connection, thread: &mut ThreadRng, templ
     let mut new_league = League::new(&league_name, template.gender, template.era, league_id);
     println!("{} created", &league_name);
 
-    for team_template in template.teams_templates.iter(){
-        let team_add = new_league.new_team(&team_template.abrv,&team_template.name,thread,league_id, conn);
+    for team_template in template.teams_templates.iter() {
+        let team_add = new_league.new_team(
+            &team_template.abrv,
+            &team_template.name,
+            thread,
+            league_id,
+            conn,
+        );
         match team_add {
-            Err(message) => panic!("{:?}",message),
+            Err(message) => panic!("{:?}", message),
             _ => {}
         }
     }
-
+    save_league(&new_league, conn, thread).unwrap();
     Ok(())
+}
+
+pub fn load_new_template(
+    conn: &mut Connection,
+    thread: &mut ThreadRng,
+) -> Result<(), rusqlite::Error> {
+    let options = load_league_templates();
+
+    let template_choice = inquire::Select::new("Please choose a league_template", options).prompt();
+
+    match template_choice {
+        Ok(template) => new_league_from_template(conn, thread, &template),
+        Err(message) => inquire_check(message),
+    }
 }
