@@ -1,6 +1,6 @@
 use core::fmt;
 
-use inquire::{Select};
+use inquire::Select;
 use rusqlite::Connection;
 
 use crate::{inquire_check, league::League};
@@ -131,7 +131,7 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         return Ok(());
     }
     let season_choice = Select::new("Choose a season to view.", sched_vec).prompt();
-    
+
     let season_id = match season_choice {
         Ok(num) => num,
         Err(message) => return inquire_check(message),

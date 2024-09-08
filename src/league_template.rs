@@ -1,13 +1,11 @@
 use core::fmt;
 
-
 use crate::{
     era::Era,
     inquire_check,
     league::{check_name_vec, save_league, League},
     player::PlayerGender,
 };
-
 
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
@@ -82,7 +80,7 @@ fn new_league_from_template(
 ) -> Result<(), rusqlite::Error> {
     // let date_string = chrono::offset::Local::now().to_string();
     //let league_name = format!("{}_{}",template.name,date_string);
-    
+
     // First, we query to see what league has the largest id.
     let mut max_id_stmt = conn.prepare("SELECT MAX(leagues.league_id) FROM leagues")?;
     let max_id_iter = max_id_stmt.query_map([], |row| row.get(0))?;

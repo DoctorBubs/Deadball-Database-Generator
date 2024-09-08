@@ -1,4 +1,3 @@
-
 use crate::Deserialize;
 use crate::PitcherQuality;
 use crate::Serialize;

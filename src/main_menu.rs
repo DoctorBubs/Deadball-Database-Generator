@@ -5,10 +5,7 @@ use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
 use crate::{
-    inquire_check,
-    league::{create_new_league},
-    league_check,
-    league_template::load_new_template,
+    inquire_check, league::create_new_league, league_check, league_template::load_new_template,
 };
 #[derive(Copy, Clone, Debug)]
 pub enum LoadLeagueInput {

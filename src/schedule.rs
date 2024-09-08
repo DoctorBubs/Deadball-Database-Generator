@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::inquire_check;
 use crate::league::{save_league, League};
 use crate::team::Team;
@@ -36,12 +38,11 @@ pub struct Series {
 
 impl Series {
     /// When given a vector of ints, this function returns true if the series home team and away team id are no in the vector.
-    fn is_valid(&self, forbidden_numbers: &[i32]) -> bool {
-        !(forbidden_numbers.contains(&self.home_team_id)
-            | forbidden_numbers.contains(&self.away_team_id))
+    fn is_valid(&self, forbidden_numbers: &HashMap<i32, bool>) -> bool {
+        forbidden_numbers.get(&self.home_team_id).is_none()
+            & forbidden_numbers.get(&self.away_team_id).is_none()
     }
 }
-
 fn new_series(home_team_id: i32, away_team_id: i32, series_length: i32) -> Series {
     Series {
         games: vec![new_game(home_team_id, away_team_id); series_length as usize],
@@ -63,7 +64,7 @@ struct SeriesListing<'a> {
 }
 
 // Generates a schedule based off a vec of series
-pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usize) -> Vec<Round> {
+pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
     let mut result = vec![];
 
     // We loop untill the length of all series is 0
@@ -71,7 +72,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
         // We create a vector for the new round.
         let mut new_round_vec = vec![];
         //We create a vector of forbidden team id's that have already been used.
-        let mut forbidden_numbers = vec![];
+        let mut forbidden_numbers = HashMap::new();
 
         //First, we choose a random series from all series
         let (i, _) = all_series
@@ -82,13 +83,13 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
 
         let first_series = all_series.remove(i);
         // And add the series home team and away team id to the forbidden numbers.
-        forbidden_numbers.push(first_series.home_team_id);
-        forbidden_numbers.push(first_series.away_team_id);
+        forbidden_numbers.insert(first_series.home_team_id, true);
+        forbidden_numbers.insert(first_series.away_team_id, true);
         // we then add the series to the round vec
         new_round_vec.push(first_series);
 
         //We loops from 1 to matchup_per_round. This previously checked the length of the new round, however this casued bugs that loopingl ike this might fix
-        for _ in 1..matchups_per_round {
+        loop {
             // We create an index variable.
 
             // We clone series again.
@@ -105,7 +106,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
                 .collect();
             // We select a random series listing  and it's index
             if filtered_series_listing.is_empty() {
-                panic!("Schedule generation tried to run when there are no possible combos left for the roudn.")
+                break;
             }
             let (_i, current_series_listing) = filtered_series_listing
                 .iter()
@@ -119,8 +120,8 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
             let current_series = all_series.remove(current_index);
 
             // We add the series home and away team ids to the forbidden numbers.
-            forbidden_numbers.push(current_series.home_team_id);
-            forbidden_numbers.push(current_series.away_team_id);
+            forbidden_numbers.insert(current_series.home_team_id, true);
+            forbidden_numbers.insert(current_series.away_team_id, true);
             // And we add the current series to the round
             new_round_vec.push(current_series);
         }
@@ -138,8 +139,6 @@ pub fn new_round_generator(mut all_series: Vec<Series>, matchups_per_round: usiz
 pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32) -> Vec<Round> {
     let ids: Vec<i32> = teams.iter().map(|team| team.team_id).collect();
 
-    let team_size = ids.len();
-    let matchups_per_round = team_size / 2;
     let all_series: Vec<Series> = ids
         .into_iter()
         // We create a permutation of home team and away id.
@@ -151,7 +150,7 @@ pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32)
             }
             acc
         });
-    let mut rounds = new_round_generator(all_series, matchups_per_round);
+    let mut rounds = new_round_generator(all_series);
     rounds.shuffle(&mut thread_rng());
     rounds
 }
