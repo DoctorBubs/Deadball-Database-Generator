@@ -76,8 +76,8 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
                 Ok(())
             }
             MenuInput::LoadLeagueFromTemplate => {
-                load_new_template(conn, thread).unwrap();
-                Ok(())
+                load_new_template(conn, thread)
+                
             }
         },
 

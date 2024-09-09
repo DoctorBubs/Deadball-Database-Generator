@@ -20,6 +20,7 @@ use crate::sched_view::view_schedule;
 
 use crate::team::add_new_team;
 use crate::team::load_team;
+use crate::vec_to_hash;
 use crate::Deserialize;
 use crate::Era;
 
@@ -250,6 +251,16 @@ pub fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error>
 
     Ok(names)
 }
+// Returns a hash
+pub fn check_name_hash(conn: &Connection) -> Result<HashMap<String, bool>, rusqlite::Error> {
+    let names_vec = check_name_vec(conn)?;
+    let mut result = HashMap::new();
+    for name in names_vec.into_iter() {
+        result.insert(name, true);
+    }
+
+    Ok(result)
+}
 
 // Creates a new leagues, and saves the league in the database
 pub fn create_new_league(
@@ -261,7 +272,11 @@ pub fn create_new_league(
     let league_name: String;
 
     let taken_names = check_name_vec(conn)?;
-
+   // let mut taken_hash = HashMap::new();
+    let taken_hash = vec_to_hash(&taken_names);
+    //for name in taken_names.iter() {
+        //taken_hash.insert(name, true);
+   // }
     loop {
         if !taken_names.is_empty() {
             println!("The following league names have already been taken:");
@@ -275,9 +290,11 @@ pub fn create_new_league(
             Ok(input) => input,
             Err(message) => return inquire_check(message),
         };
-        if !taken_names.contains(&potential_name) {
+        if taken_hash.get(&potential_name).is_none() {
             league_name = potential_name;
             break;
+        } else {
+            println!("Name already taken.")
         }
     }
 
@@ -407,13 +424,7 @@ pub fn load_league(
 
  It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
 */
-
-//This function queries the database for all leagues. If there are no leagues in the database, the user is prompted to create one.
-pub fn league_check(
-    conn: &mut Connection,
-    thread: &mut ThreadRng,
-    input: LoadLeagueInput,
-) -> Result<(), rusqlite::Error> {
+pub fn get_all_leagues_from_db(conn: &mut Connection) -> Vec<LeagueWrapper>{
     // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.
@@ -436,13 +447,22 @@ pub fn league_check(
         })
         .unwrap();
 
-    let mut options = Vec::new();
+    let mut result = Vec::new();
     // We unwrap the results in leauge iter, and push it to the options vec
     for wrapper in league_iter {
-        options.push(wrapper.unwrap())
+        result.push(wrapper.unwrap());
     }
-    // We drop the stmt so we can borrow conn later.
-    drop(stmt);
+    result
+}
+
+//This function queries the database for all leagues. If there are no leagues in the database, the user is prompted to create one.
+pub fn league_check(
+    conn: &mut Connection,
+    thread: &mut ThreadRng,
+    input: LoadLeagueInput,
+) -> Result<(), rusqlite::Error> {
+    // We query the database to get all the leagues that already exist.
+    let options = get_all_leagues_from_db(conn);
     // If there are no leagues in the database, the user is prompted to create a league
     if options.is_empty() {
         println!("No Leagues created yet! Let's create a new league to get started.");

@@ -32,6 +32,7 @@ use league::league_check;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fmt;
 
 // Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
@@ -42,9 +43,26 @@ pub fn inquire_check<E>(err: InquireError) -> Result<(), E> {
     }
 }
 
+// Takse a vec of type e,  returns a hash map of each value with a result of true.
+pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq >(vec: &Vec<E>) -> HashMap<&E,bool>{
+    let mut result = HashMap::new();
+    for value in vec.iter(){
+        result.insert(value,true);
+
+    }
+    result
+}
 fn main() -> Result<(), rusqlite::Error> {
     // First, we load the databsae, or create one if it doesn't exist.
-    let mut conn = load_database().unwrap();
+    let default_path = "deadball.db";
+    let conn_load = load_database(&default_path);
+    let mut conn = match conn_load{
+        Ok(connection) => connection,
+        Err(_) => {
+            println!("Unable to create database under {}, please check if the folder is read only.",default_path);
+            return Ok(())
+        }
+    };
     //Next we generate a thread for the random numbers we will need to generate.
     let mut r_thread = rand::thread_rng();
 
@@ -70,9 +88,9 @@ fn main() -> Result<(), rusqlite::Error> {
     user_input
 }
 
-fn load_database() -> Result<Connection, rusqlite::Error> {
+fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
     // We look for the database, and create a new one if it doesn't exist. If no database exists and there we are unable to create a new database in the folder, the function returns an error
-    let conn = Connection::open("deadball.db")?;
+    let conn = Connection::open(path)?;
     // We create the league table in the database. Each league has an ID and a unique name. Each league also has an era and gender, which are used in creating teams and players withing the league.
     conn.execute(
         "create table if not exists leagues (
@@ -187,4 +205,61 @@ fn load_database() -> Result<Connection, rusqlite::Error> {
 
     // If no errors occured, the database is returned.
     Ok(conn)
+}
+
+#[cfg(test)]
+mod tests {
+    
+
+    use fmt::format;
+    use league_template::{load_league_templates, new_league_from_template};
+    struct LeagueListing{
+        name: String,
+        id: i64
+    }
+    use super::*;
+    
+    #[test]
+    fn generate_db() {
+        let mut test_conn = load_database("test.db").unwrap();
+        let mut r_thread = rand::thread_rng();
+        let templates = load_league_templates();
+        let first = &templates[0];
+        for _ in 1..=3{
+            new_league_from_template(&mut test_conn,&mut r_thread,&first).unwrap();
+        }
+
+        let mut league_stmt = test_conn.prepare("
+            SELECT 
+                leagues.league_name, leagues.league_id
+            FROM 
+                leagues
+            ORDER BY 
+                leagues.league_id ASC;
+        
+        ").unwrap();
+
+        let league_iter = league_stmt.query_map([],|row| {
+            Ok(
+                LeagueListing{
+                    name: row.get(0).unwrap(),
+                    id: row.get(1).unwrap()
+                }
+            )
+        }).unwrap();
+        let mut test_vec = Vec::new();
+        for listing in league_iter{
+            test_vec.push(listing.unwrap())
+        };
+
+        let test_vec_length = test_vec.len();
+        assert_eq!(test_vec_length,3);
+        for i in 1..=3{
+            let test_string = format!("PCL_{}",i);
+            let current_listing = &test_vec[i - 1];
+            assert_eq!(current_listing.name,test_string)
+        }
+    }
+
+    
 }

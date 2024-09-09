@@ -1,12 +1,15 @@
 use core::fmt;
+use std::{cmp::max, thread::Thread};
 
 use crate::{
     era::Era,
     inquire_check,
-    league::{check_name_vec, save_league, League},
+    league::{check_name_hash, check_name_vec, save_league, AddTeamError, League},
     player::PlayerGender,
+    team::{self, Team},
 };
-
+use chrono;
+use name_maker::Gender;
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
@@ -73,7 +76,7 @@ pub fn load_league_templates() -> Vec<LeagueTemplate> {
     }]
 }
 
-fn new_league_from_template(
+pub fn new_league_from_template(
     conn: &mut Connection,
     thread: &mut ThreadRng,
     template: &LeagueTemplate,
@@ -82,8 +85,8 @@ fn new_league_from_template(
     //let league_name = format!("{}_{}",template.name,date_string);
 
     // First, we query to see what league has the largest id.
-    let mut max_id_stmt = conn.prepare("SELECT MAX(leagues.league_id) FROM leagues")?;
-    let max_id_iter = max_id_stmt.query_map([], |row| row.get(0))?;
+    let mut max_id_stmt = conn.prepare("SELECT COUNT(leagues.league_id) FROM leagues")?;
+    let max_id_iter = max_id_stmt.query_map([], |row| Ok(row.get(0)?))?;
     // We then put the max id in a vector
     let mut max_id_vec: Vec<i64> = Vec::new();
     for value in max_id_iter {
@@ -97,12 +100,14 @@ fn new_league_from_template(
             let mut id_num = max_id_vec[0];
             let result;
             // We then query for a vector of leauge names
-            let name_vec = check_name_vec(conn)?;
+            let name_hash = check_name_hash(conn)?;
             loop {
                 let potential_name = format!("{}_{}", template.name, id_num + 1);
-                match name_vec.contains(&potential_name) {
-                    true => id_num += 1,
-                    false => {
+                match name_hash.get(&potential_name).is_none() {
+                    //If there is already a league saved with the file naem, we add 1 to id_num
+                    false => id_num += 1,
+                    //Otherwise, we
+                    true => {
                         result = potential_name;
                         break;
                     }
@@ -118,7 +123,7 @@ fn new_league_from_template(
 
     let gender_json = serde_json::to_string(&template.gender).unwrap();
     // And we create a new entry in the sql databse.
-    let _league_entry = conn.execute(
+    let league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
     )?;
