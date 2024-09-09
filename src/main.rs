@@ -225,6 +225,10 @@ fn player_pool_test(input: &Vec<Player>, team_id: i64, for_pitchers: bool) {
     }
 }
 
+fn how_many_rounds(number_of_teams: i32, series_per_matchup: i32) -> i32 {
+    (number_of_teams - 1) * series_per_matchup
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -232,6 +236,7 @@ mod tests {
     use itertools::all;
     use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
+    use schedule::{new_schedule, schedule_to_sql};
     struct LeagueListing {
         name: String,
         id: i64,
@@ -314,5 +319,12 @@ mod tests {
                 Era::Modern => panic!("Expected a bullpen for a modern team"),
             },
         }
+        let series_per_matchup = 2;
+        let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
+        assert_eq!(
+            test_sched.len() as i32,
+            how_many_rounds(current_league.teams.len() as i32, series_per_matchup)
+        );
+        schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();
     }
 }

@@ -64,7 +64,7 @@ struct SeriesListing<'a> {
 }
 
 // Generates a schedule based off a vec of series
-pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
+pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -> Vec<Round> {
     let mut result = vec![];
 
     // We loop untill the length of all series is 0
@@ -94,6 +94,10 @@ pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
 
             // We clone series again.
             //let series_clone = all_series.clone();
+            if new_round_vec.len() as i32 == series_per_round{
+                println!("Round Generated");
+                break
+            }
             let filtered_series_listing: Vec<SeriesListing> = all_series
                 .iter()
                 // We set the iter to enumerate, as we need the index to generate a SeriesListing.
@@ -105,15 +109,15 @@ pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
                 // And we collect the new vector.
                 .collect();
             // We select a random series listing  and it's index
-            if filtered_series_listing.is_empty() {
-                break;
-            }
+            
             let (_i, current_series_listing) = filtered_series_listing
                 .iter()
                 .enumerate()
                 .choose(&mut thread_rng())
                 .unwrap();
-
+            if filtered_series_listing.is_empty(){
+                panic!("Error generating round, no valid matchups remain")
+            }
             // We take the series listing index
             let current_index = current_series_listing.index;
             // And use that index to get the series from all_series
@@ -127,7 +131,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
         }
         // Once the vector is full, we use it to create a new round.
         let new_round = Round {
-            series: new_round_vec,
+            series: new_round_vec
         };
         // We then add the round to the result.
         result.push(new_round);
@@ -136,21 +140,30 @@ pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
     result
 }
 
-pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32) -> Vec<Round> {
+pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i32) -> Vec<Round> {
     let ids: Vec<i64> = teams.iter().map(|team| team.team_id).collect();
-
+    let series_per_round = (teams.len() / 2) as i32; 
+    let home_series = series_per_matchup / 2;
+    println!("home series = {}",home_series);
+    let mut home_matchups_created = 0;
     let all_series: Vec<Series> = ids
         .into_iter()
         // We create a permutation of home team and away id.
         .permutations(2)
         .fold(Vec::new(), |mut acc, e| {
-            for _ in 0..series_per_matchup / 2 {
+            println!("{:?}",e);
+            home_matchups_created += 1;
+            for _ in 0..home_series {
                 let gen_series = new_series(e[0], e[1], series_length);
                 acc.push(gen_series)
             }
             acc
         });
-    let mut rounds = new_round_generator(all_series);
+    println!("home_matchups_created = {}",home_matchups_created );
+    println!("Total Series Created = {}",all_series.len());
+    println!("Rounds neccesary to cover all_series = {}",all_series.len() / (teams.len() / 2));
+    let mut rounds = new_round_generator(all_series,series_per_round);
+    println!("rounds generated = {}",rounds.len());
     rounds.shuffle(&mut thread_rng());
     rounds
 }
@@ -189,16 +202,11 @@ pub fn schedule_from_input(league: &League) -> Result<Vec<Round>, InquireError> 
     Ok(new_schedule(teams, series_length, series_number))
 }
 
-pub fn save_schedule_sql(
+pub fn schedule_to_sql(
     conn: &mut Connection,
     league: &League,
-    thread: &mut ThreadRng,
+    sched: Vec<Round>,
 ) -> Result<(), rusqlite::Error> {
-    let sched_input = schedule_from_input(league);
-    let sched = match sched_input {
-        Ok(rounds) => rounds,
-        Err(message) => return inquire_check(message),
-    };
     let league_id = league.league_id;
     conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])
         .unwrap();
@@ -222,6 +230,21 @@ pub fn save_schedule_sql(
             }
         }
     }
+
+    Ok(())
+}
+
+pub fn save_schedule_sql(
+    conn: &mut Connection,
+    league: &League,
+    thread: &mut ThreadRng,
+) -> Result<(), rusqlite::Error> {
+    let sched_input = schedule_from_input(league);
+    let sched = match sched_input {
+        Ok(rounds) => rounds,
+        Err(message) => return inquire_check(message),
+    };
+    schedule_to_sql(conn, league, sched)?;
     save_league(league, conn, thread).unwrap();
     Ok(())
 }
