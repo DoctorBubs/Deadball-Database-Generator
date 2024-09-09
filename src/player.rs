@@ -147,7 +147,8 @@ pub struct Player {
     pub b_traits: BTraits,
     pub pitcher_trait: Option<PitcherTrait>,
     pub trade_value: i32,
-    pub team_id : i64
+    pub team_id: i64,
+    pub player_id: i64,
 }
 
 impl Player {
@@ -285,7 +286,8 @@ impl Player {
                 ":trade_value": self.trade_value
             ],
         )?;
-
+        let new_player_id = conn.last_insert_rowid();
+        self.player_id = new_player_id;
         Ok(())
     }
     // Used to rank pitchers.
@@ -334,7 +336,7 @@ impl Player {
             }
         };
         let team_id = 0;
-
+        let player_id = 0;
         Player {
             name,
             pos,
@@ -347,7 +349,8 @@ impl Player {
             b_traits,
             pitcher_trait,
             trade_value,
-            team_id
+            team_id,
+            player_id,
         }
     }
 }

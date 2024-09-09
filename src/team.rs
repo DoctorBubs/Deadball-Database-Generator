@@ -197,7 +197,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -226,7 +226,8 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
                     toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
                 },
                 trade_value: row.get(15)?,
-                team_id: row.get(16)?
+                team_id: row.get(16)?,
+                player_id: row.get(17)?,
             },
         })
     })?;
