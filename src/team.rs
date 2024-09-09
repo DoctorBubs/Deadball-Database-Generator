@@ -44,7 +44,7 @@ pub struct Team {
     pub team_score: i32,
     pub wins: i32,
     pub losses: i32,
-    pub team_id: i32,
+    pub team_id: i64,
 }
 
 impl Team {
@@ -95,23 +95,23 @@ impl Team {
     The TeamSpot enum is used to distinguish each players role on the team in its entry in the database.
     */
     pub fn save_players_sql(
-        &self,
+        &mut self,
         conn: &mut Connection,
         team_id: i64,
     ) -> Result<(), rusqlite::Error> {
-        for starter in &self.lineup {
+        for starter in &mut self.lineup {
             starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
         }
 
-        for bench in &self.bench {
+        for bench in &mut self.bench {
             bench.save_sql(conn, team_id, TeamSpot::BenchHitter)?;
         }
 
-        for starter in &self.starting_pitching {
+        for starter in &mut self.starting_pitching {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
         }
         // As not every team has a bullpen, we do a check to make suyre.
-        match &self.bullpen {
+        match &mut self.bullpen {
             Some(pen) => {
                 for reliever in pen {
                     reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
@@ -197,7 +197,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -226,6 +226,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
                     toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
                 },
                 trade_value: row.get(15)?,
+                team_id: row.get(16)?
             },
         })
     })?;

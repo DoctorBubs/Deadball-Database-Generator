@@ -17,11 +17,11 @@ use rusqlite::Connection;
 //First we have the game struct, which represents an individual game that is scheduled
 #[derive(Clone, Debug)]
 pub struct Game {
-    home_team_id: i32,
-    away_team_id: i32,
+    home_team_id: i64,
+    away_team_id: i64,
 }
 
-fn new_game(home_team_id: i32, away_team_id: i32) -> Game {
+fn new_game(home_team_id: i64, away_team_id: i64) -> Game {
     Game {
         home_team_id,
         away_team_id,
@@ -32,18 +32,18 @@ fn new_game(home_team_id: i32, away_team_id: i32) -> Game {
 #[derive(Clone, Debug)]
 pub struct Series {
     games: Vec<Game>,
-    home_team_id: i32,
-    away_team_id: i32,
+    home_team_id: i64,
+    away_team_id: i64,
 }
 
 impl Series {
     /// When given a vector of ints, this function returns true if the series home team and away team id are no in the vector.
-    fn is_valid(&self, forbidden_numbers: &HashMap<i32, bool>) -> bool {
+    fn is_valid(&self, forbidden_numbers: &HashMap<i64, bool>) -> bool {
         forbidden_numbers.get(&self.home_team_id).is_none()
             & forbidden_numbers.get(&self.away_team_id).is_none()
     }
 }
-fn new_series(home_team_id: i32, away_team_id: i32, series_length: i32) -> Series {
+fn new_series(home_team_id: i64, away_team_id: i64, series_length: i32) -> Series {
     Series {
         games: vec![new_game(home_team_id, away_team_id); series_length as usize],
         home_team_id,
@@ -137,7 +137,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>) -> Vec<Round> {
 }
 
 pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32) -> Vec<Round> {
-    let ids: Vec<i32> = teams.iter().map(|team| team.team_id).collect();
+    let ids: Vec<i64> = teams.iter().map(|team| team.team_id).collect();
 
     let all_series: Vec<Series> = ids
         .into_iter()

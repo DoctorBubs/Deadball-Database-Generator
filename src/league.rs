@@ -218,20 +218,20 @@ impl League {
             [&new_name, &new_abrv, &league_id.to_string()],
         );
         // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
-        let team_id = conn.last_insert_rowid();
-        new_team.team_id = team_id as i32;
+        let new_team_id = conn.last_insert_rowid();
+        //new_team.team_id = team_id as i32;
         match team_enter_result {
             Ok(_) => (),
             Err(_message) => return Err(AddTeamError::DatabaseError),
         };
         //If all has gone well, we save the players that have been generated into the database
-        new_team.save_players_sql(conn, team_id).unwrap();
+        new_team.save_players_sql(conn, new_team_id).unwrap();
         // And we inster the team struct into the league's team vector.
         self.teams.push(new_team);
         Ok(())
     }
 
-    pub fn new_team_hash(&self) -> HashMap<i32, &Team> {
+    pub fn new_team_hash(&self) -> HashMap<i64, &Team> {
         let mut result = HashMap::new();
         for team in self.teams.iter() {
             result.insert(team.team_id, team);

@@ -196,7 +196,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
     )?;
 
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
-    team_season_id INTEGER PRIMARY KEY,
+    team_season_id INTEGER PRIMARY KEY,st
     league_season_id INTEGER,
     team_id INTEGER,
     wins INTEGER DEFAULT 0,
@@ -207,6 +207,22 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
 
     // If no errors occured, the database is returned.
     Ok(conn)
+}
+
+// Tests if a player has a pd.
+fn player_pd_test(player: &Player) -> bool{
+    match player.pd{
+        Some(_) => true,
+        None => false
+    }
+}
+
+fn player_pool_test(input: &Vec<Player>,team_id: i64,for_pitchers: bool){
+    for player in input.iter(){
+        assert_eq!(player.bt + player.obt_mod,player.obt);
+        assert_eq!(player.team_id, team_id);
+        assert_eq!(player_pd_test(player),for_pitchers)
+    }
 }
 
 #[cfg(test)]
@@ -280,13 +296,18 @@ mod tests {
         .unwrap();
         assert_eq!(current_league.teams.len(), 8);
         let first_team = current_league.teams.get(0).unwrap();
+        let first_team_id = first_team.team_id;
         //Next we check the team's player pools to make sure they have all the players.
         assert_eq!(first_team.lineup.len(), 8);
+        player_pool_test(&first_team.lineup, first_team_id,false);
         assert_eq!(first_team.bench.len(), 5);
+        player_pool_test(&first_team.bench, first_team_id,false);
         assert_eq!(first_team.starting_pitching.len(), 5);
+        player_pool_test(&first_team.starting_pitching, first_team_id, true);
         match &first_team.bullpen {
             Some(pen) => {
-                assert_eq!(pen.len(), 7)
+                assert_eq!(pen.len(), 7);
+                player_pool_test(pen, first_team_id, true);
             }
             None => match current_league.era {
                 Era::Ancient => {}

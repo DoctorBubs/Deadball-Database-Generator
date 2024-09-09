@@ -147,6 +147,7 @@ pub struct Player {
     pub b_traits: BTraits,
     pub pitcher_trait: Option<PitcherTrait>,
     pub trade_value: i32,
+    pub team_id : i64
 }
 
 impl Player {
@@ -216,12 +217,13 @@ impl Player {
     }
 
     pub fn save_sql(
-        &self,
+        &mut self,
         conn: &mut Connection,
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
         // We destruce the players BTraits to make it easier to instert into the database
+        self.team_id = team_id;
         let BTraits {
             contact,
             speed,
@@ -331,6 +333,7 @@ impl Player {
                 }
             }
         };
+        let team_id = 0;
 
         Player {
             name,
@@ -344,6 +347,7 @@ impl Player {
             b_traits,
             pitcher_trait,
             trade_value,
+            team_id
         }
     }
 }
