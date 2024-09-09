@@ -45,8 +45,8 @@ pub struct League {
 }
 
 pub struct LeagueWrapper {
-    league_id: i64,
-    league: League,
+    pub league_id: i64,
+    pub league: League,
 }
 
 // We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
@@ -272,11 +272,11 @@ pub fn create_new_league(
     let league_name: String;
 
     let taken_names = check_name_vec(conn)?;
-   // let mut taken_hash = HashMap::new();
+    // let mut taken_hash = HashMap::new();
     let taken_hash = vec_to_hash(&taken_names);
     //for name in taken_names.iter() {
-        //taken_hash.insert(name, true);
-   // }
+    //taken_hash.insert(name, true);
+    // }
     loop {
         if !taken_names.is_empty() {
             println!("The following league names have already been taken:");
@@ -342,19 +342,12 @@ pub struct TeamWrapper {
     pub team: Team,
 }
 
-pub fn load_league(
-    thread: &mut ThreadRng,
+/// Loads teams from SQL database and adds to league struct.
+pub fn load_teams_from_sql(
+    league_id: i64,
+    league: &mut League,
     conn: &mut Connection,
-    wrapper: LeagueWrapper,
-    edit_input: EditLeagueInput,
 ) -> Result<(), rusqlite::Error> {
-    // We destructure the LeagueWrapper
-    let LeagueWrapper {
-        league_id,
-        mut league,
-    } = wrapper;
-
-    league.display_standings(conn)?;
     let era = league.era;
     // We query the database to select all teams in the database that belong to the league via the league_id car
     let mut stmt = conn.prepare(
@@ -402,6 +395,24 @@ pub fn load_league(
         league.teams.push(loaded_team)
     }
 
+    Ok(())
+}
+
+pub fn load_league(
+    thread: &mut ThreadRng,
+    conn: &mut Connection,
+    wrapper: LeagueWrapper,
+    edit_input: EditLeagueInput,
+) -> Result<(), rusqlite::Error> {
+    // We destructure the LeagueWrapper
+    let LeagueWrapper {
+        league_id,
+        mut league,
+    } = wrapper;
+
+    league.display_standings(conn)?;
+    load_teams_from_sql(league_id, &mut league, conn)?;
+
     // Now that we have loaded the existing league from the database, it is time to generate a new team or create a new schedule based off the input
     match edit_input {
         EditLeagueInput::CreateNewTeam => {
@@ -424,7 +435,7 @@ pub fn load_league(
 
  It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
 */
-pub fn get_all_leagues_from_db(conn: &mut Connection) -> Vec<LeagueWrapper>{
+pub fn get_all_leagues_from_db(conn: &mut Connection) -> Vec<LeagueWrapper> {
     // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.

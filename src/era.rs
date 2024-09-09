@@ -10,7 +10,7 @@ use rand::Rng;
 /* Deadball has 2 sets of rules to simulate 2 different era's of baseball.
 The Ancient Era simulates the low scoring style of basbeall playedf in the early 1900's, while the modern is used to simulate baseball since.
 The main difference is how the the pitch die for pitchers is generated, however it also influence the numbers of players on the roster, as well as player postions.*/
-#[derive(Copy, Clone, Serialize, Deserialize)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum Era {
     Ancient,
     Modern,

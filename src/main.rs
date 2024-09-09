@@ -44,11 +44,10 @@ pub fn inquire_check<E>(err: InquireError) -> Result<(), E> {
 }
 
 // Takse a vec of type e,  returns a hash map of each value with a result of true.
-pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq >(vec: &Vec<E>) -> HashMap<&E,bool>{
+pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &Vec<E>) -> HashMap<&E, bool> {
     let mut result = HashMap::new();
-    for value in vec.iter(){
-        result.insert(value,true);
-
+    for value in vec.iter() {
+        result.insert(value, true);
     }
     result
 }
@@ -56,11 +55,14 @@ fn main() -> Result<(), rusqlite::Error> {
     // First, we load the databsae, or create one if it doesn't exist.
     let default_path = "deadball.db";
     let conn_load = load_database(&default_path);
-    let mut conn = match conn_load{
+    let mut conn = match conn_load {
         Ok(connection) => connection,
         Err(_) => {
-            println!("Unable to create database under {}, please check if the folder is read only.",default_path);
-            return Ok(())
+            println!(
+                "Unable to create database under {}, please check if the folder is read only.",
+                default_path
+            );
+            return Ok(());
         }
     };
     //Next we generate a thread for the random numbers we will need to generate.
@@ -209,27 +211,30 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
 
 #[cfg(test)]
 mod tests {
-    
 
     use fmt::format;
+    use itertools::all;
+    use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
-    struct LeagueListing{
+    struct LeagueListing {
         name: String,
-        id: i64
+        id: i64,
     }
     use super::*;
-    
+
     #[test]
     fn generate_db() {
         let mut test_conn = load_database("test.db").unwrap();
         let mut r_thread = rand::thread_rng();
         let templates = load_league_templates();
         let first = &templates[0];
-        for _ in 1..=3{
-            new_league_from_template(&mut test_conn,&mut r_thread,&first).unwrap();
+        for _ in 1..=3 {
+            new_league_from_template(&mut test_conn, &mut r_thread, &first).unwrap();
         }
 
-        let mut league_stmt = test_conn.prepare("
+        let mut league_stmt = test_conn
+            .prepare(
+                "
             SELECT 
                 leagues.league_name, leagues.league_id
             FROM 
@@ -237,29 +242,56 @@ mod tests {
             ORDER BY 
                 leagues.league_id ASC;
         
-        ").unwrap();
-
-        let league_iter = league_stmt.query_map([],|row| {
-            Ok(
-                LeagueListing{
-                    name: row.get(0).unwrap(),
-                    id: row.get(1).unwrap()
-                }
+        ",
             )
-        }).unwrap();
+            .unwrap();
+
+        let league_iter = league_stmt
+            .query_map([], |row| {
+                Ok(LeagueListing {
+                    name: row.get(0).unwrap(),
+                    id: row.get(1).unwrap(),
+                })
+            })
+            .unwrap();
         let mut test_vec = Vec::new();
-        for listing in league_iter{
+        for listing in league_iter {
             test_vec.push(listing.unwrap())
-        };
+        }
 
         let test_vec_length = test_vec.len();
-        assert_eq!(test_vec_length,3);
-        for i in 1..=3{
-            let test_string = format!("PCL_{}",i);
+        assert_eq!(test_vec_length, 3);
+        for i in 1..=3 {
+            let test_string = format!("PCL_{}", i);
             let current_listing = &test_vec[i - 1];
-            assert_eq!(current_listing.name,test_string)
+            assert_eq!(current_listing.name, test_string)
+        }
+        drop(league_stmt);
+        let mut all_league_wrappers = get_all_leagues_from_db(&mut test_conn);
+        assert_eq!(all_league_wrappers.len(), 3);
+        let mut current_league = &mut all_league_wrappers.remove(0).league;
+        assert_eq!(current_league.name, "PCL_1");
+        assert_eq!(current_league.league_id, 1);
+        load_teams_from_sql(
+            current_league.league_id,
+            &mut current_league,
+            &mut test_conn,
+        )
+        .unwrap();
+        assert_eq!(current_league.teams.len(), 8);
+        let first_team = current_league.teams.get(0).unwrap();
+        //Next we check the team's player pools to make sure they have all the players.
+        assert_eq!(first_team.lineup.len(), 8);
+        assert_eq!(first_team.bench.len(), 5);
+        assert_eq!(first_team.starting_pitching.len(), 5);
+        match &first_team.bullpen {
+            Some(pen) => {
+                assert_eq!(pen.len(), 7)
+            }
+            None => match current_league.era {
+                Era::Ancient => {}
+                Era::Modern => panic!("Expected a bullpen for a modern team")
+            },
         }
     }
-
-    
 }

@@ -75,10 +75,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
                 league_check(conn, thread, choice).unwrap();
                 Ok(())
             }
-            MenuInput::LoadLeagueFromTemplate => {
-                load_new_template(conn, thread)
-                
-            }
+            MenuInput::LoadLeagueFromTemplate => load_new_template(conn, thread),
         },
 
         Err(message) => inquire_check(message),
