@@ -7,3 +7,5 @@ The program also creates a folder for each league, and in each league folder a p
 # Scheduling and Issues
 
 The plan is to enable schedule generation in the program as well, however this has turned out to be tricky to solve, so the option to generate a schedule is currently commented out untill a solution is implemented.  The program will also not work if it is run in a folder that does not allow writing inside.
+
+If you would like to generate a Deadball like to an Excel workbook, please [consider my other repo.](https://github.com/DoctorBubs/Deadball_WorkBook_Generator/tree/main)
