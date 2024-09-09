@@ -147,8 +147,8 @@ pub struct Player {
     pub b_traits: BTraits,
     pub pitcher_trait: Option<PitcherTrait>,
     pub trade_value: i32,
-    pub team_id: i64,
-    pub player_id: i64,
+    pub team_id : i64,
+    pub player_id : i64
 }
 
 impl Player {
@@ -335,6 +335,7 @@ impl Player {
                 }
             }
         };
+        // Since we don't know what the team_id or player_id will be in the database, we set both to 0 temporarily.
         let team_id = 0;
         let player_id = 0;
         Player {
@@ -350,7 +351,7 @@ impl Player {
             pitcher_trait,
             trade_value,
             team_id,
-            player_id,
+            player_id
         }
     }
 }

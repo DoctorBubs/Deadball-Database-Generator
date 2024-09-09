@@ -39,8 +39,8 @@ pub struct Series {
 impl Series {
     /// When given a vector of ints, this function returns true if the series home team and away team id are no in the vector.
     fn is_valid(&self, forbidden_numbers: &HashMap<i64, bool>) -> bool {
-        forbidden_numbers.get(&self.home_team_id).is_none()
-            & forbidden_numbers.get(&self.away_team_id).is_none()
+        (forbidden_numbers.get(&self.home_team_id).is_none())
+            & (forbidden_numbers.get(&self.away_team_id).is_none())
     }
 }
 fn new_series(home_team_id: i64, away_team_id: i64, series_length: i32) -> Series {
@@ -80,7 +80,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
             .enumerate()
             .choose(&mut thread_rng())
             .unwrap();
-
+        // And rempove it from alll series.
         let first_series = all_series.remove(i);
         // And add the series home team and away team id to the forbidden numbers.
         forbidden_numbers.insert(first_series.home_team_id, true);
@@ -90,38 +90,37 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
 
         //We loops from 1 to matchup_per_round. This previously checked the length of the new round, however this casued bugs that loopingl ike this might fix
         loop {
-            // We create an index variable.
-
-            // We clone series again.
-            //let series_clone = all_series.clone();
+            // If we havce enough series in the round, we brea
             if new_round_vec.len() as i32 == series_per_round{
-                println!("Round Generated");
+                println!("Round generated succcsfully");
                 break
             }
             let filtered_series_listing: Vec<SeriesListing> = all_series
                 .iter()
                 // We set the iter to enumerate, as we need the index to generate a SeriesListing.
                 .enumerate()
-                //From the clone we map to create a series listing. The listing contains an index, which represents the index of the series in all series
+                //From the clone we map to create a series listing. The listing contains an index, which represents the index of the series in all series.
                 .map(|(index, series)| SeriesListing { series, index })
                 // We then filter for only series listing that series is valid based off the current forbidden numbers
                 .filter(|x| x.series.is_valid(&forbidden_numbers))
                 // And we collect the new vector.
                 .collect();
-            // We select a random series listing  and it's index
             
+            //If there are no valid series listing, we panic.
+            if filtered_series_listing.is_empty(){
+                panic!("No Valid series left to put in round");
+            }
+            // We choose a series listing from filtered series listing
             let (_i, current_series_listing) = filtered_series_listing
                 .iter()
                 .enumerate()
                 .choose(&mut thread_rng())
                 .unwrap();
-            if filtered_series_listing.is_empty(){
-                panic!("Error generating round, no valid matchups remain")
-            }
-            // We take the series listing index
-            let current_index = current_series_listing.index;
+            
+            
+            
             // And use that index to get the series from all_series
-            let current_series = all_series.remove(current_index);
+            let current_series = all_series.remove(current_series_listing.index);
 
             // We add the series home and away team ids to the forbidden numbers.
             forbidden_numbers.insert(current_series.home_team_id, true);
@@ -153,7 +152,7 @@ pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i
         .fold(Vec::new(), |mut acc, e| {
             println!("{:?}",e);
             home_matchups_created += 1;
-            for _ in 0..home_series {
+            for _ in 1..=home_series {
                 let gen_series = new_series(e[0], e[1], series_length);
                 acc.push(gen_series)
             }
