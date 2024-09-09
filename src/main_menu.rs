@@ -11,13 +11,13 @@ use crate::{
 pub enum LoadLeagueInput {
     EditLeague(EditLeagueInput),
     RefreshLeague,
-    ViewSchedule,
+    //ViewSchedule,
 }
 
 #[derive(Copy, Clone, Debug)]
 pub enum EditLeagueInput {
     CreateNewTeam,
-    CreateSchedule,
+    //CreateSchedule,
 }
 // MenuInput contains all the valid choices a user can use at the main menu.
 #[derive(Copy, Clone, Debug)]
@@ -36,9 +36,9 @@ impl fmt::Display for MenuInput {
                 LoadLeagueInput::RefreshLeague => "Refresh an existing league.",
                 LoadLeagueInput::EditLeague(edit_input) => match edit_input {
                     EditLeagueInput::CreateNewTeam => "Create a new team.",
-                    EditLeagueInput::CreateSchedule => "Generate a schedule for an existing league",
+                    //EditLeagueInput::CreateSchedule => "Generate a schedule for an existing league",
                 },
-                LoadLeagueInput::ViewSchedule => "View schedule.",
+                //LoadLeagueInput::ViewSchedule => "View schedule.",
             },
             Self::LoadLeagueFromTemplate => "Create a new league from a template.",
             Self::Exit => "Exit",
@@ -50,13 +50,13 @@ impl fmt::Display for MenuInput {
 pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rusqlite::Error> {
     // We load a vector of the possible options a view can pick in the main menu.
     let new_team = EditLeagueInput::CreateNewTeam;
-    let new_sched = EditLeagueInput::CreateSchedule;
+    //let new_sched = EditLeagueInput::CreateSchedule;
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_team)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
-        MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
-        MenuInput::LoadExistingLeague(LoadLeagueInput::ViewSchedule),
+        //MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
+        //MenuInput::LoadExistingLeague(LoadLeagueInput::ViewSchedule),
         MenuInput::LoadLeagueFromTemplate,
         MenuInput::Exit,
     ];

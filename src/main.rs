@@ -319,12 +319,12 @@ mod tests {
                 Era::Modern => panic!("Expected a bullpen for a modern team"),
             },
         }
-        let series_per_matchup = 6;
-        let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
-        assert_eq!(
-            test_sched.len() as i32,
-            how_many_rounds(current_league.teams.len() as i32, series_per_matchup)
-        );
-        schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();
+        //let series_per_matchup = 6;
+        //let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
+        //assert_eq!(
+          //  test_sched.len() as i32,
+            //how_many_rounds(current_league.teams.len() as i32, series_per_matchup)
+        //);
+        //schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();
     }
 }

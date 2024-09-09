@@ -18,3 +18,6 @@
 /test.db
 old_tests
 >>>>>>> Stashed changes
+/src/schedule.rs
+/src/sched_view.rs
+.vscode
