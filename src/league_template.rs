@@ -8,16 +8,16 @@ use crate::{
     player::PlayerGender,
     team::{self, Team},
 };
-use chrono;
+
 use name_maker::Gender;
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
-
+/// Used to generate a team based off a template
 struct TeamTemplate {
     name: String,
     abrv: String,
 }
-
+/// Used to generate a League based off a template choosen by user.
 pub struct LeagueTemplate {
     name: String,
     era: Era,

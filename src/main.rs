@@ -104,7 +104,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         (),
     )?;
     /*  Leagues have a one to many relationship to teams. Each team has its own id, as well as a foreign key that references the league id.
-    Each team also has a name, and an abbreviation of their name. For example, if  you wanted to create a team named after the Los Angeles Dodgers, the abreviation would be LAD.
+    Each team also has a name, and an abbreviation of their name. For example, if  you wanted to create a team named after the Los Angeles Dodgers, the abbreviation would be LAD.
     If a team is generated via the program, the program will not let you have multiple teams in the same league with the same name and/or abbreviation.
     Teams also have a team score, which is a number that summarizes how good a team is based off the quality of their players, as well as current wins and losses*/
     conn.execute(
@@ -119,7 +119,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
-    /*  The last table to create is the players tables. Teams have a one to many relationship with players, with each player beloning to one team
+    /*  The last table to create is the players tables. Teams have a one to many relationship with players, with each player belonging to one team
         Each player has a unique id, and a foreign key team_id which references the id of the team the player belongs to
 
 
@@ -136,7 +136,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              obt_mod INTEGER NOT NULL, --OBT Modifier, which is used to calculate a players on base target by addition to a player batter target
              obt INTEGER NOT NULL, -- On base Target, indicates how often a player get's on base. Correlates to a player on base percentage in real life.
              PD TEXT , -- If a player is a pitcher, they are assigned a pitch die, which represents the stand rpg die, E.G. d12, d4. Pitch die can be negative.
-             pd_int INTEGER , /*If a player has a pitch die, PD_int represents the outcome of a pitch die roll that is the fartherst away from 0.
+             pd_int INTEGER , /*If a player has a pitch die, PD_int represents the outcome of a pitch die roll that is the farthest away from 0.
              For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
             */
              pitcher_trait TEXT , --Pitchers
@@ -151,7 +151,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
          )",
         (),
     )?;
-
+    // We also generate a season table.
     conn.execute(
         "CREATE TABLE IF NOT EXISTS seasons(
 
@@ -162,7 +162,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         FOREIGN KEY(champion_id) REFERENCES teams(team_id))",
         (),
     )?;
-
+    // As well as a table of rounds.
     conn.execute(
         "CREATE TABLE IF NOT EXISTS rounds(
         round_id INTEGER PRIMARY KEY,
@@ -171,7 +171,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
     )",
         (),
     )?;
-
+    // Ans series that are part of a round.
     conn.execute(
         "CREATE TABLE IF NOT EXISTS series(
     series_id INTEGER PRIMARY KEY,
@@ -184,6 +184,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
     )",
         (),
     )?;
+    // And games that are part of a series.
     conn.execute(
         "CREATE TABLE IF NOT EXISTS games(
         game_id INTEGER PRIMARY KEY,
@@ -224,19 +225,19 @@ fn player_pool_test(input: &Vec<Player>, team_id: i64, for_pitchers: bool) {
         assert_eq!(player_pd_test(player), for_pitchers)
     }
 }
-
-fn how_many_rounds(number_of_teams: i32, series_per_matchup: i32) -> i32 {
-    (number_of_teams - 1) * series_per_matchup
-}
+/* 
+//fn how_many_rounds(number_of_teams: i32, series_per_matchup: i32) -> i32 {
+   // (number_of_teams - 1) * series_per_matchup
+}*/
 
 #[cfg(test)]
 mod tests {
 
-    use fmt::format;
-    use itertools::all;
+   
     use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
-    use schedule::{new_schedule, schedule_to_sql};
+    
+    /// Used to test Leagues in database.
     struct LeagueListing {
         name: String,
         id: i64,
@@ -245,14 +246,19 @@ mod tests {
 
     #[test]
     fn generate_db() {
+        // WARNING: This will automatically fail if there is a test.db in the folder, as well as if there are folders named PCL_1,PCL_2,or PCL_3.
+
+        // We create a test database
         let mut test_conn = load_database("test.db").unwrap();
         let mut r_thread = rand::thread_rng();
+        // And get a league template.
         let templates = load_league_templates();
         let first = &templates[0];
+        // We use the template to create a new league in the database multiple times
         for _ in 1..=3 {
             new_league_from_template(&mut test_conn, &mut r_thread, &first).unwrap();
         }
-
+        // We query for the league ids and names.
         let mut league_stmt = test_conn
             .prepare(
                 "
@@ -267,6 +273,7 @@ mod tests {
             )
             .unwrap();
 
+        // And use the data to create a vector of league listing.
         let league_iter = league_stmt
             .query_map([], |row| {
                 Ok(LeagueListing {
@@ -279,36 +286,48 @@ mod tests {
         for listing in league_iter {
             test_vec.push(listing.unwrap())
         }
-
+        // We test to see if the database contains the number of leagues we expect
         let test_vec_length = test_vec.len();
         assert_eq!(test_vec_length, 3);
+        // As well as if they fit the template name pattern we expect as wel
         for i in 1..=3 {
             let test_string = format!("PCL_{}", i);
             let current_listing = &test_vec[i - 1];
             assert_eq!(current_listing.name, test_string)
         }
+        // We drop the stmt so we can use conn later.
         drop(league_stmt);
+        // We load all the leagues in the database as LeagueWrappers.
         let mut all_league_wrappers = get_all_leagues_from_db(&mut test_conn);
+        // And check to make suree the number is what we are expecting
         assert_eq!(all_league_wrappers.len(), 3);
+        
+        // We select the first league in the vector.
         let mut current_league = &mut all_league_wrappers.remove(0).league;
+        // And check that it's name and league_id are what we expect.
         assert_eq!(current_league.name, "PCL_1");
         assert_eq!(current_league.league_id, 1);
+        // Next, we load the the teams in the league from the databasem which are inserted into the league struct.
         load_teams_from_sql(
             current_league.league_id,
             &mut current_league,
             &mut test_conn,
         )
         .unwrap();
+        // We test to make sure the length of league.teams is what we expect.
         assert_eq!(current_league.teams.len(), 8);
+        // Next, we select the 
         let first_team = current_league.teams.get(0).unwrap();
         let first_team_id = first_team.team_id;
-        //Next we check the team's player pools to make sure they have all the players.
+        //Next we check the team's player pools to make sure they have all the players we expect.
         assert_eq!(first_team.lineup.len(), 8);
+        // And then check that the player structs data matches what we epxect.
         player_pool_test(&first_team.lineup, first_team_id, false);
         assert_eq!(first_team.bench.len(), 5);
         player_pool_test(&first_team.bench, first_team_id, false);
         assert_eq!(first_team.starting_pitching.len(), 5);
         player_pool_test(&first_team.starting_pitching, first_team_id, true);
+        // For bullpen, there are multiple steps, as Ancient teams do not have a bullpen.
         match &first_team.bullpen {
             Some(pen) => {
                 assert_eq!(pen.len(), 7);
@@ -319,12 +338,12 @@ mod tests {
                 Era::Modern => panic!("Expected a bullpen for a modern team"),
             },
         }
-        //let series_per_matchup = 6;
-        //let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
-        //assert_eq!(
-          //  test_sched.len() as i32,
-            //how_many_rounds(current_league.teams.len() as i32, series_per_matchup)
-        //);
-        //schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();
+        /*let series_per_matchup = 6;
+        /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
+        assert_eq!(
+            test_sched.len() as i32,
+            how_many_rounds(current_league.teams.len() as i32, series_per_matchup)
+        );
+        schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();*/
     }
 }
