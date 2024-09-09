@@ -91,10 +91,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
         //We loops from 1 to matchup_per_round. This previously checked the length of the new round, however this casued bugs that loopingl ike this might fix
         loop {
             // If we havce enough series in the round, we brea
-            if new_round_vec.len() as i32 == series_per_round{
-                println!("Round generated succcsfully");
-                break
-            }
+            
             let filtered_series_listing: Vec<SeriesListing> = all_series
                 .iter()
                 // We set the iter to enumerate, as we need the index to generate a SeriesListing.
@@ -105,10 +102,11 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
                 .filter(|x| x.series.is_valid(&forbidden_numbers))
                 // And we collect the new vector.
                 .collect();
-            
+
             //If there are no valid series listing, we panic.
-            if filtered_series_listing.is_empty(){
-                panic!("No Valid series left to put in round");
+            if filtered_series_listing.is_empty() {
+                println!("Round Created with {} series",new_round_vec.len());
+                break;
             }
             // We choose a series listing from filtered series listing
             let (_i, current_series_listing) = filtered_series_listing
@@ -116,10 +114,8 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
                 .enumerate()
                 .choose(&mut thread_rng())
                 .unwrap();
-            
-            
-            
-            // And use that index to get the series from all_series
+
+            // We get the current series from all series based off the current_series_listing_index.
             let current_series = all_series.remove(current_series_listing.index);
 
             // We add the series home and away team ids to the forbidden numbers.
@@ -130,7 +126,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
         }
         // Once the vector is full, we use it to create a new round.
         let new_round = Round {
-            series: new_round_vec
+            series: new_round_vec,
         };
         // We then add the round to the result.
         result.push(new_round);
@@ -141,30 +137,32 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
 
 pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i32) -> Vec<Round> {
     let ids: Vec<i64> = teams.iter().map(|team| team.team_id).collect();
-    let series_per_round = (teams.len() / 2) as i32; 
+    let series_per_round = (teams.len() / 2) as i32;
     let home_series = series_per_matchup / 2;
-    println!("home series = {}",home_series);
-    let mut home_matchups_created = 0;
+    println!("home series = {}", home_series);
+
     let all_series: Vec<Series> = ids
         .into_iter()
         // We create a permutation of home team and away id.
         .permutations(2)
-        .fold(Vec::new(), |mut acc, e| {
-            println!("{:?}",e);
-            home_matchups_created += 1;
-            for _ in 1..=home_series {
-                let gen_series = new_series(e[0], e[1], series_length);
-                acc.push(gen_series)
-            }
-            acc
-        });
-    println!("home_matchups_created = {}",home_matchups_created );
-    println!("Total Series Created = {}",all_series.len());
-    println!("Rounds neccesary to cover all_series = {}",all_series.len() / (teams.len() / 2));
-    let mut rounds = new_round_generator(all_series,series_per_round);
-    println!("rounds generated = {}",rounds.len());
-    rounds.shuffle(&mut thread_rng());
-    rounds
+        .map(|vec| new_series(vec[0], vec[1], series_length))
+        .collect();
+    for series in all_series.iter(){
+        println!("{} @ {}", series.home_team_id,series.away_team_id)
+    }
+    // println!("home_matchups_created = {}",home_matchups_created );
+    //println!("Total Series Created = {}",all_series.len());
+  
+    let mut result: Vec<Round> = Vec::new();
+    for _ in 0..(series_per_matchup / 2) {
+        let series_clone = all_series.clone();
+        let mut rounds = new_round_generator(series_clone, series_per_round);
+
+        rounds.shuffle(&mut thread_rng());
+        result.append(&mut rounds);
+    }
+    println!("Total Rounds generated = {}",result.len());
+    result
 }
 
 // Asks the user for a number. It ensures the number is positive, and if force_even is true ensures the number is even

@@ -319,7 +319,7 @@ mod tests {
                 Era::Modern => panic!("Expected a bullpen for a modern team"),
             },
         }
-        let series_per_matchup = 2;
+        let series_per_matchup = 6;
         let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(
             test_sched.len() as i32,
