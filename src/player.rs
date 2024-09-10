@@ -51,7 +51,7 @@ impl AgeCat {
     }
 }
 
-// Players can be either left handed or right hander, however batters may also be switch hitters. We use an enum to keep track.
+// Players can be either left handed or right handed, however batters may also be switch hitters. We use an enum to keep track.
 #[derive(Serialize, Deserialize, Debug)]
 pub enum Hand {
     R,
@@ -139,11 +139,11 @@ pub struct Player {
     pub age: i32,
     pub pos: String,
     pub hand: Hand,
-    pub bt: i32,        // BT is essentialy a players batting average.
+    pub bt: i32,        // BT is essentially a players batting average.
     pub obt_mod: i32,   // Used to calculate a players obt via summing with it's bt.'
     pub obt: i32,       // A player's obt is calculated by adding its bt + its obt_mod
-    pub pd: Option<PD>, // The main difference between a batter and pitcher is that pitchers have a base pitch die assocatied with themsleves, while batters do not.
-    // This is sumulated using an option.
+    pub pd: Option<PD>, // The main difference between a batter and pitcher is that pitchers have a base pitch die associated with themselves, while batters do not.
+    // This is simulated using an option.
     pub b_traits: BTraits,
     pub pitcher_trait: Option<PitcherTrait>,
     pub trade_value: i32,
@@ -167,8 +167,8 @@ impl Player {
             None => false,
         }*/
     }
-    /* For lineup purposes, this calulates if a player should be batting at or near the top of the lineup.
-    This is mostly based off a players on base target, with a slight perefernce to players with low power and speed */
+    /* For lineup purposes, this calculates if a player should be batting at or near the top of the lineup.
+    This is mostly based off a players on base target, with a slight preference to players with low power and speed */
 
     pub fn get_leadoff_score(&self) -> i32 {
         match self.b_traits.get_above_average() {
@@ -186,7 +186,7 @@ impl Player {
     }
 
     // We also calculate how good a player would be at getting rbi.
-    // higher bt and positive power and contact traits are preffered.
+    // higher bt and positive power and contact traits are preferred.
     pub fn get_rbi_score(&self) -> i32 {
         self.bt + self.b_traits.get_rbi_score()
     }
@@ -223,7 +223,7 @@ impl Player {
         team_id: i64,
         team_spot: TeamSpot,
     ) -> Result<(), rusqlite::Error> {
-        // We destruce the players BTraits to make it easier to instert into the database
+        // We deconstruct the players BTraits to make it easier to insert into the database
         self.team_id = team_id;
         let BTraits {
             contact,

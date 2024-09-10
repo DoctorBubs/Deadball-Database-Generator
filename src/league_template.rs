@@ -14,7 +14,7 @@ struct TeamTemplate {
     name: String,
     abrv: String,
 }
-/// Used to generate a League based off a template choosen by user.
+/// Used to generate a League based off a template chosen by user.
 pub struct LeagueTemplate {
     name: String,
     era: Era,
@@ -26,7 +26,7 @@ pub struct LeagueTemplate {
 
 impl fmt::Display for LeagueTemplate {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.name)
+        write!(f, "[ name:{}, era:{}, gender:{}]", self.name,self.era,self.gender)
     }
 }
 pub fn load_league_templates() -> Vec<LeagueTemplate> {
@@ -87,18 +87,18 @@ pub fn new_league_from_template(
         let sql_result = value?;
         max_id_vec.push(sql_result);
     }
-    // To determine the league name, we check ifg htere are any id's
+    // To determine the league name, we check if there are any id's.
     let league_name = match max_id_vec.is_empty() {
         false => {
-            // If there alreeady leagues i nteh database, first we retireve the id number.
+            // If there already leagues in the database, first we retrieve the id number.
             let mut id_num = max_id_vec[0];
             let result;
-            // We then query for a vector of leauge names
+            // We then query for a vector of league names
             let name_hash = check_name_hash(conn)?;
             loop {
                 let potential_name = format!("{}_{}", template.name, id_num + 1);
                 match name_hash.get(&potential_name).is_none() {
-                    //If there is already a league saved with the file naem, we add 1 to id_num
+                    //If there is already a league saved with the file name, we add 1 to id_num
                     false => id_num += 1,
                     //Otherwise, we
                     true => {
@@ -116,13 +116,13 @@ pub fn new_league_from_template(
     let era_json = serde_json::to_string(&template.era).unwrap();
 
     let gender_json = serde_json::to_string(&template.gender).unwrap();
-    // And we create a new entry in the sql databse.
+    // And we create a new entry in the sql database.
     let _league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
     )?;
 
-    // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
+    // Via last_insert_rowid, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
 
     let mut new_league = League::new(&league_name, template.gender, template.era, league_id);

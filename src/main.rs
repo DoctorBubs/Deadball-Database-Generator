@@ -295,7 +295,7 @@ mod tests {
         drop(league_stmt);
         // We load all the leagues in the database as LeagueWrappers.
         let mut all_league_wrappers = get_all_leagues_from_db(&mut test_conn);
-        // And check to make suree the number is what we are expecting
+        // And check to make sure the number is what we are expecting
         assert_eq!(all_league_wrappers.len(), 3);
 
         // We select the first league in the vector.
@@ -303,7 +303,7 @@ mod tests {
         // And check that it's name and league_id are what we expect.
         assert_eq!(current_league.name, "PCL_1");
         assert_eq!(current_league.league_id, 1);
-        // Next, we load the the teams in the league from the databasem which are inserted into the league struct.
+        // Next, we load the the teams in the league from the database which are inserted into the league struct.
         load_teams_from_sql(
             current_league.league_id,
             &mut current_league,
@@ -317,7 +317,7 @@ mod tests {
         let first_team_id = first_team.team_id;
         //Next we check the team's player pools to make sure they have all the players we expect.
         assert_eq!(first_team.lineup.len(), 8);
-        // And then check that the player structs data matches what we epxect.
+        // And then check that the player structs data matches what we expect.
         player_pool_test(&first_team.lineup, first_team_id, false);
         assert_eq!(first_team.bench.len(), 5);
         player_pool_test(&first_team.bench, first_team_id, false);

@@ -14,7 +14,11 @@ For example,when using a pitcher with a PD of D12, a 12 sided die is rolled, and
 Inversely, a pitcher with a PD of -D4 rolls a 4 sided die, the the number generated is negative.
 */
 
-// Via Serde, the pitch die is serialized via traditional dice roation
+
+
+
+
+// Via Serde, the pitch die is serialized via traditional dice notation
 pub enum PD {
     #[serde(rename = "d20")]
     D20,

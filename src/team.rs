@@ -110,7 +110,7 @@ impl Team {
         for starter in &mut self.starting_pitching {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
         }
-        // As not every team has a bullpen, we do a check to make suyre.
+        // As not every team has a bullpen, we do a check to make sure.
         match &mut self.bullpen {
             Some(pen) => {
                 for reliever in pen {
@@ -150,7 +150,7 @@ impl fmt::Display for Team {
     }
 }
 
-// Takea vector of players, and reduces it to the sum of how much they contribute to a team score.
+// Take a vector of players, and reduces it to the sum of how much they contribute to a team score.
 // Batters contribution is based off their BT, while pitchers is based off their pitch dice.
 fn team_score_from_vec(vec: &[Player]) -> i32 {
     vec.iter()
@@ -201,7 +201,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
         FROM players 
         WHERE team_id = ?1"
     )?;
-    // We use the statment to query the database
+    // We use the statement to query the database
     let player_iter = stmt.query_map([team.team_id], |row| {
         //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
         Ok(PlayerWrapper {
@@ -285,7 +285,7 @@ fn new_bench(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Play
     new_player_vec(base, gender, thread, BatterQuality::Farmhand, era)
 }
 
-// The ancienct and modern era have different definitions of what a pitcher is. Modern era pitchers can be either starters or relievers, while the ancient era does not make the distinction.
+// The ancient and modern era have different definitions of what a pitcher is. Modern era pitchers can be either starters or relievers, while the ancient era does not make the distinction.
 //Thus, Modern pitchers in the rotation are marked as SP, while ancient are just P
 fn new_rotation(gender: PlayerGender, thread: &mut ThreadRng, era: Era) -> Vec<Player> {
     let base = match era {
@@ -367,7 +367,7 @@ pub fn add_team_check(
 
     Ok(())
 }
-// Prompts the user to create a new team, while also ensure that the user does not use the same name or abreviation for a team in the same league more than once.
+// Prompts the user to create a new team, while also ensure that the user does not use the same name or abbreviation for a team in the same league more than once.
 pub fn add_new_team(
     league: &mut League,
     thread: &mut ThreadRng,
@@ -417,7 +417,7 @@ pub fn add_new_team(
             Err(message) => return inquire_check(message),
         };
         /* The league takes the new team name and abbreviation created.  If there is already a team with the same name and/or abbreviation, an error is returned and the user is prompted to enter in something else.
-            There is also a check to see if there is an error adding the team to the database, and returns a nerror if it does.
+            There is also a check to see if there is an error adding the team to the database, and returns an error if it does.
             Otherwise, the function will return OK.
         */
         match league.new_team(&abrv, &team_name, thread, league_id, conn) {
