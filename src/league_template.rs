@@ -75,14 +75,13 @@ pub fn load_league_templates() -> Vec<LeagueTemplate> {
         ],
     }]
 }
-
+/// Takes a league template, and creates a league based off the template that is added to the database.
 pub fn new_league_from_template(
     conn: &mut Connection,
     thread: &mut ThreadRng,
     template: &LeagueTemplate,
 ) -> Result<(), rusqlite::Error> {
-    // let date_string = chrono::offset::Local::now().to_string();
-    //let league_name = format!("{}_{}",template.name,date_string);
+ 
 
     // First, we query to see what league has the largest id.
     let mut max_id_stmt = conn.prepare("SELECT COUNT(leagues.league_id) FROM leagues")?;
