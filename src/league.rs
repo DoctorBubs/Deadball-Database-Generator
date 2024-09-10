@@ -417,16 +417,15 @@ pub fn load_league(
     match edit_input {
         EditLeagueInput::CreateNewTeam => {
             add_new_team(&mut league, thread, conn, league_id, true).unwrap()
-        }
-        //EditLeagueInput::CreateSchedule => {
-         //   match league.teams.len() % 2 == 0 {
+        } //EditLeagueInput::CreateSchedule => {
+          //   match league.teams.len() % 2 == 0 {
           //      true => save_schedule_sql(conn, &league, thread).unwrap(),
-             //   false => {
-               //     println!("League must have an even number of teams");
-                 //   save_league(&league, conn, thread).unwrap();
-               // }
-            //};
-        //}
+          //   false => {
+          //     println!("League must have an even number of teams");
+          //   save_league(&league, conn, thread).unwrap();
+          // }
+          //};
+          //}
     };
     Ok(())
 }
@@ -495,12 +494,10 @@ pub fn league_check(
                     println!("Refreshing league.");
                     save_league(&select.league, conn, thread).unwrap();
                     Ok(())
-                }
-
-                //LoadLeagueInput::ViewSchedule => {
+                } //LoadLeagueInput::ViewSchedule => {
                   //  view_schedule(&select.league, conn)?;
-                   // Ok(())
-                //}
+                  // Ok(())
+                  //}
             },
             Err(message) => inquire_check(message),
         }

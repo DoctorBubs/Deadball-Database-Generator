@@ -64,7 +64,7 @@ struct SeriesListing<'a> {
 }
 
 // Generates a schedule based off a vec of series
-pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -> Vec<Round> {
+pub fn new_round_generator(mut all_series: Vec<Series>, _series_per_round: i32) -> Vec<Round> {
     let mut result = vec![];
 
     // We loop untill the length of all series is 0
@@ -91,7 +91,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
         //We loops from 1 to matchup_per_round. This previously checked the length of the new round, however this casued bugs that loopingl ike this might fix
         loop {
             // If we havce enough series in the round, we brea
-            
+
             let filtered_series_listing: Vec<SeriesListing> = all_series
                 .iter()
                 // We set the iter to enumerate, as we need the index to generate a SeriesListing.
@@ -105,7 +105,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
 
             //If there are no valid series listing, we panic.
             if filtered_series_listing.is_empty() {
-                println!("Round Created with {} series",new_round_vec.len());
+                println!("Round Created with {} series", new_round_vec.len());
                 break;
             }
             // We choose a series listing from filtered series listing
@@ -135,7 +135,7 @@ pub fn new_round_generator(mut all_series: Vec<Series>, series_per_round: i32) -
     result
 }
 
-pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i32) -> Vec<Round> {
+pub fn new_schedule(teams: &[Team], series_length: i32, series_per_matchup: i32) -> Vec<Round> {
     let ids: Vec<i64> = teams.iter().map(|team| team.team_id).collect();
     let series_per_round = (teams.len() / 2) as i32;
     let home_series = series_per_matchup / 2;
@@ -147,12 +147,12 @@ pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i
         .permutations(2)
         .map(|vec| new_series(vec[0], vec[1], series_length))
         .collect();
-    for series in all_series.iter(){
-        println!("{} @ {}", series.home_team_id,series.away_team_id)
+    for series in all_series.iter() {
+        println!("{} @ {}", series.home_team_id, series.away_team_id)
     }
     // println!("home_matchups_created = {}",home_matchups_created );
     //println!("Total Series Created = {}",all_series.len());
-  
+
     let mut result: Vec<Round> = Vec::new();
     for _ in 0..(series_per_matchup / 2) {
         let series_clone = all_series.clone();
@@ -161,7 +161,7 @@ pub fn new_schedule(teams: &Vec<Team>, series_length: i32, series_per_matchup: i
         rounds.shuffle(&mut thread_rng());
         result.append(&mut rounds);
     }
-    println!("Total Rounds generated = {}",result.len());
+    println!("Total Rounds generated = {}", result.len());
     result
 }
 
@@ -213,8 +213,8 @@ pub fn schedule_to_sql(
             .unwrap();
         let round_id = conn.last_insert_rowid();
         for series in round.series {
-            let home_id = series.home_team_id as i64;
-            let away_id = series.away_team_id as i64;
+            let home_id = series.home_team_id;
+            let away_id = series.away_team_id;
             conn.execute(
                 "INSERT INTO series(round_id,home_team_id,away_team_id) VALUES(?1, ?2, ?3)",
                 [round_id, home_id, away_id],

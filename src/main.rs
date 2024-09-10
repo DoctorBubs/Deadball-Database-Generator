@@ -44,7 +44,7 @@ pub fn inquire_check<E>(err: InquireError) -> Result<(), E> {
 }
 
 // Takse a vec of type e,  returns a hash map of each value with a result of true.
-pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &Vec<E>) -> HashMap<&E, bool> {
+pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &[E]) -> HashMap<&E, bool> {
     let mut result = HashMap::new();
     for value in vec.iter() {
         result.insert(value, true);
@@ -54,7 +54,7 @@ pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &Vec<E>) -> HashMap<&
 fn main() -> Result<(), rusqlite::Error> {
     // First, we load the databsae, or create one if it doesn't exist.
     let default_path = "deadball.db";
-    let conn_load = load_database(&default_path);
+    let conn_load = load_database(default_path);
     let mut conn = match conn_load {
         Ok(connection) => connection,
         Err(_) => {
@@ -212,20 +212,17 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
 
 // Tests if a player has a pd.
 fn player_pd_test(player: &Player) -> bool {
-    match player.pd {
-        Some(_) => true,
-        None => false,
-    }
+    player.pd.is_some()
 }
 
-fn player_pool_test(input: &Vec<Player>, team_id: i64, for_pitchers: bool) {
+fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
     for player in input.iter() {
         assert_eq!(player.bt + player.obt_mod, player.obt);
         assert_eq!(player.team_id, team_id);
         assert_eq!(player_pd_test(player), for_pitchers)
     }
 }
-/* 
+/*
 //fn how_many_rounds(number_of_teams: i32, series_per_matchup: i32) -> i32 {
    // (number_of_teams - 1) * series_per_matchup
 }*/
@@ -233,10 +230,9 @@ fn player_pool_test(input: &Vec<Player>, team_id: i64, for_pitchers: bool) {
 #[cfg(test)]
 mod tests {
 
-   
     use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
-    
+
     /// Used to test Leagues in database.
     struct LeagueListing {
         name: String,
@@ -301,7 +297,7 @@ mod tests {
         let mut all_league_wrappers = get_all_leagues_from_db(&mut test_conn);
         // And check to make suree the number is what we are expecting
         assert_eq!(all_league_wrappers.len(), 3);
-        
+
         // We select the first league in the vector.
         let mut current_league = &mut all_league_wrappers.remove(0).league;
         // And check that it's name and league_id are what we expect.
@@ -316,7 +312,7 @@ mod tests {
         .unwrap();
         // We test to make sure the length of league.teams is what we expect.
         assert_eq!(current_league.teams.len(), 8);
-        // Next, we select the 
+        // Next, we select the
         let first_team = current_league.teams.get(0).unwrap();
         let first_team_id = first_team.team_id;
         //Next we check the team's player pools to make sure they have all the players we expect.

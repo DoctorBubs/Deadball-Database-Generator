@@ -1,15 +1,12 @@
 use core::fmt;
-use std::{cmp::max, thread::Thread};
 
 use crate::{
     era::Era,
     inquire_check,
-    league::{check_name_hash, check_name_vec, save_league, AddTeamError, League},
+    league::{check_name_hash, save_league, League},
     player::PlayerGender,
-    team::{self, Team},
 };
 
-use name_maker::Gender;
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 /// Used to generate a team based off a template
@@ -81,11 +78,9 @@ pub fn new_league_from_template(
     thread: &mut ThreadRng,
     template: &LeagueTemplate,
 ) -> Result<(), rusqlite::Error> {
- 
-
     // First, we query to see what league has the largest id.
     let mut max_id_stmt = conn.prepare("SELECT COUNT(leagues.league_id) FROM leagues")?;
-    let max_id_iter = max_id_stmt.query_map([], |row| Ok(row.get(0)?))?;
+    let max_id_iter = max_id_stmt.query_map([], |row| row.get(0))?;
     // We then put the max id in a vector
     let mut max_id_vec: Vec<i64> = Vec::new();
     for value in max_id_iter {
@@ -122,7 +117,7 @@ pub fn new_league_from_template(
 
     let gender_json = serde_json::to_string(&template.gender).unwrap();
     // And we create a new entry in the sql databse.
-    let league_entry = conn.execute(
+    let _league_entry = conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
     )?;
@@ -141,10 +136,9 @@ pub fn new_league_from_template(
             league_id,
             conn,
         );
-        match team_add {
-            Err(message) => panic!("{:?}", message),
-            _ => {}
-        }
+        if let Err(message) = team_add {
+            panic!("{:?}", message)
+        };
     }
     save_league(&new_league, conn, thread).unwrap();
     Ok(())
