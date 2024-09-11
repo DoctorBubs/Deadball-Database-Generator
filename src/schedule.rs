@@ -7,7 +7,6 @@ use itertools::Itertools;
 //use serde::ser;
 use inquire::{CustomType, InquireError};
 use rand::prelude::IteratorRandom;
-use rand::rngs::ThreadRng;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use rusqlite::Connection;
@@ -231,11 +230,7 @@ pub fn schedule_to_sql(
     Ok(())
 }
 
-pub fn save_schedule_sql(
-    conn: &mut Connection,
-    league: &League,
-    thread: &mut ThreadRng,
-) -> Result<(), rusqlite::Error> {
+pub fn save_schedule_sql(conn: &mut Connection, league: &League) -> Result<(), rusqlite::Error> {
     let sched_input = schedule_from_input(league);
     let sched = match sched_input {
         Ok(rounds) => rounds,

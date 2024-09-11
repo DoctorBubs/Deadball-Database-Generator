@@ -30,6 +30,7 @@ use crate::traits::Toughness;
 use inquire::Confirm;
 use inquire::InquireError;
 use league::league_check;
+use league::EditLeagueError;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
@@ -52,7 +53,7 @@ pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &[E]) -> HashMap<&E, 
     }
     result
 }
-fn main() -> Result<(), rusqlite::Error> {
+fn main() -> Result<(), EditLeagueError> {
     // First, we load the databsae, or create one if it doesn't exist.
     let default_path = "deadball.db";
     let conn_load = load_database(default_path);

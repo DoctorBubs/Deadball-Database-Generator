@@ -59,12 +59,23 @@ impl fmt::Display for LeagueWrapper {
 }
 
 #[derive(Debug)]
-//Possible Errors that could arrise from adding a team to a league
-pub enum AddTeamError {
+//Possible Errors that could arise from editing a league.
+pub enum EditLeagueError {
     AbrvTaken,
     NameTaken,
     DatabaseError(rusqlite::Error),
     SerdeError(serde_json::Error),
+}
+
+impl fmt::Display for EditLeagueError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let text = match self {
+            Self::DatabaseError(message) => message.to_string(),
+            Self::SerdeError(message) => message.to_string(),
+            _ => "Invalid Team and/or Abbreviation".to_string(),
+        };
+        write!(f, "{}", text)
+    }
 }
 
 struct StandingWrapper {
@@ -204,12 +215,12 @@ impl League {
         thread: &mut ThreadRng,
         league_id: i64,
         conn: &mut Connection,
-    ) -> Result<(), AddTeamError> {
+    ) -> Result<(), EditLeagueError> {
         for team in &self.teams {
             if new_abrv == &team.abrv {
-                return Err(AddTeamError::AbrvTaken);
+                return Err(EditLeagueError::AbrvTaken);
             } else if new_name == &team.name {
-                return Err(AddTeamError::NameTaken);
+                return Err(EditLeagueError::NameTaken);
             };
         }
         // We create a new team
@@ -225,14 +236,12 @@ impl League {
         //new_team.team_id = team_id as i32;
         match team_enter_result {
             Ok(_) => (),
-            Err(message) => return Err(AddTeamError::DatabaseError(message)),
+            Err(message) => return Err(EditLeagueError::DatabaseError(message)),
         };
         //If all has gone well, we save the players that have been generated into the database
-        match new_team.save_players_sql(conn, new_team_id) {
-            Err(message) => return Err(message),
-            _ => {}
-        }
-        // And we inster the team struct into the league's team vector.
+
+        new_team.save_players_sql(conn, new_team_id)?;
+        // And we insert the team struct into the league's team vector.
         self.teams.push(new_team);
         Ok(())
     }
@@ -272,12 +281,15 @@ pub fn check_name_hash(conn: &Connection) -> Result<HashMap<String, bool>, rusql
 pub fn create_new_league(
     thread: &mut ThreadRng,
     conn: &mut Connection,
-) -> Result<(), rusqlite::Error> {
+) -> Result<(), EditLeagueError> {
     let _validator = MinLengthValidator::new(3);
 
     let league_name: String;
 
-    let taken_names = check_name_vec(conn)?;
+    let taken_names = match check_name_vec(conn) {
+        Ok(data) => data,
+        Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+    };
     // let mut taken_hash = HashMap::new();
     let taken_hash = vec_to_hash(&taken_names);
     //for name in taken_names.iter() {
@@ -319,14 +331,23 @@ pub fn create_new_league(
     // We then create a league struct.
 
     // We then serialize the era and jender to json.
-    let era_json = serde_json::to_string(&era).unwrap();
+    let era_json = match serde_json::to_string(&era) {
+        Ok(data) => data,
+        Err(message) => return Err(EditLeagueError::SerdeError(message)),
+    };
 
-    let gender_json = serde_json::to_string(&gender).unwrap();
+    let gender_json = match serde_json::to_string(&gender) {
+        Ok(gender) => gender,
+        Err(message) => return Err(EditLeagueError::SerdeError(message)),
+    };
     // And we create a new entry in the sql databse.
-    let _league_entry = conn.execute(
+    match conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
-    )?;
+    ) {
+        Ok(_) => {}
+        Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+    };
 
     // if league_entry.is_err() {
     // println!("Error creating a new league in the database.");
@@ -338,7 +359,10 @@ pub fn create_new_league(
     let mut new_league = League::new(&league_name, gender, era, league_id);
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
-    add_new_team(&mut new_league, thread, conn, league_id, true)
+    match add_new_team(&mut new_league, thread, conn, league_id, true) {
+        Ok(_) => Ok(()),
+        Err(message) => Err(EditLeagueError::DatabaseError(message)),
+    }
 }
 
 #[derive(Debug)]
@@ -421,12 +445,10 @@ pub fn load_league(
 
     // Now that we have loaded the existing league from the database, it is time to generate a new team or create a new schedule based off the input
     match edit_input {
-        EditLeagueInput::CreateNewTeam => {
-            add_new_team(&mut league, thread, conn, league_id, true).unwrap()
-        }
+        EditLeagueInput::CreateNewTeam => add_new_team(&mut league, thread, conn, league_id, true)?,
         EditLeagueInput::CreateSchedule => {
             match league.teams.len() % 2 == 0 {
-                true => save_schedule_sql(conn, &league, thread).unwrap(),
+                true => save_schedule_sql(conn, &league)?,
                 false => {
                     println!("League must have an even number of teams");
                     save_league(&league);

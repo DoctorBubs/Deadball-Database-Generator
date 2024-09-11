@@ -5,7 +5,10 @@ use rand::rngs::ThreadRng;
 use rusqlite::Connection;
 
 use crate::{
-    inquire_check, league::create_new_league, league_check, league_template::load_new_template,
+    inquire_check,
+    league::{create_new_league, EditLeagueError},
+    league_check,
+    league_template::load_new_template,
 };
 #[derive(Copy, Clone, Debug)]
 pub enum LoadLeagueInput {
@@ -47,7 +50,7 @@ impl fmt::Display for MenuInput {
     }
 }
 
-pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), rusqlite::Error> {
+pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), EditLeagueError> {
     // We load a vector of the possible options a view can pick in the main menu.
     let new_team = EditLeagueInput::CreateNewTeam;
     //let new_sched = EditLeagueInput::CreateSchedule;
@@ -72,8 +75,14 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
             // If the user selects exit, the function returns Ok, which exit the program
             MenuInput::Exit => Ok(()),
             //Both CreateNewTeam and RefreshLeague are used in the league check function, so a selection of either will call the function.
-            MenuInput::LoadExistingLeague(choice) => league_check(conn, thread, choice),
-            MenuInput::LoadLeagueFromTemplate => load_new_template(conn, thread),
+            MenuInput::LoadExistingLeague(choice) => match league_check(conn, thread, choice) {
+                Ok(_) => Ok(()),
+                Err(message) => Err(EditLeagueError::DatabaseError(message)),
+            },
+            MenuInput::LoadLeagueFromTemplate => match load_new_template(conn, thread) {
+                Ok(_) => Ok(()),
+                Err(message) => Err(EditLeagueError::DatabaseError(message)),
+            },
         },
 
         Err(message) => inquire_check(message),

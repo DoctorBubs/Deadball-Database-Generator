@@ -1,6 +1,6 @@
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
-use crate::league::AddTeamError;
+use crate::league::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
@@ -18,7 +18,6 @@ use name_maker::Gender;
 use name_maker::RandomNameGenerator;
 use rand::rngs::ThreadRng;
 use rand::Rng;
-use rusqlite::named_params;
 use rusqlite::Connection;
 
 use std::fmt;
@@ -256,17 +255,16 @@ impl Player {
         conn: &mut Connection,
         team_id: i64,
         team_spot: TeamSpot,
-    ) -> Result<(), AddTeamError> {
+    ) -> Result<(), EditLeagueError> {
         self.team_id = team_id;
         let p_serde = match self.get_serde(team_spot) {
             Ok(data) => data,
-            Err(message) => return Err(AddTeamError::SerdeError(message)),
+            Err(message) => return Err(EditLeagueError::SerdeError(message)),
         };
-        
-        
+
         let new_player_id = match p_serde.save_to_sql(conn) {
             Ok(num) => num,
-            Err(message) => return Err(AddTeamError::DatabaseError(message)),
+            Err(message) => return Err(EditLeagueError::DatabaseError(message)),
         };
         self.player_id = new_player_id;
         Ok(())

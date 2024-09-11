@@ -1,6 +1,6 @@
 use crate::b_traits::BTraits;
 use crate::inquire_check;
-use crate::league::AddTeamError;
+use crate::league::EditLeagueError;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
@@ -98,28 +98,23 @@ impl Team {
         &mut self,
         conn: &mut Connection,
         team_id: i64,
-    ) -> Result<(), AddTeamError> {
-        
+    ) -> Result<(), EditLeagueError> {
         for starter in &mut self.lineup {
             starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
-            
         }
 
         for bench in &mut self.bench {
             bench.save_sql(conn, team_id, TeamSpot::BenchHitter)?;
-           
         }
 
         for starter in &mut self.starting_pitching {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
-            
         }
         // As not every team has a bullpen, we do a check to make sure.
         match &mut self.bullpen {
             Some(pen) => {
                 for reliever in pen {
                     reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
-                    
                 }
             }
             None => (),
@@ -434,20 +429,20 @@ pub fn add_new_team(
         match league.new_team(&abrv, &team_name, thread, league_id, conn) {
             Err(message) => {
                 match message {
-                    AddTeamError::AbrvTaken => println!(
+                    EditLeagueError::AbrvTaken => println!(
                         "This league already has a team with that abbreviation, please try again."
                     ),
-                    AddTeamError::NameTaken => {
+                    EditLeagueError::NameTaken => {
                         println!("This league already has a team with that name, please try again.")
                     }
-                    AddTeamError::DatabaseError(message) => {
+                    EditLeagueError::DatabaseError(message) => {
                         println!("Error adding team to the data base, please check if the database file exists and has not been corrupted");
-                        println!("The error was:{}",message);
+                        println!("The error was:{}", message);
                         return Ok(());
                     }
-                    AddTeamError::SerdeError(message) => {
+                    EditLeagueError::SerdeError(message) => {
                         println!("Error serializing a league, please try again");
-                        println!("The error message was:{}.",message);
+                        println!("The error message was:{}.", message);
                         return Ok(());
                     }
                 };
