@@ -98,23 +98,28 @@ impl Team {
         &mut self,
         conn: &mut Connection,
         team_id: i64,
-    ) -> Result<(), rusqlite::Error> {
+    ) -> Result<(), AddTeamError> {
+        
         for starter in &mut self.lineup {
             starter.save_sql(conn, team_id, TeamSpot::StartingLineup)?;
+            
         }
 
         for bench in &mut self.bench {
             bench.save_sql(conn, team_id, TeamSpot::BenchHitter)?;
+           
         }
 
         for starter in &mut self.starting_pitching {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
+            
         }
         // As not every team has a bullpen, we do a check to make sure.
         match &mut self.bullpen {
             Some(pen) => {
                 for reliever in pen {
                     reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
+                    
                 }
             }
             None => (),
@@ -435,8 +440,14 @@ pub fn add_new_team(
                     AddTeamError::NameTaken => {
                         println!("This league already has a team with that name, please try again.")
                     }
-                    AddTeamError::DatabaseError => {
-                        println!("Error adding team to the data base, please try again.");
+                    AddTeamError::DatabaseError(message) => {
+                        println!("Error adding team to the data base, please check if the database file exists and has not been corrupted");
+                        println!("The error was:{}",message);
+                        return Ok(());
+                    }
+                    AddTeamError::SerdeError(message) => {
+                        println!("Error serializing a league, please try again");
+                        println!("The error message was:{}.",message);
                         return Ok(());
                     }
                 };

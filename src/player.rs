@@ -1,11 +1,12 @@
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
+use crate::league::AddTeamError;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
+use crate::player_serde::PlayerSerde;
 use crate::team::TeamSpot;
 use crate::traits::player_trait_option;
-use crate::player_serde::PlayerSerde;
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
 use crate::Era;
@@ -60,8 +61,6 @@ pub enum Hand {
 }
 
 impl Hand {
-   
-
     pub fn new(thread: &mut ThreadRng, quality: &impl PlayerQuality) -> Hand {
         let roll = thread.gen_range(1..=10);
         match roll {
@@ -211,15 +210,8 @@ impl Player {
         }
     }
 
-    
-    pub fn save_sql(
-        &mut self,
-        conn: &mut Connection,
-        team_id: i64,
-        team_spot: TeamSpot,
-    ) -> Result<(), rusqlite::Error> {
-        // We deconstruct the players BTraits to make it easier to insert into the database
-        self.team_id = team_id;
+    pub fn get_serde(&mut self, team_spot: TeamSpot) -> Result<PlayerSerde, serde_json::Error> {
+        //  self.team_id = team_id;
         let BTraits {
             contact,
             speed,
@@ -235,53 +227,47 @@ impl Player {
         let toughness_option = player_trait_option(toughness);
 
         let pd_int = self.pd.map(|die| die.to_int());
-        conn.execute(
-            "INSERT INTO players(
-                team_id,player_name,age,pos,hand,
-                bt,obt_mod,obt,
-                pd,pd_int,pitcher_trait,team_spot,
-                contact,defense,power,speed,toughness,trade_value) 
-            VALUES(:team_id, 
-                :player_name, 
-                :age, 
-                :pos, 
-                :hand, 
-                :bt, 
-                :obt_mod, 
-                :obt, 
-                :pd,
-                :pd_int, 
-                :pitcher_trait, 
-                :team_spot, 
-                :contact,
-                :defense,
-                :power,
-                :speed,
-                :toughness,
-                :trade_value
-            )",
-            named_params![
-                ":team_id": &team_id,
-                ":player_name":&self.name,
-                ":age":&self.age.to_string(),
-                ":pos":&self.pos,
-                ":hand":serde_json::to_value(&self.hand).unwrap(),
-                ":bt":&self.bt.to_string(),
-                ":obt_mod":&self.obt_mod.to_string(),
-                ":obt":&self.obt.to_string(),
-                ":pd":serde_json::to_value(self.pd).unwrap(),
-                ":pd_int": serde_json::to_value(pd_int).unwrap(),
-                ":pitcher_trait": serde_json::to_value(self.pitcher_trait).unwrap(),
-                ":team_spot":serde_json::to_string(&team_spot).unwrap(),
-                ":contact": serde_json::to_value(contact_option).unwrap(),
-                ":defense":serde_json::to_value(defense_option).unwrap(),
-                ":power": serde_json::to_value(power_option).unwrap(),
-                ":speed": serde_json::to_value(speed_option).unwrap(),
-                ":toughness": serde_json::to_value(toughness_option).unwrap(),
-                ":trade_value": self.trade_value
-            ],
-        )?;
-        let new_player_id = conn.last_insert_rowid();
+
+        let new_player_serde = PlayerSerde {
+            team_id: self.team_id,
+            player_name: &self.name,
+            pos: &self.pos,
+            age: self.age,
+            hand: serde_json::to_value(&self.hand)?,
+            bt: self.bt.to_string(),
+            obt_mod: self.obt_mod.to_string(),
+            obt: self.obt.to_string(),
+            pd: serde_json::to_value(self.pd)?,
+            pd_int: serde_json::to_value(pd_int)?,
+            pitcher_trait: serde_json::to_value(self.pitcher_trait)?,
+            team_spot: serde_json::to_string(&team_spot)?,
+            contact: serde_json::to_value(contact_option)?,
+            defense: serde_json::to_value(defense_option)?,
+            power: serde_json::to_value(power_option)?,
+            speed: serde_json::to_value(speed_option)?,
+            toughness: serde_json::to_value(toughness_option)?,
+            trade_value: self.trade_value,
+        };
+
+        Ok(new_player_serde)
+    }
+    pub fn save_sql(
+        &mut self,
+        conn: &mut Connection,
+        team_id: i64,
+        team_spot: TeamSpot,
+    ) -> Result<(), AddTeamError> {
+        self.team_id = team_id;
+        let p_serde = match self.get_serde(team_spot) {
+            Ok(data) => data,
+            Err(message) => return Err(AddTeamError::SerdeError(message)),
+        };
+        
+        
+        let new_player_id = match p_serde.save_to_sql(conn) {
+            Ok(num) => num,
+            Err(message) => return Err(AddTeamError::DatabaseError(message)),
+        };
         self.player_id = new_player_id;
         Ok(())
     }

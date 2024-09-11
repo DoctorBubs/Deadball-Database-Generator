@@ -59,11 +59,12 @@ impl fmt::Display for LeagueWrapper {
 }
 
 #[derive(Debug)]
-//Possible Errors that oculd arrise from adding a team to a league
+//Possible Errors that could arrise from adding a team to a league
 pub enum AddTeamError {
     AbrvTaken,
     NameTaken,
-    DatabaseError,
+    DatabaseError(rusqlite::Error),
+    SerdeError(serde_json::Error),
 }
 
 struct StandingWrapper {
@@ -180,7 +181,7 @@ impl League {
         })?;
 
         for row in rows {
-            let standing = row.unwrap();
+            let standing = row?;
             println!(
                 "{} {} {} {} {}",
                 standing.name,
@@ -224,11 +225,11 @@ impl League {
         //new_team.team_id = team_id as i32;
         match team_enter_result {
             Ok(_) => (),
-            Err(_message) => return Err(AddTeamError::DatabaseError),
+            Err(message) => return Err(AddTeamError::DatabaseError(message)),
         };
         //If all has gone well, we save the players that have been generated into the database
-        match new_team.save_players_sql(conn, new_team_id){
-            Err(_) => return  Err(AddTeamError::DatabaseError),
+        match new_team.save_players_sql(conn, new_team_id) {
+            Err(message) => return Err(message),
             _ => {}
         }
         // And we inster the team struct into the league's team vector.
