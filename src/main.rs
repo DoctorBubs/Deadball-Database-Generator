@@ -45,7 +45,7 @@ pub fn inquire_check<E>(err: InquireError) -> Result<(), E> {
     }
 }
 
-// Takse a vec of type e,  returns a hash map of each value with a result of true.
+// Takes a vec of type e,  returns a hash map of each value with a result of true.
 pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &[E]) -> HashMap<&E, bool> {
     let mut result = HashMap::new();
     for value in vec.iter() {
