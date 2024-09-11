@@ -55,6 +55,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
         MenuInput::CreateNewLeague,
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_team)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
+        // Uncomment the next 2 lines to enable schedule generation.
         //MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
         //MenuInput::LoadExistingLeague(LoadLeagueInput::ViewSchedule),
         MenuInput::LoadLeagueFromTemplate,
@@ -71,10 +72,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
             // If the user selects exit, the function returns Ok, which exit the program
             MenuInput::Exit => Ok(()),
             //Both CreateNewTeam and RefreshLeague are used in the league check function, so a selection of either will call the function.
-            MenuInput::LoadExistingLeague(choice) => {
-                league_check(conn, thread, choice).unwrap();
-                Ok(())
-            }
+            MenuInput::LoadExistingLeague(choice) => league_check(conn, thread, choice),
             MenuInput::LoadLeagueFromTemplate => load_new_template(conn, thread),
         },
 

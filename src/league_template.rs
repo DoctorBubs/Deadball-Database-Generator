@@ -26,7 +26,11 @@ pub struct LeagueTemplate {
 
 impl fmt::Display for LeagueTemplate {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "[ name:{}, era:{}, gender:{}]", self.name,self.era,self.gender)
+        write!(
+            f,
+            "[ name:{}, era:{}, gender:{}]",
+            self.name, self.era, self.gender
+        )
     }
 }
 pub fn load_league_templates() -> Vec<LeagueTemplate> {
@@ -140,7 +144,7 @@ pub fn new_league_from_template(
             panic!("{:?}", message)
         };
     }
-    save_league(&new_league, conn, thread).unwrap();
+    save_league(&new_league);
     Ok(())
 }
 

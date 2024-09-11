@@ -419,16 +419,16 @@ pub fn load_league(
     match edit_input {
         EditLeagueInput::CreateNewTeam => {
             add_new_team(&mut league, thread, conn, league_id, true).unwrap()
-        } 
+        }
         EditLeagueInput::CreateSchedule => {
-             match league.teams.len() % 2 == 0 {
+            match league.teams.len() % 2 == 0 {
                 true => save_schedule_sql(conn, &league, thread).unwrap(),
-             false => {
-               println!("League must have an even number of teams");
-            save_league(&league, conn, thread).unwrap();
-           }
-          };
-          }
+                false => {
+                    println!("League must have an even number of teams");
+                    save_league(&league);
+                }
+            };
+        }
     };
     Ok(())
 }
@@ -495,13 +495,13 @@ pub fn league_check(
                 //Otherwise, the league is saved to the users disk.
                 LoadLeagueInput::RefreshLeague => {
                     println!("Refreshing league.");
-                    save_league(&select.league, conn, thread).unwrap();
+                    save_league(&select.league);
                     Ok(())
-                } 
+                }
                 LoadLeagueInput::ViewSchedule => {
                     view_schedule(&select.league, conn)?;
-                   Ok(())
-                  }
+                    Ok(())
+                }
             },
             Err(message) => inquire_check(message),
         }
@@ -509,11 +509,7 @@ pub fn league_check(
 }
 
 // Once a league is saved, we save a copy of the league data in a folder.
-pub fn save_league(
-    league: &League,
-    _conn: &mut Connection,
-    _thread: &mut ThreadRng,
-) -> std::io::Result<()> {
+pub fn save_league_to_folders(league: &League) -> std::io::Result<()> {
     println!();
     let flder_path_string = league.name.to_string();
     let folder_path = Path::new(&flder_path_string);
@@ -525,6 +521,20 @@ pub fn save_league(
         let mut file = File::create(file_path)?;
         file.write_all(team.to_string().as_bytes())?;
     }
-    println!("League saved successfully.");
+
     Ok(())
+}
+
+pub fn save_league(league: &League) {
+    let save_league_attempt = save_league_to_folders(league);
+    match save_league_attempt {
+        Ok(()) => println!("League saved successfully."),
+        Err(message) => {
+            println!(
+                "Unable to save league to a folder.\nThe error was {}",
+                message
+            );
+            println!("If you were able to fix the issue with the folder, use the Refresh league option from the main menu to save the league as a folder.")
+        }
+    }
 }

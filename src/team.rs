@@ -359,10 +359,10 @@ pub fn add_team_check(
         // If the user selects true, the user adds another team, however we note that this is not the first team created for the league.
         Ok(true) => add_new_team(league, thread, conn, league_id, false)?,
         //If not, we save the league.
-        Ok(false) => save_league(league, conn, thread).unwrap(),
-        Err(_) => {
-            panic!("Error on add team prompt");
+        Ok(false) => {
+            save_league(league);
         }
+        Err(message) => return inquire_check(message),
     };
 
     Ok(())

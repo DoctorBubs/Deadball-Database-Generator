@@ -74,10 +74,14 @@ fn main() -> Result<(), rusqlite::Error> {
     let mut user_input = run_main_menu(&mut conn, &mut r_thread);
     loop {
         // We take the result of what the user choose. If there is an error, we break
-        if user_input.is_err() {
-            break;
+        match user_input {
+            Ok(_) => {}
+            Err(ref message) => {
+                println!("Something went wrong, please check that this folder is not read only.\nIt is also possible that {} is corrupted, please check that as well\nThe Error message was {}",default_path,message);
+                break;
+            }
         }
-        //If there was no error, we ask the user if they would like to retun to the main menu.
+        //If there was no error, we ask the user if they would like to return to the main menu.
         let ans = Confirm::new("Would you like to return to the main menu?")
             .with_default(true)
             .prompt();
@@ -206,7 +210,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
 
     ", params) */
 
-    // If no errors occured, the database is returned.
+    // If no errors occurred, the database is returned.
     Ok(conn)
 }
 

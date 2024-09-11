@@ -242,6 +242,6 @@ pub fn save_schedule_sql(
         Err(message) => return inquire_check(message),
     };
     schedule_to_sql(conn, league, sched)?;
-    save_league(league, conn, thread).unwrap();
+    save_league(league);
     Ok(())
 }
