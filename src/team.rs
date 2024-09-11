@@ -245,7 +245,10 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
             TeamSpot::Bullpen => match &mut team.bullpen {
                 Some(pen) => pen.push(player),
                 None => {
-                    panic!("Attempted to add a reliever to an Ancient era team with no bullpen!")
+                    // If the database has been altered to include a reliever in an Ancient era team, we warn the user and save the player in the team's pitching pool.
+                    println!("Warning: {} is listed in the database as a reliever, however {} is an Ancient Era team that does not have a bullpen.",player.name, team.name);
+                    println!("Please fix the listing for this player in the database, the player's id is {}.Afterward, please refresh this league via the main menu", player.player_id);
+                    println!("For now, {} will be added to the pitcher pool of {}.",player.name, team.name)
                 }
             },
         }
