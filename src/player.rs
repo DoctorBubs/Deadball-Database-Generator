@@ -5,7 +5,7 @@ use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_quality::PlayerQuality;
 use crate::team::TeamSpot;
 use crate::traits::player_trait_option;
-
+use crate::player_serde::PlayerSerde;
 use crate::traits::PitcherTrait;
 use crate::Deserialize;
 use crate::Era;
@@ -60,13 +60,7 @@ pub enum Hand {
 }
 
 impl Hand {
-    /*pub fn to_string(&self) -> String {
-        match self {
-            Self::R => "R".to_string(),
-            Self::L => "L".to_string(),
-            Self::S => "S".to_string(),
-        }
-    }*/
+   
 
     pub fn new(thread: &mut ThreadRng, quality: &impl PlayerQuality) -> Hand {
         let roll = thread.gen_range(1..=10);
@@ -217,6 +211,7 @@ impl Player {
         }
     }
 
+    
     pub fn save_sql(
         &mut self,
         conn: &mut Connection,

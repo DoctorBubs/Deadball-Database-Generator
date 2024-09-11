@@ -12,6 +12,7 @@ mod sched_view;
 mod schedule;
 mod team;
 mod traits;
+mod player_serde;
 use crate::era::Era;
 use crate::main_menu::run_main_menu;
 use crate::pd::PD;
@@ -298,7 +299,7 @@ mod tests {
         // We drop the stmt so we can use conn later.
         drop(league_stmt);
         // We load all the leagues in the database as LeagueWrappers.
-        let mut all_league_wrappers = get_all_leagues_from_db(&mut test_conn);
+        let mut all_league_wrappers = get_all_leagues_from_db(&mut test_conn).unwrap();
         // And check to make sure the number is what we are expecting
         assert_eq!(all_league_wrappers.len(), 3);
 

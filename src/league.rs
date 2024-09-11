@@ -227,7 +227,10 @@ impl League {
             Err(_message) => return Err(AddTeamError::DatabaseError),
         };
         //If all has gone well, we save the players that have been generated into the database
-        new_team.save_players_sql(conn, new_team_id).unwrap();
+        match new_team.save_players_sql(conn, new_team_id){
+            Err(_) => return  Err(AddTeamError::DatabaseError),
+            _ => {}
+        }
         // And we inster the team struct into the league's team vector.
         self.teams.push(new_team);
         Ok(())
@@ -437,35 +440,35 @@ pub fn load_league(
 
  It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
 */
-pub fn get_all_leagues_from_db(conn: &mut Connection) -> Vec<LeagueWrapper> {
+pub fn get_all_leagues_from_db(
+    conn: &mut Connection,
+) -> Result<Vec<LeagueWrapper>, rusqlite::Error> {
     // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.
-    let league_iter = stmt
-        .query_map([], |row| {
-            Ok(LeagueWrapper {
+    let league_iter = stmt.query_map([], |row| {
+        Ok(LeagueWrapper {
+            league_id: row.get(0)?,
+            league: League {
+                name: row.get(1)?,
+                era: serde_json::from_value(row.get(2)?).unwrap(),
+
+                //
+                gender: serde_json::from_value(row.get(3)?).unwrap(),
                 league_id: row.get(0)?,
-                league: League {
-                    name: row.get(1)?,
-                    era: serde_json::from_value(row.get(2)?).unwrap(),
 
-                    //
-                    gender: serde_json::from_value(row.get(3)?).unwrap(),
-                    league_id: row.get(0)?,
-
-                    //PlayerGender::from_string(row.get(3)?),
-                    teams: Vec::new(),
-                },
-            })
+                //PlayerGender::from_string(row.get(3)?),
+                teams: Vec::new(),
+            },
         })
-        .unwrap();
+    })?;
 
     let mut result = Vec::new();
-    // We unwrap the results in leauge iter, and push it to the options vec
+    // We unwrap the results in league iter, and push it to the options vec
     for wrapper in league_iter {
-        result.push(wrapper.unwrap());
+        result.push(wrapper?);
     }
-    result
+    Ok(result)
 }
 
 //This function queries the database for all leagues. If there are no leagues in the database, the user is prompted to create one.
@@ -475,7 +478,7 @@ pub fn league_check(
     input: LoadLeagueInput,
 ) -> Result<(), rusqlite::Error> {
     // We query the database to get all the leagues that already exist.
-    let options = get_all_leagues_from_db(conn);
+    let options = get_all_leagues_from_db(conn)?;
     // If there are no leagues in the database, the user is prompted to create a league
     if options.is_empty() {
         println!("No Leagues created yet! Let's create a new league to get started.");
@@ -521,7 +524,6 @@ pub fn save_league_to_folders(league: &League) -> std::io::Result<()> {
         let mut file = File::create(file_path)?;
         file.write_all(team.to_string().as_bytes())?;
     }
-
     Ok(())
 }
 
