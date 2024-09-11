@@ -3,7 +3,7 @@ use core::fmt;
 use crate::{
     era::Era,
     inquire_check,
-    league::{check_name_hash, save_league, League},
+    league::{check_name_hash, save_league, EditLeagueError, League},
     player::PlayerGender,
 };
 
@@ -151,13 +151,16 @@ pub fn new_league_from_template(
 pub fn load_new_template(
     conn: &mut Connection,
     thread: &mut ThreadRng,
-) -> Result<(), rusqlite::Error> {
+) -> Result<(), EditLeagueError> {
     let options = load_league_templates();
 
     let template_choice = inquire::Select::new("Please choose a league_template", options).prompt();
 
     match template_choice {
-        Ok(template) => new_league_from_template(conn, thread, &template),
+        Ok(template) => match new_league_from_template(conn, thread, &template) {
+            Ok(()) => Ok(()),
+            Err(message) => Err(EditLeagueError::DatabaseError(message)),
+        },
         Err(message) => inquire_check(message),
     }
 }

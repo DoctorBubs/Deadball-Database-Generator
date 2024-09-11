@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::inquire_check;
-use crate::league::{save_league, League};
+use crate::league::{save_league, EditLeagueError, League};
 use crate::team::Team;
 use itertools::Itertools;
 //use serde::ser;
@@ -204,12 +204,10 @@ pub fn schedule_to_sql(
     sched: Vec<Round>,
 ) -> Result<(), rusqlite::Error> {
     let league_id = league.league_id;
-    conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])
-        .unwrap();
+    conn.execute("INSERT INTO seasons(league_id) VALUES(?1)", [league_id])?;
     let season_id = conn.last_insert_rowid();
     for round in sched {
-        conn.execute("INSERT INTO rounds(season_id) VALUES(?1)", [season_id])
-            .unwrap();
+        conn.execute("INSERT INTO rounds(season_id) VALUES(?1)", [season_id])?;
         let round_id = conn.last_insert_rowid();
         for series in round.series {
             let home_id = series.home_team_id;
@@ -217,12 +215,10 @@ pub fn schedule_to_sql(
             conn.execute(
                 "INSERT INTO series(round_id,home_team_id,away_team_id) VALUES(?1, ?2, ?3)",
                 [round_id, home_id, away_id],
-            )
-            .unwrap();
+            )?;
             let series_id = conn.last_insert_rowid();
             for _game in series.games {
-                conn.execute("INSERT INTO games(series_id) VALUES(?1)", [series_id])
-                    .unwrap();
+                conn.execute("INSERT INTO games(series_id) VALUES(?1)", [series_id])?;
             }
         }
     }
@@ -230,13 +226,15 @@ pub fn schedule_to_sql(
     Ok(())
 }
 
-pub fn save_schedule_sql(conn: &mut Connection, league: &League) -> Result<(), rusqlite::Error> {
+pub fn save_schedule_sql(conn: &mut Connection, league: &League) -> Result<(), EditLeagueError> {
     let sched_input = schedule_from_input(league);
     let sched = match sched_input {
         Ok(rounds) => rounds,
         Err(message) => return inquire_check(message),
     };
-    schedule_to_sql(conn, league, sched)?;
+    if let Err(message) = schedule_to_sql(conn, league, sched) {
+        return Err(EditLeagueError::DatabaseError(message));
+    }
     save_league(league);
     Ok(())
 }

@@ -1,4 +1,3 @@
-
 use rusqlite::{named_params, Connection};
 #[derive(Debug)]
 /// Used to convert Player struct into Serde values.

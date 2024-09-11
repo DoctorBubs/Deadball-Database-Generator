@@ -65,6 +65,7 @@ pub enum EditLeagueError {
     NameTaken,
     DatabaseError(rusqlite::Error),
     SerdeError(serde_json::Error),
+    Inquire(InquireError),
 }
 
 impl fmt::Display for EditLeagueError {
@@ -72,6 +73,7 @@ impl fmt::Display for EditLeagueError {
         let text = match self {
             Self::DatabaseError(message) => message.to_string(),
             Self::SerdeError(message) => message.to_string(),
+            Self::Inquire(message) => message.to_string(),
             _ => "Invalid Team and/or Abbreviation".to_string(),
         };
         write!(f, "{}", text)
@@ -361,7 +363,7 @@ pub fn create_new_league(
     //And then prompt the user to create the first team for the league.
     match add_new_team(&mut new_league, thread, conn, league_id, true) {
         Ok(_) => Ok(()),
-        Err(message) => Err(EditLeagueError::DatabaseError(message)),
+        Err(message) => Err(message),
     }
 }
 
@@ -433,15 +435,19 @@ pub fn load_league(
     conn: &mut Connection,
     wrapper: LeagueWrapper,
     edit_input: EditLeagueInput,
-) -> Result<(), rusqlite::Error> {
+) -> Result<(), EditLeagueError> {
     // We destructure the LeagueWrapper
     let LeagueWrapper {
         league_id,
         mut league,
     } = wrapper;
 
-    league.display_standings(conn)?;
-    load_teams_from_sql(league_id, &mut league, conn)?;
+    if let Err(message) = league.display_standings(conn) {
+        return Err(EditLeagueError::DatabaseError(message));
+    }
+    if let Err(message) = load_teams_from_sql(league_id, &mut league, conn) {
+        return Err(EditLeagueError::DatabaseError(message));
+    }
 
     // Now that we have loaded the existing league from the database, it is time to generate a new team or create a new schedule based off the input
     match edit_input {
@@ -499,14 +505,16 @@ pub fn league_check(
     conn: &mut Connection,
     thread: &mut ThreadRng,
     input: LoadLeagueInput,
-) -> Result<(), rusqlite::Error> {
+) -> Result<(), EditLeagueError> {
     // We query the database to get all the leagues that already exist.
-    let options = get_all_leagues_from_db(conn)?;
+    let options = match get_all_leagues_from_db(conn) {
+        Ok(wrappers) => wrappers,
+        Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+    };
     // If there are no leagues in the database, the user is prompted to create a league
     if options.is_empty() {
         println!("No Leagues created yet! Let's create a new league to get started.");
-        create_new_league(thread, conn).unwrap();
-        Ok(())
+        create_new_league(thread, conn)
     } else {
         //Otherwise, the user is shown a list of all leagues that currently exist, and is prompted to select one.
         let ans: Result<LeagueWrapper, InquireError> =
@@ -515,8 +523,10 @@ pub fn league_check(
             Ok(select) => match input {
                 //If the users decided they wanted to create a new team earlier they are taken to the prompt to create a new team
                 LoadLeagueInput::EditLeague(edit) => {
-                    load_league(thread, conn, select, edit)?;
-                    Ok(())
+                    match load_league(thread, conn, select, edit) {
+                        Ok(()) => Ok(()),
+                        Err(message) => Err(message),
+                    }
                 }
                 //Otherwise, the league is saved to the users disk.
                 LoadLeagueInput::RefreshLeague => {
@@ -524,10 +534,7 @@ pub fn league_check(
                     save_league(&select.league);
                     Ok(())
                 }
-                LoadLeagueInput::ViewSchedule => {
-                    view_schedule(&select.league, conn)?;
-                    Ok(())
-                }
+                LoadLeagueInput::ViewSchedule => view_schedule(&select.league, conn),
             },
             Err(message) => inquire_check(message),
         }

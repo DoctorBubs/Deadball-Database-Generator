@@ -356,7 +356,7 @@ pub fn add_team_check(
     conn: &mut Connection,
     thread: &mut ThreadRng,
     league_id: i64,
-) -> Result<(), rusqlite::Error> {
+) -> Result<(), EditLeagueError> {
     let ans = Confirm::new("Would you like to create another team?")
         .with_default(true)
         .prompt();
@@ -380,8 +380,8 @@ pub fn add_new_team(
     conn: &mut Connection,
     league_id: i64,
     first_team: bool,
-) -> Result<(), rusqlite::Error> {
-    let result: Result<(), rusqlite::Error>;
+) -> Result<(), EditLeagueError> {
+    let result: Result<(), EditLeagueError>;
     // If this is the first team generated for the league, we display a different prompt to the user.
     let mut prompt_string = match first_team {
         true => "Enter the name of the first team",
@@ -435,23 +435,33 @@ pub fn add_new_team(
                     EditLeagueError::NameTaken => {
                         println!("This league already has a team with that name, please try again.")
                     }
-                    EditLeagueError::DatabaseError(message) => {
-                        println!("Error adding team to the data base, please check if the database file exists and has not been corrupted");
-                        println!("The error was:{}", message);
-                        return Ok(());
-                    }
-                    EditLeagueError::SerdeError(message) => {
-                        println!("Error serializing a league, please try again");
-                        println!("The error message was:{}.", message);
-                        return Ok(());
-                    }
+                    _ => return Err(message), /*
+
+                                              EditLeagueError::DatabaseError(message) => {
+                                                  println!("Error adding team to the data base, please check if the database file exists and has not been corrupted");
+                                                  println!("The error was:{}", message);
+                                                  return Ok(());
+                                              }
+                                              EditLeagueError::SerdeError(message) => {
+                                                  println!("Error serializing a league, please try again");
+                                                  println!("The error message was:{}.", message);
+                                                  return Ok(());
+                                              }
+
+                                              EditLeagueError::Inquire(message) => {
+                                                  println!("Inquire Error, message was {}",message);
+                                                  return Ok(())
+                                              } */
                 };
                 //println!("Error {:?}",message);
                 prompt_string = "Enter a unique team name.";
             }
             // If the league returns OK, we ask the user if they would like to create a new team.
             Ok(()) => {
-                result = add_team_check(league, conn, thread, league_id);
+                result = match add_team_check(league, conn, thread, league_id) {
+                    Ok(()) => Ok(()),
+                    Err(message) => Err(message),
+                };
                 break;
             }
         };

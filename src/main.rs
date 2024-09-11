@@ -38,10 +38,10 @@ use std::collections::HashMap;
 use std::fmt;
 
 // Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
-pub fn inquire_check<E>(err: InquireError) -> Result<(), E> {
+pub fn inquire_check(err: InquireError) -> Result<(), EditLeagueError> {
     match err {
         inquire::InquireError::OperationCanceled => Ok(()),
-        _ => panic!("{:?}", err),
+        _ => Err(EditLeagueError::Inquire(err)),
     }
 }
 

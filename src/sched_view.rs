@@ -1,9 +1,12 @@
 use core::fmt;
 
-use inquire::Select;
+use inquire::{validator::ErrorMessage, Select};
 use rusqlite::Connection;
 
-use crate::{inquire_check, league::League};
+use crate::{
+    inquire_check,
+    league::{EditLeagueError, League},
+};
 
 fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
     let mut seasons_stmt =
@@ -124,8 +127,11 @@ impl fmt::Display for RoundChoiceListing {
     }
 }
 
-pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite::Error> {
-    let sched_vec = get_season_vec(league, conn)?;
+pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), EditLeagueError> {
+    let sched_vec = match get_season_vec(league, conn) {
+        Ok(vec) => vec,
+        Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+    };
     if sched_vec.is_empty() {
         println!("No schedule generated");
         return Ok(());
@@ -137,7 +143,11 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         Err(message) => return inquire_check(message),
     };
     //println!("{:?}",sched_vec?);
-    let round_vec = get_round_vec(conn, season_id)?
+    let init_rounds = match get_round_vec(conn, season_id) {
+        Ok(vec) => vec,
+        Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+    };
+    let round_vec = init_rounds
         .into_iter()
         .enumerate()
         .map(|(index, value)| RoundChoiceListing { index, value })
@@ -150,7 +160,10 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         Ok(listing) => listing.value,
         Err(message) => return inquire_check(message),
     };
-    let series_vec = get_series_vec(conn, round_id)?;
+    let series_vec = match get_series_vec(conn, round_id) {
+        Ok(vec) => vec,
+        Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+    };
     //println!("{:?}",series_vec);
     let series_choice = Select::new("Choose a series from the round", series_vec).prompt();
     let choosed_wrapper = match series_choice {
@@ -158,7 +171,11 @@ pub fn view_schedule(league: &League, conn: &Connection) -> Result<(), rusqlite:
         Err(message) => return inquire_check(message),
     };
 
-    let game_vec = get_game_vec(conn, &choosed_wrapper)?;
-    println!("{:?}", game_vec);
-    Ok(())
+    match get_game_vec(conn, &choosed_wrapper) {
+        Ok(game_vec) => {
+            println!("{:?}", game_vec);
+            Ok(())
+        }
+        Err(message) => Err(EditLeagueError::DatabaseError(message)),
+    }
 }

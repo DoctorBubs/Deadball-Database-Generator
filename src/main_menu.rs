@@ -77,11 +77,11 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
             //Both CreateNewTeam and RefreshLeague are used in the league check function, so a selection of either will call the function.
             MenuInput::LoadExistingLeague(choice) => match league_check(conn, thread, choice) {
                 Ok(_) => Ok(()),
-                Err(message) => Err(EditLeagueError::DatabaseError(message)),
+                Err(message) => Err(message),
             },
             MenuInput::LoadLeagueFromTemplate => match load_new_template(conn, thread) {
                 Ok(_) => Ok(()),
-                Err(message) => Err(EditLeagueError::DatabaseError(message)),
+                Err(message) => Err(message),
             },
         },
 
