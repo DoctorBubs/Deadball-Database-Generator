@@ -36,6 +36,7 @@ use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
+use std::process::Output;
 
 // Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
 pub fn inquire_check(err: InquireError) -> Result<(), EditLeagueError> {
@@ -79,7 +80,32 @@ fn main() -> Result<(), EditLeagueError> {
         match user_input {
             Ok(_) => {}
             Err(ref message) => {
-                println!("Something went wrong, please check that this folder is not read only.\nIt is also possible that {} is corrupted, please check that as well\nThe Error message was {}",default_path,message);
+                match message{
+                    EditLeagueError::DatabaseError(output) => {
+                        println!("Something went wrong, please check that this folder is not read only.\nIt is also possible that {} is corrupted, please check that as well\nThe Error message was {}",default_path,output);
+                    },
+                    EditLeagueError::Inquire(_) | EditLeagueError::SerdeError(_) => {
+                        let output_string;
+                        let library_type;
+                        match message{
+                            EditLeagueError::SerdeError(output) => {
+                                library_type = "serde";
+                                output_string = output.to_string()
+                            },
+                            EditLeagueError::Inquire(output) => {
+                                library_type = "inquire";
+                                output_string = output.to_string()
+                            }
+                            // We break, as there are only 2 options that can lead to this path
+                            _ => break
+
+                        };
+                        println!("Something went wrong with the {} library, please make sure that all dependencies have been installed correctly",library_type);
+                        println!("The error message was: {}", output_string)
+                    },
+                    _ => println!("Something went wrong regarding a team name, please restart the program and try again")
+                }
+
                 break;
             }
         }
@@ -340,6 +366,23 @@ mod tests {
                 Era::Modern => panic!("Expected a bullpen for a modern team"),
             },
         }
+        // Next, we check to make sure that a league will not allow the addition of a team with the same name as an existin team.
+        let double_name_check = current_league.new_team(
+            &"NY".to_string(),
+            &"Los Angeles Angels".to_string(),
+            &mut r_thread,
+            1,
+            &mut test_conn,
+        );
+        assert!(double_name_check.is_err());
+        let double_abrv_check = current_league.new_team(
+            &"LA".to_string(),
+            &"Los Angeles Gladiators".to_string(),
+            &mut r_thread,
+            1,
+            &mut test_conn,
+        );
+        assert!(double_abrv_check.is_err());
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(
