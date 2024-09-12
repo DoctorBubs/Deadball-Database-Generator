@@ -191,13 +191,14 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
 struct PlayerWrapper {
     team_spot: TeamSpot,
     player: Player,
+    pd_int: i32,
 }
 
 pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite::Error> {
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -207,6 +208,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
         Ok(PlayerWrapper {
             // Team spot is deserialized from the team spot row.
             team_spot: serde_json::from_value(row.get(0)?).unwrap(),
+            pd_int: serde_json::from_value(row.get(18)?).unwrap_or(0),
             // And we use the rest to fill out the player.
             player: Player {
                 name: row.get(1)?,
@@ -236,7 +238,16 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
         // We remove the player wrapper from the Ok.
         let wrapper = result.unwrap();
         //We destructure the player wrapper.
-        let PlayerWrapper { team_spot, player } = wrapper;
+        let PlayerWrapper {
+            team_spot,
+            player,
+            pd_int,
+        } = wrapper;
+
+        let player_error_opt = player.get_player_error(pd_int);
+        if let Some(player_error) = player_error_opt {
+            println!("{}", player_error)
+        }
         // And based off the team spot, the player is assigned to the correct player pool.
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),

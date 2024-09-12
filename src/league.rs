@@ -37,7 +37,7 @@ use std::collections::HashMap;
 
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct League {
     pub name: String,
     pub teams: Vec<Team>,

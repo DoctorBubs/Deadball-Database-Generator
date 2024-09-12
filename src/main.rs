@@ -7,6 +7,7 @@ mod main_menu;
 mod pd;
 mod pitcher_rank_info;
 mod player;
+mod player_error;
 mod player_quality;
 mod player_serde;
 mod sched_view;
@@ -251,10 +252,17 @@ fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
     for player in input.iter() {
         assert_eq!(player.bt + player.obt_mod, player.obt);
         assert_eq!(player.team_id, team_id);
-        assert_eq!(player_pd_test(player), for_pitchers)
+        assert_eq!(player_pd_test(player), for_pitchers);
+        // Next, we check to ensure that there are no errors from loading the player from SQL.
+        let pd_int = match player.pd{
+            Some(die) => die.to_int(),
+            None => 0 
+        };
+        let player_err = player.get_player_error(pd_int);
+        assert!(player_err.is_none());
     }
 }
-/*
+/* Used for testing schedules. Commented for now untill we have a better solution for scheduling.
 //fn how_many_rounds(number_of_teams: i32, series_per_matchup: i32) -> i32 {
    // (number_of_teams - 1) * series_per_matchup
 }*/

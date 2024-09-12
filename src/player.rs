@@ -3,6 +3,9 @@ use crate::b_traits::BTraits;
 use crate::league::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
+use crate::player_error;
+use crate::player_error::CompTable;
+use crate::player_error::PlayerError;
 use crate::player_quality::PlayerQuality;
 use crate::player_serde::PlayerSerde;
 use crate::team::TeamSpot;
@@ -124,8 +127,14 @@ pub fn select_gender() -> Result<PlayerGender, InquireError> {
     Select::new("Select the league gender,", options).prompt()
 }
 
+/// Takes a bool and a value. If the bool is false, returns Some(value).
+fn get_greater<T: Eq + std::cmp::PartialOrd>(target: T, actual: T) -> Option<T> {
+    match actual > target {
+        true => None,
+        false => Some(actual),
+    }
+}
 #[derive(Serialize, Deserialize, Debug)]
-
 pub struct Player {
     pub name: String,
     pub age: i32,
@@ -206,6 +215,56 @@ impl Player {
         match self.is_pitcher() {
             true => self.get_base_pd().to_int(),
             false => self.bt,
+        }
+    }
+
+    pub fn get_player_error(&self, pd_int: i32) -> Option<PlayerError> {
+        let result = PlayerError {
+            valid_age: get_greater(0, self.age),
+            valid_bt: get_greater(0, self.bt),
+            valid_obt: get_greater(0, self.obt),
+            valid_obt_mod: get_greater(0, self.obt_mod),
+            valid_obt_sum: {
+                let expected = self.bt + self.obt_mod;
+                if self.obt == expected {
+                    None
+                } else {
+                    Some(CompTable {
+                        expected: expected,
+                        actual: self.obt,
+                    })
+                }
+            },
+            valid_pd_int: {
+                match self.pd {
+                    None => None,
+                    Some(die) => {
+                        let expected = die.to_int();
+                        match expected == pd_int {
+                            true => None,
+                            false => Some(CompTable {
+                                expected: expected,
+                                actual: pd_int,
+                            }),
+                        }
+                    }
+                }
+            },
+            name: &self.name,
+            id: self.player_id,
+        };
+        match result {
+            PlayerError {
+                valid_age: None,
+                valid_bt: None,
+                valid_obt_mod: None,
+                valid_obt: None,
+                valid_obt_sum: None,
+                valid_pd_int: None,
+                name: _,
+                id: _,
+            } => None,
+            _ => Some(result),
         }
     }
 
