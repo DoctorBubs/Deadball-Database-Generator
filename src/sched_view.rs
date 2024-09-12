@@ -1,6 +1,6 @@
 use core::fmt;
 
-use inquire::{validator::ErrorMessage, Select};
+use inquire::Select;
 use rusqlite::Connection;
 
 use crate::{

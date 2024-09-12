@@ -37,7 +37,6 @@ use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
-use std::process::Output;
 
 // Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
 pub fn inquire_check(err: InquireError) -> Result<(), EditLeagueError> {
@@ -254,9 +253,9 @@ fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
         assert_eq!(player.team_id, team_id);
         assert_eq!(player_pd_test(player), for_pitchers);
         // Next, we check to ensure that there are no errors from loading the player from SQL.
-        let pd_int = match player.pd{
+        let pd_int = match player.pd {
             Some(die) => die.to_int(),
-            None => 0 
+            None => 0,
         };
         let player_err = player.get_player_error(pd_int);
         assert!(player_err.is_none());

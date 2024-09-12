@@ -244,7 +244,9 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
             pd_int,
         } = wrapper;
 
+        // We check if the loader player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
+        // If there is an error, we print a warning.
         if let Some(player_error) = player_error_opt {
             println!("{}", player_error)
         }

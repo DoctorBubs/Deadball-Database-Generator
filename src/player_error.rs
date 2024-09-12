@@ -13,21 +13,13 @@ impl<T: Eq + Display> fmt::Display for CompTable<T> {
     }
 }
 
-fn option_string<'a, T: Display>(opt: Option<T>, field_name: &str) -> Option<String> {
-    if let Some(value) = opt {
-        Some(format!("\n{} is invalid for {}", value, field_name))
-    } else {
-        None
-    }
+fn option_string<T: Display>(opt: Option<T>, field_name: &str) -> Option<String> {
+    opt.map(|value| format!("\n{} is invalid for {}", value, field_name))
 }
 type CompOpt<T> = Option<CompTable<T>>;
 
 fn add_comp_table_string<T: Eq + Display>(opt: CompOpt<T>, field_name: &str) -> Option<String> {
-    if let Some(table) = opt {
-        Some(format!("\n{} is invalid.{}", field_name, table))
-    } else {
-        None
-    }
+    opt.map(|table| format!("\n{} is invalid.{}", field_name, table))
 }
 
 #[derive(Debug)]
@@ -54,10 +46,8 @@ impl fmt::Display for PlayerError<'_> {
             add_comp_table_string(self.valid_pd_int, "pd_int"),
         ];
 
-        for addon in addons {
-            if let Some(new_string) = addon {
-                result = format! {"{}{}",result,new_string}
-            }
+        for addon in addons.into_iter().flatten() {
+            result = format! {"{}{}",result,addon}
         }
 
         result = format!("{}\n]\n Player ID = {}", result, self.id);

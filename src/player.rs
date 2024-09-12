@@ -3,7 +3,7 @@ use crate::b_traits::BTraits;
 use crate::league::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
-use crate::player_error;
+
 use crate::player_error::CompTable;
 use crate::player_error::PlayerError;
 use crate::player_quality::PlayerQuality;
@@ -230,7 +230,7 @@ impl Player {
                     None
                 } else {
                     Some(CompTable {
-                        expected: expected,
+                        expected,
                         actual: self.obt,
                     })
                 }
@@ -243,7 +243,7 @@ impl Player {
                         match expected == pd_int {
                             true => None,
                             false => Some(CompTable {
-                                expected: expected,
+                                expected,
                                 actual: pd_int,
                             }),
                         }
