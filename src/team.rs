@@ -31,6 +31,7 @@ use crate::ThreadRng;
 use core::fmt;
 
 use std::fmt::Write;
+use std::ops::Not;
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
 Team's also have a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
@@ -47,6 +48,7 @@ pub struct Team {
     pub wins: i32,
     pub losses: i32,
     pub team_id: i64,
+    pub note: Note,
 }
 
 impl Team {
@@ -68,6 +70,7 @@ impl Team {
             team_score: 0,
             wins: 0,
             losses: 0,
+            note: None,
         };
 
         new_team.calc_team_score();
@@ -149,6 +152,16 @@ impl fmt::Display for Team {
         };
 
         write!(f, "{}", chars)
+    }
+}
+
+impl Notable for Team {
+    fn get_note(&self) -> &Note {
+        &self.note
+    }
+
+    fn get_note_input_string(&self) -> String {
+        format!("Please enter the note you wish to attach to {}", self.name)
     }
 }
 

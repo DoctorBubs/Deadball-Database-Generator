@@ -402,7 +402,7 @@ pub fn load_teams_from_sql(
     let era = league.era;
     // We query the database to select all teams in the database that belong to the league via the league_id car
     let mut stmt = conn.prepare(
-        "SELECT team_id,abrv,team_name,wins,losses 
+        "SELECT team_id,abrv,team_name,wins,losses,team_note
         FROM teams 
         WHERE league_id = ?1",
     )?;
@@ -429,6 +429,7 @@ pub fn load_teams_from_sql(
                         Era::Modern => Some(Vec::new()),
                     },
                     team_score: 0,
+                    note: serde_json::from_value(row.get(5)?).unwrap(),
                 },
             )
         })?

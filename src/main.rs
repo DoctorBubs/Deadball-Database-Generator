@@ -149,6 +149,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              abrv TEXT NOT NULL,
              wins INTEGER DEFAULT 0,
              losses INTEGER DEFAULT 0,
+             team_note TEXT,
              FOREIGN KEY(league_id) REFERENCES leagues(league_id)
          )",
         (),
