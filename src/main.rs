@@ -1,10 +1,10 @@
 mod b_traits;
 mod era;
-mod note;
 mod league;
 mod league_template;
 mod lineup_score;
 mod main_menu;
+mod note;
 mod pd;
 mod pitcher_rank_info;
 mod player;

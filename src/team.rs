@@ -1,6 +1,8 @@
 use crate::b_traits::BTraits;
 use crate::inquire_check;
 use crate::league::EditLeagueError;
+use crate::note::Notable;
+use crate::note::Note;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
@@ -198,7 +200,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int,player_note
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -230,6 +232,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
                 trade_value: row.get(15)?,
                 team_id: row.get(16)?,
                 player_id: row.get(17)?,
+                note: serde_json::from_value(row.get(19)?).unwrap(),
             },
         })
     })?;

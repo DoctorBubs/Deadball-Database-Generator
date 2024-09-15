@@ -15,6 +15,7 @@ use crate::era::select_era;
 use crate::inquire_check;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
+use crate::note::Notable;
 use crate::note::Note;
 use crate::player::select_gender;
 //use crate::sched_view::view_schedule;
@@ -45,7 +46,17 @@ pub struct League {
     pub gender: PlayerGender,
     pub era: Era,
     pub league_id: i64, //bench_quality:BatterQuality,
-    pub note: Note
+    pub note: Note,
+}
+
+impl Notable for League {
+    fn get_note(&self) -> &Note {
+        &self.note
+    }
+
+    fn get_note_input_string(&self) -> String {
+        format!("Please enter the note for {}", self.name)
+    }
 }
 
 pub struct LeagueWrapper {
@@ -56,7 +67,6 @@ pub struct LeagueWrapper {
 // We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
 impl fmt::Display for LeagueWrapper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-
         write!(f, "{}_{}", self.league_id, self.league.name)
     }
 }
@@ -103,7 +113,7 @@ impl League {
             gender,
             era,
             league_id,
-            note: None
+            note: None,
         }
     }
 

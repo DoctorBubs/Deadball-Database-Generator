@@ -2,6 +2,8 @@ use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
 use crate::league::EditLeagueError;
 use crate::lineup_score::LineupScore;
+use crate::note::Notable;
+use crate::note::Note;
 use crate::pitcher_rank_info::PitcherRankInfo;
 
 use crate::player_error::CompTable;
@@ -150,6 +152,7 @@ pub struct Player {
     pub trade_value: i32,
     pub team_id: i64,
     pub player_id: i64,
+    pub note: Note,
 }
 
 impl Player {
@@ -373,6 +376,7 @@ impl Player {
                 }
             }
         };
+        let note = None;
         // Since we don't know what the team_id or player_id will be in the database, we set both to 0 temporarily.
         let team_id = 0;
         let player_id = 0;
@@ -390,6 +394,7 @@ impl Player {
             trade_value,
             team_id,
             player_id,
+            note,
         }
     }
 }
@@ -423,7 +428,19 @@ impl fmt::Display for Player {
                 )
             }
         };
+        let note_string = match &self.note {
+            Some(text) => format!(" {}", text),
+            None => "".to_string(),
+        };
+        write!(f, "{}{}", chars, note_string)
+    }
+}
 
-        write!(f, "{}", chars)
+impl Notable for Player {
+    fn get_note(&self) -> &Note {
+        &self.note
+    }
+    fn get_note_input_string(&self) -> String {
+        format!("Please enter the note for {}", self.name)
     }
 }
