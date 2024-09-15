@@ -1,5 +1,6 @@
 mod b_traits;
 mod era;
+mod note;
 mod league;
 mod league_template;
 mod lineup_score;
@@ -131,7 +132,8 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              league_id INTEGER PRIMARY KEY,
              league_name TEXT NOT NULL UNIQUE,
              era TEXT NOT NULL,
-             gender TEXT NOT NULL
+             gender TEXT NOT NULL,
+             league_note TEXT
          )",
         (),
     )?;
@@ -179,6 +181,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              speed TEXT ,
              toughness TEXT,
              trade_value INTEGER NOT NULL,
+             player_note TEXT,
              FOREIGN KEY(team_id) REFERENCES teams(team_id)
          )",
         (),
