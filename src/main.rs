@@ -227,6 +227,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         series_id INTEGER NOT NULL,
         home_score INTEGER DEFAULT 0,
         away_score INTEGER DEFAULT 0,
+        game_not TEXT,
         FOREIGN KEY (series_id) REFERENCES series(series_id)
     )",
         (),
