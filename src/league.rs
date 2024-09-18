@@ -10,7 +10,7 @@ use inquire::Select;
 use inquire::Text;
 
 use rusqlite::Connection;
-
+use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
 use crate::main_menu::EditLeagueInput;
@@ -58,20 +58,7 @@ impl fmt::Display for LeagueWrapper {
     }
 }
 
-#[derive(Debug)]
-//Possible Errors that could arise from editing a league.
-pub enum EditLeagueError {
-    /// Error when there is a team with the same abbreviation in the league.
-    AbrvTaken,
-    /// Error when there is a team with the same name in the league.
-    NameTaken,
-    /// Error accessing the database.
-    DatabaseError(rusqlite::Error),
-    ///Error Serializing
-    SerdeError(serde_json::Error),
-    ///Error using Inquire
-    Inquire(InquireError),
-}
+
 
 impl fmt::Display for EditLeagueError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

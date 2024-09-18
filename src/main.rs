@@ -1,5 +1,6 @@
 mod b_traits;
 mod era;
+mod edit_league_error;
 mod league;
 mod league_template;
 mod lineup_score;
@@ -31,7 +32,7 @@ use crate::traits::Toughness;
 use inquire::Confirm;
 use inquire::InquireError;
 use league::league_check;
-use league::EditLeagueError;
+use edit_league_error::EditLeagueError;
 use rand::rngs::ThreadRng;
 use rusqlite::{Connection, Result};
 use serde::{Deserialize, Serialize};

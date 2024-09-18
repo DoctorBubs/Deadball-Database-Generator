@@ -1,7 +1,8 @@
 use std::collections::HashMap;
-
+use crate::edit_league_error::EditLeagueError;
 use crate::inquire_check;
-use crate::league::{save_league, EditLeagueError, League};
+use crate::league::{save_league, League};
+//use crate::note::Note;
 use crate::team::Team;
 use itertools::Itertools;
 //use serde::ser;
@@ -18,12 +19,14 @@ use rusqlite::Connection;
 pub struct Game {
     home_team_id: i64,
     away_team_id: i64,
+    //note: Note
 }
 
 fn new_game(home_team_id: i64, away_team_id: i64) -> Game {
     Game {
         home_team_id,
         away_team_id,
+        //note: None
     }
 }
 

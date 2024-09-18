@@ -3,10 +3,10 @@ use core::fmt;
 use inquire::{InquireError, Select};
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;
-
+use crate::edit_league_error::EditLeagueError;
 use crate::{
     inquire_check,
-    league::{create_new_league, EditLeagueError},
+    league::create_new_league,
     league_check,
     league_template::load_new_template,
 };

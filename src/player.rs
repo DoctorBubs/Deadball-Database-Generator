@@ -1,6 +1,6 @@
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
-use crate::league::EditLeagueError;
+use crate::edit_league_error::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::pitcher_rank_info::PitcherRankInfo;
 

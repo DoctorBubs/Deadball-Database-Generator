@@ -2,10 +2,10 @@ use core::fmt;
 
 use inquire::Select;
 use rusqlite::Connection;
-
+use crate::edit_league_error::EditLeagueError;
 use crate::{
     inquire_check,
-    league::{EditLeagueError, League},
+    league:: League,
 };
 
 fn get_season_vec(league: &League, conn: &Connection) -> Result<Vec<i64>, rusqlite::Error> {
