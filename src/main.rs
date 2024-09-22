@@ -1,10 +1,10 @@
 mod b_traits;
 mod era;
-mod edit_league_error;
 mod league;
 mod league_template;
 mod lineup_score;
 mod main_menu;
+mod edit_league_error;
 mod note;
 mod pd;
 mod pitcher_rank_info;
@@ -175,7 +175,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              pd_int INTEGER , /*If a player has a pitch die, PD_int represents the outcome of a pitch die roll that is the farthest away from 0.
              For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
             */
-             pitcher_trait TEXT , --Pitchers
+             pitcher_trait TEXT , -- Traits for pitchers
              team_spot TEXT NOT NULL, -- Represents where a player is on a team. E.G are they starting lineup or in the bullpen.
              contact TEXT ,
              defense TEXT,
