@@ -2,7 +2,7 @@ use inquire::{InquireError, Text};
 use std::option;
 use EditLeagueError::Inquire;
 
-use crate::league::EditLeagueError;
+use crate::edit_league_error::EditLeagueError;
 
 /// We add a journaling aspect to the program by creating a Note type. Users are able to add note to leauges, teams, and players, and eventually series and games.
 pub type Note = Option<String>;

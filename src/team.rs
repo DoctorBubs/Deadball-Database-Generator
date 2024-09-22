@@ -1,7 +1,9 @@
 use crate::b_traits::BTraits;
 use crate::edit_league_error::EditLeagueError;
 use crate::inquire_check;
-use crate::league::EditLeagueError;
+use crate::note::Notable;
+use crate::note::Note;
+
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
