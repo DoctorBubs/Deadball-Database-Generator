@@ -175,7 +175,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
             */
              pitcher_trait TEXT , --Pitchers
-             team_spot TEXT NOT NULL, -- Represents where 
+             team_spot TEXT NOT NULL, -- Represents where a player is on a team. E.G are they starting lineup or in the bullpen.
              contact TEXT ,
              defense TEXT,
              power TEXT ,

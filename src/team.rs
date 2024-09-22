@@ -31,7 +31,7 @@ use crate::ThreadRng;
 use core::fmt;
 
 use std::fmt::Write;
-use std::ops::Not;
+
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
 Team's also have a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
