@@ -15,6 +15,8 @@ use crate::era::select_era;
 use crate::inquire_check;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
+use crate::note::Notable;
+use crate::note::Note;
 use crate::player::select_gender;
 //use crate::sched_view::view_schedule;
 
@@ -44,6 +46,17 @@ pub struct League {
     pub gender: PlayerGender,
     pub era: Era,
     pub league_id: i64, //bench_quality:BatterQuality,
+    pub note: Note,
+}
+
+impl Notable for League {
+    fn get_note(&self) -> &Note {
+        &self.note
+    }
+
+    fn get_note_input_string(&self) -> String {
+        format!("Please enter the note for {}", self.name)
+    }
 }
 
 pub struct LeagueWrapper {
@@ -87,6 +100,7 @@ impl League {
             gender,
             era,
             league_id,
+            note: None,
         }
     }
 
@@ -375,7 +389,7 @@ pub fn load_teams_from_sql(
     let era = league.era;
     // We query the database to select all teams in the database that belong to the league via the league_id car
     let mut stmt = conn.prepare(
-        "SELECT team_id,abrv,team_name,wins,losses 
+        "SELECT team_id,abrv,team_name,wins,losses,team_note
         FROM teams 
         WHERE league_id = ?1",
     )?;
@@ -402,6 +416,7 @@ pub fn load_teams_from_sql(
                         Era::Modern => Some(Vec::new()),
                     },
                     team_score: 0,
+                    note: serde_json::from_value(row.get(5)?).unwrap(),
                 },
             )
         })?
@@ -476,6 +491,7 @@ pub fn get_all_leagues_from_db(
 
                 //
                 gender: serde_json::from_value(row.get(3)?).unwrap(),
+                note: serde_json::from_value(row.get(4)?).unwrap(),
                 league_id: row.get(0)?,
 
                 //PlayerGender::from_string(row.get(3)?),

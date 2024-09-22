@@ -5,6 +5,7 @@ mod league;
 mod league_template;
 mod lineup_score;
 mod main_menu;
+mod note;
 mod pd;
 mod pitcher_rank_info;
 mod player;
@@ -132,7 +133,8 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              league_id INTEGER PRIMARY KEY,
              league_name TEXT NOT NULL UNIQUE,
              era TEXT NOT NULL,
-             gender TEXT NOT NULL
+             gender TEXT NOT NULL,
+             league_note TEXT
          )",
         (),
     )?;
@@ -148,6 +150,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              abrv TEXT NOT NULL,
              wins INTEGER DEFAULT 0,
              losses INTEGER DEFAULT 0,
+             team_note TEXT,
              FOREIGN KEY(league_id) REFERENCES leagues(league_id)
          )",
         (),
@@ -173,13 +176,14 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
             */
              pitcher_trait TEXT , --Pitchers
-             team_spot TEXT NOT NULL, -- Represents where 
+             team_spot TEXT NOT NULL, -- Represents where a player is on a team. E.G are they starting lineup or in the bullpen.
              contact TEXT ,
              defense TEXT,
              power TEXT ,
              speed TEXT ,
              toughness TEXT,
              trade_value INTEGER NOT NULL,
+             player_note TEXT,
              FOREIGN KEY(team_id) REFERENCES teams(team_id)
          )",
         (),
@@ -224,6 +228,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         series_id INTEGER NOT NULL,
         home_score INTEGER DEFAULT 0,
         away_score INTEGER DEFAULT 0,
+        game_not TEXT,
         FOREIGN KEY (series_id) REFERENCES series(series_id)
     )",
         (),

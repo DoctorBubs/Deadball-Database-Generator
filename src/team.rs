@@ -1,6 +1,7 @@
 use crate::b_traits::BTraits;
 use crate::edit_league_error::EditLeagueError;
 use crate::inquire_check;
+use crate::league::EditLeagueError;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
@@ -30,6 +31,7 @@ use core::fmt;
 
 use std::fmt::Write;
 
+
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
 Team's also have a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
 #[derive(Serialize, Deserialize, Debug)]
@@ -45,6 +47,7 @@ pub struct Team {
     pub wins: i32,
     pub losses: i32,
     pub team_id: i64,
+    pub note: Note,
 }
 
 impl Team {
@@ -66,6 +69,7 @@ impl Team {
             team_score: 0,
             wins: 0,
             losses: 0,
+            note: None,
         };
 
         new_team.calc_team_score();
@@ -150,6 +154,16 @@ impl fmt::Display for Team {
     }
 }
 
+impl Notable for Team {
+    fn get_note(&self) -> &Note {
+        &self.note
+    }
+
+    fn get_note_input_string(&self) -> String {
+        format!("Please enter the note you wish to attach to {}", self.name)
+    }
+}
+
 // Take a vector of players, and reduces it to the sum of how much they contribute to a team score.
 // Batters contribution is based off their BT, while pitchers is based off their pitch dice.
 fn team_score_from_vec(vec: &[Player]) -> i32 {
@@ -198,7 +212,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int,player_note
         FROM players 
         WHERE team_id = ?1"
     )?;
@@ -230,6 +244,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
                 trade_value: row.get(15)?,
                 team_id: row.get(16)?,
                 player_id: row.get(17)?,
+                note: serde_json::from_value(row.get(19)?).unwrap(),
             },
         })
     })?;
