@@ -329,6 +329,17 @@ impl Player {
         }
     }
 
+    /// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new palyter
+    pub fn get_default_info() -> (i32, String, String, i64, i64, Note) {
+    let age = 0;
+    let pos = "".to_string();
+    let name = "".to_string();
+    let player_id = 0;
+    let team_id = 0;
+    let note = None;
+    (age, pos, name, player_id, team_id, note)
+}
+
     pub fn new(
         pos: String,
         gender: PlayerGender,

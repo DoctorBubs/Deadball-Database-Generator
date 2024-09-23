@@ -17,16 +17,7 @@ use serde::Serialize;
     and we apply the traits to an enum for both pitchers and hittters to determnig the calculations for each.
 */
 
-/// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new palyter
-fn get_default_player_id() -> (i32, String, String, i64, i64, Note) {
-    let age = 0;
-    let pos = "".to_string();
-    let name = "".to_string();
-    let player_id = 0;
-    let team_id = 0;
-    let note = None;
-    (age, pos, name, player_id, team_id, note)
-}
+
 pub trait PlayerQuality {
     fn get_bt(&self, thread: &mut ThreadRng) -> i32;
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32;
@@ -68,7 +59,7 @@ pub trait PlayerQuality {
             }
         };
         let hand = self.get_hand(thread);
-        let (age, pos, name, player_id, team_id, note) = get_default_player_id();
+        let (age, pos, name, player_id, team_id, note) = Player::get_default_info();
         Player {
             name,
             age,
@@ -83,7 +74,7 @@ pub trait PlayerQuality {
             hand,
             player_id,
             team_id,
-            note,
+            note
         }
     }
 }
