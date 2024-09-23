@@ -1,9 +1,9 @@
-use std::collections::HashMap;
 use crate::edit_league_error::EditLeagueError;
 use crate::inquire_check;
 use crate::league::{save_league, League};
 use crate::team::Team;
 use itertools::Itertools;
+use std::collections::HashMap;
 //use serde::ser;
 use inquire::{CustomType, InquireError};
 use rand::prelude::IteratorRandom;

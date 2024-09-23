@@ -1,11 +1,11 @@
-use core::fmt;
 use crate::edit_league_error::EditLeagueError;
 use crate::{
     era::Era,
     inquire_check,
-    league::{check_name_hash, save_league,League},
+    league::{check_name_hash, save_league, League},
     player::PlayerGender,
 };
+use core::fmt;
 
 use rand::rngs::ThreadRng;
 use rusqlite::Connection;

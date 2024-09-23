@@ -57,26 +57,11 @@ impl AgeCat {
 }
 
 // Players can be either left handed or right handed, however batters may also be switch hitters. We use an enum to keep track.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum Hand {
     R,
     L,
     S,
-}
-
-impl Hand {
-    pub fn new(thread: &mut ThreadRng, quality: &impl PlayerQuality) -> Hand {
-        let roll = thread.gen_range(1..=10);
-        match roll {
-            1..=6 => Self::R,
-            7..=9 => Self::L,
-            10 => match quality.for_pitcher() {
-                true => Self::L,
-                false => Self::S,
-            },
-            _ => Self::R,
-        }
-    }
 }
 
 impl fmt::Display for Hand {
@@ -351,50 +336,18 @@ impl Player {
         thread: &mut ThreadRng,
         era: Era,
     ) -> Player {
+        // First, we randomly generate a player's age and name.
         let name = gender.new_name();
-        let bt = quality.get_bt(thread);
-        let obt_mod = quality.get_obt_mod(thread);
-        let obt = bt + obt_mod;
-        let mut b_traits = BTraits::default();
-        quality.calc_traits(&mut b_traits, thread);
-        /*let pd = match quality{
-        BatterQuality::Pitcher => Some(PD::D8),
-        _ => None
-        }*/
-        let pd = quality.get_pd(thread, era);
-        let pitcher_trait = quality.get_pitcher_trait(thread);
-        let hand = Hand::new(thread, &quality);
         let age_cat = AgeCat::random(thread);
         let age = age_cat.new_age(thread);
-        let trade_value = match pd {
-            None => bt + b_traits.get_trade_value(),
-            Some(pd) => {
-                let base = pd.to_int();
-                match pitcher_trait {
-                    Some(_) => (base + 1) * 5,
-                    None => base * 5,
-                }
-            }
-        };
-        let note = None;
-        // Since we don't know what the team_id or player_id will be in the database, we set both to 0 temporarily.
-        let team_id = 0;
-        let player_id = 0;
+        //Next we use the quality to generate the players stats such as bt and pd.
+        let generated_player = quality.gen_player(thread, era);
+        // and we fill out the players fields.
         Player {
             name,
-            pos,
             age,
-            hand,
-            bt,
-            obt_mod,
-            obt,
-            pd,
-            b_traits,
-            pitcher_trait,
-            trade_value,
-            team_id,
-            player_id,
-            note,
+            pos,
+            ..generated_player
         }
     }
 }

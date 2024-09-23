@@ -33,7 +33,6 @@ use core::fmt;
 
 use std::fmt::Write;
 
-
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
 Team's also have a team score, which is used in Deadball to simulate a game with only a few dice rolls.' */
 #[derive(Serialize, Deserialize, Debug)]

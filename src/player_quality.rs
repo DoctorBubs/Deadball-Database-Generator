@@ -1,5 +1,11 @@
+use std::thread;
+
 use crate::b_traits::BTraits;
+use crate::note::Note;
 use crate::pd::PD;
+use crate::player::Hand;
+use crate::player::Player;
+use crate::traits::Contact;
 use crate::traits::PitcherTrait;
 use crate::Era;
 use crate::ThreadRng;
@@ -10,19 +16,81 @@ use serde::Serialize;
 /*  There are several fields on the player struct that are generated differently for batters and pitchers. We use a PlayerQuality trait to summarize what calculation have to be made for both,
     and we apply the traits to an enum for both pitchers and hittters to determnig the calculations for each.
 */
+
+/// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new palyter
+fn get_default_player_id() -> (i32, String, String, i64, i64, Note) {
+    let age = 0;
+    let pos = "".to_string();
+    let name = "".to_string();
+    let player_id = 0;
+    let team_id = 0;
+    let note = None;
+    (age, pos, name, player_id, team_id, note)
+}
 pub trait PlayerQuality {
     fn get_bt(&self, thread: &mut ThreadRng) -> i32;
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32;
     fn get_pd(&self, thread: &mut ThreadRng, era: Era) -> Option<PD>;
     fn for_pitcher(&self) -> bool;
-
+    fn get_hand(&self, thread: &mut ThreadRng) -> Hand {
+        let roll = thread.gen_range(1..=10);
+        match roll {
+            1..=6 => Hand::R,
+            7..=9 => Hand::L,
+            10 => match self.for_pitcher() {
+                true => Hand::L,
+                false => Hand::S,
+            },
+            _ => Hand::R,
+        }
+    }
     fn calc_traits(&self, _trait_struct: &mut BTraits, _thread: &mut ThreadRng) {}
     fn get_pitcher_trait(&self, thread: &mut ThreadRng) -> Option<PitcherTrait>;
+    fn upgrade(&self) -> Self;
+    fn get_box_copy(&self) -> Box<Self>;
+    /// Randomly generates a base player based off the quality.
+    fn gen_player(&self, thread: &mut ThreadRng, era: Era) -> Player {
+        let bt = self.get_bt(thread);
+        let obt_mod = self.get_obt_mod(thread);
+        let obt = bt + obt_mod;
+        let mut b_traits = BTraits::default();
+        self.calc_traits(&mut b_traits, thread);
+        let pd = self.get_pd(thread, era);
+        let pitcher_trait = self.get_pitcher_trait(thread);
+        let trade_value = match pd {
+            None => bt + b_traits.get_trade_value(),
+            Some(pd) => {
+                let base = pd.to_int();
+                match pitcher_trait {
+                    Some(_) => (base + 1) * 5,
+                    None => base * 5,
+                }
+            }
+        };
+        let hand = self.get_hand(thread);
+        let (age, pos, name, player_id, team_id, note) = get_default_player_id();
+        Player {
+            name,
+            age,
+            pos,
+            bt,
+            obt_mod,
+            obt,
+            b_traits,
+            pd,
+            pitcher_trait,
+            trade_value,
+            hand,
+            player_id,
+            team_id,
+            note,
+        }
+    }
 }
 
 /* Batter quality is the enum used ot generated batters. Batters do not get a base pitch die, however their stats for hitting are much better then pitchers.
- The batter qualtiy enum has 2 levels, TopProspect and Farmhand. Currently, TopProspect is used to generate playts in a teams startinging lineup, while the lower quality
-farmhands is used for the typically wore performing bench players */
+ The batter quality enum has 2 levels, TopProspect and Farmhand. Currently, TopProspect is used to generate players in a teams starting lineup, while the lower quality
+farmhands is used for the typically worse performing bench players. */
 #[derive(Copy, Clone, Serialize, Deserialize)]
 pub enum BatterQuality {
     TopProspect,
@@ -68,6 +136,13 @@ impl PlayerQuality for BatterQuality {
             }
         }
     }
+
+    fn upgrade(&self) -> Self {
+        Self::TopProspect
+    }
+    fn get_box_copy(&self) -> Box<Self> {
+        Box::new(*self)
+    }
 }
 
 // The pitcher quality enum is used to generate the pitcher stats. Currenly, only the top prosepect enum is used, this may change in the future.
@@ -106,6 +181,14 @@ impl PlayerQuality for PitcherQuality {
             18 => Some(PitcherTrait::ST),
             _ => None,
         }
+    }
+
+    fn upgrade(&self) -> Self {
+        Self::TopProspect
+    }
+
+    fn get_box_copy(&self) -> Box<Self> {
+        Box::new(*self)
     }
 }
 
