@@ -399,7 +399,7 @@ mod tests {
         assert!(double_abrv_check.is_err());
         println!("Now lets check the leaderboards");
         current_league.display_top_hitters(&mut test_conn).unwrap();
-    
+
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(

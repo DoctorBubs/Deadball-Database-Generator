@@ -17,7 +17,6 @@ use serde::Serialize;
     and we apply the traits to an enum for both pitchers and hittters to determnig the calculations for each.
 */
 
-
 pub trait PlayerQuality {
     fn get_bt(&self, thread: &mut ThreadRng) -> i32;
     fn get_obt_mod(&self, thread: &mut ThreadRng) -> i32;
@@ -74,7 +73,7 @@ pub trait PlayerQuality {
             hand,
             player_id,
             team_id,
-            note
+            note,
         }
     }
 }

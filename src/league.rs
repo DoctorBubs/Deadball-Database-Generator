@@ -48,19 +48,18 @@ use crate::ThreadRng;
 use std::collections::HashMap;
 
 /// Used when sorting players via a leaderboard.
-#[derive(Debug,Copy,Clone)]
-enum PlayerSortBy<T: PlayerTrait>{
+#[derive(Debug, Copy, Clone)]
+enum PlayerSortBy<T: PlayerTrait> {
     Bt,
     Obt,
     Obt_Mod,
     Age,
-    B_Trait(T)
+    B_Trait(T),
 }
 
-
-struct BatterLeaderBoardWrapper{
+struct BatterLeaderBoardWrapper {
     team_name: String,
-    player: Player
+    player: Player,
 }
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
@@ -236,16 +235,16 @@ impl League {
 
         Ok(())
     }
-    
-    
-   
-    /// Displays a leaderboard of the top 10 batters in the league, sorted by obt.
-    pub fn display_top_hitters(&self,conn: &mut Connection) -> Result<(), rusqlite::Error> {
-        
+
+    /// Displays a leaderboard of the top 10 batters in the league.
+    /// The query is structured so that batters with high on base targets, power, and the platoon
+    /// advntage will be higher in the leaderboard
+    pub fn display_top_hitters(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
         /* We create a SQL query for data on the top 10 batters.
          We do not need to query for data regarding a players pitching ability or their id, as we will use a default later to fill in the empty fields.
         */
-        let mut stmt = conn.prepare("
+        let mut stmt = conn.prepare(
+            "
             SELECT
                 teams.team_name,
                 players.player_name,
@@ -303,55 +302,62 @@ impl League {
                 teams.league_id = ?1
                 AND players.PD IS NULL
             ORDER BY
+                /*To Sort, we add the players obt + power_number + hand number
+                 The idea that is that players with high obts, powers and platoon
+                advantage will be high up in the query
+                If there is a tie, we sort by the individual field used.
+                We are using the assumption that OBT is more important then power, ann
+                 power is more important than the platoon advantage. */
                 players.obt + power_number + hand_number DESC,
                 hand_number DESC,
                 players.obt DESC, 
                 power_number DESC,
+                /*If there is still a tie, we sort by the other rows in the query
+                 First we sort by how good at contact the player is. */
                 contact_number DESC,
                 players.bt DESC, 
-                speed_number DESC,
+                --Then we check speed and defense, with defense being more important.
                 defense_number DESC,
+                speed_number DESC,
+                -- Finally, we sort by if the players is resistant to injury, and then finally age.
                 toughness_number DESC,
                 players.age ASC
           LIMIT 10;
-        ")?;
-        let player_iter = stmt.query_map([self.league_id], |row|{
-            Ok(
-                BatterLeaderBoardWrapper{
-                    team_name: row.get(0)?,
-                    player: Player {
-                        name: row.get(1)?,
-                        age: row.get(2)?,
-                        pos: row.get(3)?,
-                        hand: serde_json::from_value(row.get(4)?).unwrap(),
-                        bt: row.get(5)?,
-                        obt_mod: row.get(6)?,
-                        obt: row.get(7)?,
-                        b_traits: BTraits {
-                            contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
-                            defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
-                            power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
-                            speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
-                            toughness: serde_json::from_value(row.get(12)?).unwrap_or(Toughness::T0),
-                        },
-                        // We use a default player to fill in the fields we did not query from.
-                        ..Player::default()
+        ",
+        )?;
+        let player_iter = stmt.query_map([self.league_id], |row| {
+            Ok(BatterLeaderBoardWrapper {
+                team_name: row.get(0)?,
+                player: Player {
+                    name: row.get(1)?,
+                    age: row.get(2)?,
+                    pos: row.get(3)?,
+                    hand: serde_json::from_value(row.get(4)?).unwrap(),
+                    bt: row.get(5)?,
+                    obt_mod: row.get(6)?,
+                    obt: row.get(7)?,
+                    b_traits: BTraits {
+                        contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
+                        defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
+                        power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
+                        speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
+                        toughness: serde_json::from_value(row.get(12)?).unwrap_or(Toughness::T0),
                     },
-                }
-            )
+                    // We use a default player to fill in the fields we did not query from.
+                    ..Player::default()
+                },
+            })
         })?;
-     println!("Team_name,Player_Name, Age,Pos,Hand,Bt,OBT_Mod,OBT,Traits");
-     for result in player_iter{
-        let wrapper = result?;
-        let BatterLeaderBoardWrapper{team_name, player} = wrapper;
-        println!("{},{}",team_name,player)
-     }
-        
-    Ok(())
-        
+        println!("Team_name,Player_Name, Age,Pos,Hand,Bt,OBT_Mod,OBT,Traits");
+        for result in player_iter {
+            let wrapper = result?;
+            let BatterLeaderBoardWrapper { team_name, player } = wrapper;
+            println!("{},{}", team_name, player)
+        }
 
+        Ok(())
     }
-    
+
     /*  Take a new abbrevaiton and name for a team, a thread for random number, a league id and connection to the the database.
         If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it is succesfull, an Ok is returned
     */

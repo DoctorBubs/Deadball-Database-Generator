@@ -332,14 +332,14 @@ impl Player {
 
     /// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new palyter
     pub fn get_default_info() -> (i32, String, String, i64, i64, Note) {
-    let age = 0;
-    let pos = "".to_string();
-    let name = "".to_string();
-    let player_id = 0;
-    let team_id = 0;
-    let note = None;
-    (age, pos, name, player_id, team_id, note)
-}
+        let age = 0;
+        let pos = "".to_string();
+        let name = "".to_string();
+        let player_id = 0;
+        let team_id = 0;
+        let note = None;
+        (age, pos, name, player_id, team_id, note)
+    }
 
     pub fn new(
         pos: String,
@@ -362,14 +362,12 @@ impl Player {
             ..generated_player
         }
     }
-    
-
 }
 
-impl Default for Player{
+impl Default for Player {
     fn default() -> Self {
-        let (age,pos,name,player_id,team_id,note) = Self::get_default_info();
-        Player{
+        let (age, pos, name, player_id, team_id, note) = Self::get_default_info();
+        Player {
             name,
             age,
             pos,
@@ -378,18 +376,15 @@ impl Default for Player{
             obt_mod: 0,
             obt: 0,
             pd: None,
-            b_traits: BTraits ::default(),
+            b_traits: BTraits::default(),
             pitcher_trait: None,
             trade_value: 0,
             team_id,
             player_id,
-            note
-            
-
+            note,
         }
     }
 }
-
 
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
