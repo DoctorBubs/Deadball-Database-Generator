@@ -252,13 +252,12 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
 
     for result in player_iter {
         // We remove the player wrapper from the Ok.
-        let wrapper = result.unwrap();
         //We destructure the player wrapper.
         let PlayerWrapper {
             team_spot,
             player,
             pd_int,
-        } = wrapper;
+        } = result?;
 
         // We check if the loader player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);

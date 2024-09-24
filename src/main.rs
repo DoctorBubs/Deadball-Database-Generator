@@ -178,11 +178,11 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
             */
              pitcher_trait TEXT , -- Traits for pitchers
              team_spot TEXT NOT NULL, -- Represents where a player is on a team. E.G are they starting lineup or in the bullpen.
-             contact BLOB ,
-             defense BLOB,
-             power BLOB ,
-             speed BLOB ,
-             toughness BLOB,
+             contact TEXT ,
+             defense TEXT,
+             power TEXT ,
+             speed TEXT ,
+             toughness TEXT,
              trade_value INTEGER NOT NULL,
              player_note TEXT,
              FOREIGN KEY(team_id) REFERENCES teams(team_id)
@@ -399,7 +399,8 @@ mod tests {
         assert!(double_abrv_check.is_err());
         println!("Now lets check the leaderboards");
         current_league.display_top_hitters(&mut test_conn).unwrap();
-
+        println!("Now the pitcher leaderboard");
+        current_league.display_top_pitchers(&mut test_conn).unwrap();
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(

@@ -49,15 +49,16 @@ use std::collections::HashMap;
 
 /// Used when sorting players via a leaderboard.
 #[derive(Debug, Copy, Clone)]
-enum PlayerSortBy<T: PlayerTrait> {
+enum _PlayerSortBy<T: PlayerTrait> {
     Bt,
     Obt,
     Obt_Mod,
     Age,
     B_Trait(T),
 }
-
-struct BatterLeaderBoardWrapper {
+/// Used when adding players to leaderboards, this struct contains a player and the name of it's teams.
+#[derive(Debug)]
+struct PlayerRankWrapper {
     team_name: String,
     player: Player,
 }
@@ -88,7 +89,7 @@ pub struct LeagueWrapper {
     pub league: League,
 }
 
-// We implement display for LeagueWrapper, as we will need to see print a list of all leeagues to the console when a user wants to open an existing leaghue
+// We implement display for LeagueWrapper, as we will need to see print a list of all leagues to the console when a user wants to open an existing leaghue
 impl fmt::Display for LeagueWrapper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}_{}", self.league_id, self.league.name)
@@ -322,42 +323,136 @@ impl League {
                 -- Finally, we sort by if the players is resistant to injury, and then finally age.
                 toughness_number DESC,
                 players.age ASC
+                -- And we limit the players in the query to 10.
           LIMIT 10;
         ",
         )?;
         let player_iter = stmt.query_map([self.league_id], |row| {
-            Ok(BatterLeaderBoardWrapper {
+            Ok(
+                // We Save the team name in the PlayerRankWrapper
+                PlayerRankWrapper {
+                    team_name: row.get(0)?,
+                    player: Player {
+                        // And we fill the fields in the player struct with values from the rows.
+                        name: row.get(1)?,
+                        age: row.get(2)?,
+                        pos: row.get(3)?,
+                        hand: serde_json::from_value(row.get(4)?).unwrap(),
+                        bt: row.get(5)?,
+                        obt_mod: row.get(6)?,
+                        obt: row.get(7)?,
+                        b_traits: BTraits {
+                            contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
+                            defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
+                            power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
+                            speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
+                            toughness: serde_json::from_value(row.get(12)?)
+                                .unwrap_or(Toughness::T0),
+                        },
+                        // We use a default player to fill in the fields we did not query from.
+                        ..Player::default()
+                    },
+                },
+            )
+        })?;
+        // We print a line of headers for each category to display
+        println!("Team_name,Player_Name, Age,Pos,Hand,Bt,OBT_Mod,OBT,Traits");
+        // We then loop over the player iter to print what we need.
+        for result in player_iter {
+            // We remove the PlayerRankWrapper from the ok, and deconstruct it
+
+            let PlayerRankWrapper { team_name, player } = result?;
+            /* Since we have already implemented the Display trait for Player, and
+            the string generated matches what we want, we cna just print the player directly */
+            println!("{},{}", team_name, player)
+        }
+        // We then return Ok as we have gotten this far without an error from the database.
+        Ok(())
+    }
+    ///Prints a ranking of the top 10 pitchers in the league.
+    /// Players with better pd and traits go higher, preference is also given to leftys.
+    pub fn display_top_pitchers(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
+        let mut stmt = conn.prepare(
+            "
+            SELECT 
+                teams.team_name,
+                players.player_name,
+                players.age,
+                players.hand,
+                players.PD,
+                players.pitcher_trait,
+                players.pos,
+                players.pd_int,
+                CASE
+                    WHEN players.pitcher_trait IS NULL THEN 0
+                    WHEN players.pitcher_trait LIKE '%CN-%' THEN -1
+                    ELSE 1
+                END AS pitcher_trait_num,
+                CASE
+                    WHEN players.hand LIKE '%L%' THEN 1
+                    ELSE 0
+                END AS hand_num
+            FROM
+                teams
+            INNER JOIN 
+                players
+            ON
+                teams.team_id = players.team_id
+            WHERE
+                teams.league_id = ?1
+                AND players.PD IS NOT NULL
+            
+            ORDER BY players.pd_int DESC, pitcher_trait_num DESC, hand_num DESC, players.age DESC
+        LIMIT 10;
+        ",
+        )?;
+
+        let player_iter = stmt.query_map([self.league_id], |row| {
+            Ok(PlayerRankWrapper {
                 team_name: row.get(0)?,
                 player: Player {
                     name: row.get(1)?,
                     age: row.get(2)?,
-                    pos: row.get(3)?,
-                    hand: serde_json::from_value(row.get(4)?).unwrap(),
-                    bt: row.get(5)?,
-                    obt_mod: row.get(6)?,
-                    obt: row.get(7)?,
-                    b_traits: BTraits {
-                        contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
-                        defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
-                        power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
-                        speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
-                        toughness: serde_json::from_value(row.get(12)?).unwrap_or(Toughness::T0),
-                    },
-                    // We use a default player to fill in the fields we did not query from.
+                    hand: serde_json::from_value(row.get(3)?).unwrap(),
+                    pd: serde_json::from_value(row.get(4)?).unwrap(),
+                    pitcher_trait: serde_json::from_value(row.get(5)?).unwrap(),
+                    pos: row.get(6)?,
+                    // We fill the rest of the player fields with default datat.
                     ..Player::default()
                 },
             })
         })?;
-        println!("Team_name,Player_Name, Age,Pos,Hand,Bt,OBT_Mod,OBT,Traits");
+        println!("Team,name,pos,hand,age,PD,Trait");
         for result in player_iter {
-            let wrapper = result?;
-            let BatterLeaderBoardWrapper { team_name, player } = wrapper;
-            println!("{},{}", team_name, player)
+            let PlayerRankWrapper { team_name, player } = result.unwrap();
+            let Player {
+                name,
+                pos,
+                hand,
+                age,
+                pd,
+                pitcher_trait,
+                ..
+            } = player;
+            // Since not all pitchers will have PitcherTraits, we match to create a string value.
+            let p_trait_value = match pitcher_trait {
+                Some(value) => format!("{}", value),
+                None => "".to_string(),
+            };
+            // We print the fields. Since a player will always have a PD , we are OK to unwrap it.
+            println!(
+                "{},{},{},{},{},{},{}",
+                team_name,
+                name,
+                pos,
+                hand,
+                age,
+                pd.unwrap(),
+                p_trait_value
+            )
         }
-
         Ok(())
     }
-
     /*  Take a new abbrevaiton and name for a team, a thread for random number, a league id and connection to the the database.
         If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it is succesfull, an Ok is returned
     */
