@@ -8,7 +8,9 @@ use inquire::validator::MinLengthValidator;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
+use rusqlite::Result;
 
+use crate::b_traits::BTraits;
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
@@ -17,6 +19,14 @@ use crate::main_menu::LoadLeagueInput;
 use crate::note::Notable;
 use crate::note::Note;
 use crate::player::select_gender;
+use crate::player::Hand;
+use crate::player::Player;
+use crate::traits::Contact;
+use crate::traits::Defense;
+use crate::traits::PlayerTrait;
+use crate::traits::Power;
+use crate::traits::Speed;
+use crate::traits::Toughness;
 use rusqlite::Connection;
 //use crate::sched_view::view_schedule;
 
@@ -37,6 +47,21 @@ use crate::ThreadRng;
 //use crate::schedule::*;
 use std::collections::HashMap;
 
+/// Used when sorting players via a leaderboard.
+#[derive(Debug,Copy,Clone)]
+enum PlayerSortBy<T: PlayerTrait>{
+    Bt,
+    Obt,
+    Obt_Mod,
+    Age,
+    B_Trait(T)
+}
+
+
+struct BatterLeaderBoardWrapper{
+    team_name: String,
+    player: Player
+}
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
 #[derive(Debug, Serialize, Deserialize)]
@@ -211,6 +236,79 @@ impl League {
 
         Ok(())
     }
+    
+    
+   
+    /// Displays a leaderboard of the top 10 batters in the league, sorted by obt.
+    pub fn display_top_hitters(&self,conn: &mut Connection) -> Result<(), rusqlite::Error> {
+        
+        /* We create a SQL query for data on the top 10 batters.
+         We do not need to query for data regarding a players pitching ability or their id, as we will use a default later to fill in the empty fields.
+        */
+        let mut stmt = conn.prepare("
+            SELECT
+                teams.team_name,
+                players.player_name,
+                players.age,
+                players.pos,
+                players.hand,
+                players.bt,
+                players.obt_mod,
+                players.obt,
+                players.contact,
+                players.defense,
+                players.power,
+                players.speed,
+                players.toughness
+            FROM teams
+            INNER JOIN 
+                players
+            ON
+                players.team_id = teams.team_id
+            WHERE
+                teams.league_id = ?1
+                AND players.PD IS NULL
+            ORDER BY
+                players.obt DESC, players.bt DESC, players.age ASC
+            LIMIT 10;
+        ")?;
+        let player_iter = stmt.query_map([self.league_id], |row|{
+            Ok(
+                BatterLeaderBoardWrapper{
+                    team_name: row.get(0)?,
+                    player: Player {
+                        name: row.get(1)?,
+                        age: row.get(2)?,
+                        pos: row.get(3)?,
+                        hand: serde_json::from_value(row.get(4)?).unwrap(),
+                        bt: row.get(5)?,
+                        obt_mod: row.get(6)?,
+                        obt: row.get(7)?,
+                        b_traits: BTraits {
+                            contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
+                            defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
+                            power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
+                            speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
+                            toughness: serde_json::from_value(row.get(12)?).unwrap_or(Toughness::T0),
+                        },
+                        // We use a default player to fill in the fields we did not query from.
+                        ..Player::default()
+                    },
+                }
+            )
+        })?;
+     println!("Team_name,Player_Name, Age,Pos,Hand,Bt,OBT_Mod,OBT,Traits");
+     for result in player_iter{
+        let wrapper = result?;
+        let BatterLeaderBoardWrapper{team_name, player} = wrapper;
+        println!("{},{}",team_name,player)
+     }
+        
+    Ok(())
+        
+
+    }
+    
     /*  Take a new abbrevaiton and name for a team, a thread for random number, a league id and connection to the the database.
         If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it is succesfull, an Ok is returned
     */

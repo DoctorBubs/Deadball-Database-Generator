@@ -25,6 +25,7 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::Connection;
 
+use std::default;
 use std::fmt;
 pub enum AgeCat {
     Prospect,
@@ -361,7 +362,34 @@ impl Player {
             ..generated_player
         }
     }
+    
+
 }
+
+impl Default for Player{
+    fn default() -> Self {
+        let (age,pos,name,player_id,team_id,note) = Self::get_default_info();
+        Player{
+            name,
+            age,
+            pos,
+            hand: Hand::R,
+            bt: 0,
+            obt_mod: 0,
+            obt: 0,
+            pd: None,
+            b_traits: BTraits ::default(),
+            pitcher_trait: None,
+            trade_value: 0,
+            team_id,
+            player_id,
+            note
+            
+
+        }
+    }
+}
+
 
 impl fmt::Display for Player {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
