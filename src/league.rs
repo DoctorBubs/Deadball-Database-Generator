@@ -259,7 +259,41 @@ impl League {
                 players.defense,
                 players.power,
                 players.speed,
-                players.toughness
+                players.toughness,
+                -- Next we convert the players batter traits to numbers for use in sorting.
+                CASE
+                    WHEN players.power LIKE '%P++%' THEN 4
+                    WHEN players.power LIKE '%P+%' THEN 2
+                    WHEN players.power LIKE '%P-%' THEN -2
+                    WHEN players.power LIKE '%P--%' THEN -4
+                    ELSE 0
+                END AS power_number,
+                CASE
+                    WHEN players.contact LIKE '%C+%' THEN 1
+                    WHEN players.contact LIKE '%C-%' THEN 0
+                    ELSE 0
+                END AS contact_number,
+                CASE 
+                    WHEN players.speed LIKE '%S++%' THEN 2
+                    WHEN players.speed  LIKE '%S+%' THEN 1
+                    WHEN players.speed LIKE '%S-' THEN -1
+                    ELSE 0
+                END AS speed_number,
+                CASE
+                    WHEN players.defense LIKE '%D+%' Then 1
+                    WHEN players.defense LIKE '%D-%' THEN -1
+                    ELSE 0
+                END AS defense_number,
+                CASE
+                    WHEN players.toughness LIKE '%T+%' THEN 1
+                    ELSE 0
+                END AS toughness_number,
+                -- We also convert Hand to a number
+                CASE
+                    WHEN players.hand LIKE '%S%' THEN 5
+                    WHEN players.hand LIKE '%L%' THEN 2
+                    ELSE 0
+                END AS hand_number
             FROM teams
             INNER JOIN 
                 players
@@ -269,8 +303,17 @@ impl League {
                 teams.league_id = ?1
                 AND players.PD IS NULL
             ORDER BY
-                players.obt DESC, players.bt DESC, players.age ASC
-            LIMIT 10;
+                players.obt + power_number + hand_number DESC,
+                hand_number DESC,
+                players.obt DESC, 
+                power_number DESC,
+                contact_number DESC,
+                players.bt DESC, 
+                speed_number DESC,
+                defense_number DESC,
+                toughness_number DESC,
+                players.age ASC
+          LIMIT 10;
         ")?;
         let player_iter = stmt.query_map([self.league_id], |row|{
             Ok(

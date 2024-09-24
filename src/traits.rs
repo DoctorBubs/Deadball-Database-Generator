@@ -78,7 +78,7 @@ pub enum Speed {
     S1,
     #[serde(rename = "")]
     S0,
-    #[serde(rename = "S++")]
+    #[serde(rename = "S-")]
     SM1,
 }
 
@@ -148,7 +148,7 @@ pub enum Defense {
     D1,
     #[serde(rename = "")]
     D0,
-    #[serde(rename = "C-")]
+    #[serde(rename = "D-")]
     DM1,
 }
 

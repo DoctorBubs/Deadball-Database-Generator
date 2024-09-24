@@ -178,11 +178,11 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
             */
              pitcher_trait TEXT , -- Traits for pitchers
              team_spot TEXT NOT NULL, -- Represents where a player is on a team. E.G are they starting lineup or in the bullpen.
-             contact TEXT ,
-             defense TEXT,
-             power TEXT ,
-             speed TEXT ,
-             toughness TEXT,
+             contact BLOB ,
+             defense BLOB,
+             power BLOB ,
+             speed BLOB ,
+             toughness BLOB,
              trade_value INTEGER NOT NULL,
              player_note TEXT,
              FOREIGN KEY(team_id) REFERENCES teams(team_id)
