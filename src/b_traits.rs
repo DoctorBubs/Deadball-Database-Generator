@@ -53,17 +53,6 @@ impl BTraits {
         }
     }
 
-    // creates a default BTraits
-    pub fn default() -> BTraits {
-        BTraits {
-            contact: Contact::C0,
-            defense: Defense::D0,
-            power: Power::P0,
-            speed: Speed::S0,
-            toughness: Toughness::T0,
-        }
-    }
-
     pub fn get_trade_value(&self) -> i32 {
         (self.contact.to_int()
             + self.defense.to_int()
@@ -147,6 +136,17 @@ impl BTraits {
     */
 }
 
+impl Default for BTraits {
+    fn default() -> Self {
+        BTraits {
+            contact: Contact::C0,
+            defense: Defense::D0,
+            power: Power::P0,
+            speed: Speed::S0,
+            toughness: Toughness::T0,
+        }
+    }
+}
 impl fmt::Display for BTraits {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = format!(
@@ -157,7 +157,7 @@ impl fmt::Display for BTraits {
         write!(f, "{}", chars)
     }
 }
-
+/// Takes a original trait and a new trait. If the new trait is a valid upgrade or downgrade, the new trait is returned.
 fn trait_stack<T: PlayerTrait>(original: T, new: T) -> T {
     let original_num = original.to_int();
     let new_num = new.to_int();

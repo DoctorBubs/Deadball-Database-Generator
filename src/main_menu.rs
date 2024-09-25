@@ -12,6 +12,7 @@ pub enum LoadLeagueInput {
     EditLeague(EditLeagueInput),
     RefreshLeague,
     ViewSchedule,
+    ViewRankings,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -39,11 +40,27 @@ impl fmt::Display for MenuInput {
                     EditLeagueInput::CreateSchedule => "Generate a schedule for an existing league",
                 },
                 LoadLeagueInput::ViewSchedule => "View schedule.",
+                LoadLeagueInput::ViewRankings => "View the top 10 batter or pitchers for a league.",
             },
             Self::LoadLeagueFromTemplate => "Create a new league from a template.",
             Self::Exit => "Exit",
         };
         write!(f, "{}", chars)
+    }
+}
+
+pub enum RankingsChoice {
+    Batters,
+    Pitchers,
+}
+
+impl fmt::Display for RankingsChoice {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let text = match self {
+            Self::Batters => "View top 10 Batters",
+            Self::Pitchers => "View top 10 Pitchers",
+        };
+        write!(f, "{}", text)
     }
 }
 
@@ -55,6 +72,7 @@ pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<()
         MenuInput::CreateNewLeague,
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_team)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
+        MenuInput::LoadExistingLeague(LoadLeagueInput::ViewRankings),
         // Uncomment the next 2 lines to enable schedule generation.
         //MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_sched)),
         //MenuInput::LoadExistingLeague(LoadLeagueInput::ViewSchedule),

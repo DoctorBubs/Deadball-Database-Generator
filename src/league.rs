@@ -4,6 +4,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
+use inquire::validator::ErrorMessage;
 use inquire::validator::MinLengthValidator;
 use inquire::InquireError;
 use inquire::Select;
@@ -16,6 +17,7 @@ use crate::era::select_era;
 use crate::inquire_check;
 use crate::main_menu::EditLeagueInput;
 use crate::main_menu::LoadLeagueInput;
+use crate::main_menu::RankingsChoice;
 use crate::note::Notable;
 use crate::note::Note;
 use crate::player::select_gender;
@@ -453,8 +455,31 @@ impl League {
         }
         Ok(())
     }
-    /*  Take a new abbrevaiton and name for a team, a thread for random number, a league id and connection to the the database.
-        If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it is succesfull, an Ok is returned
+    /// Prompts the user to what player rankings they would like to see.
+    pub fn display_ranking(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
+        // We give the user the chance to pick if we are going to rank batters or pitchers.
+        let options = vec![RankingsChoice::Batters, RankingsChoice::Pitchers];
+        let answer = Select::new("Which player rankings would you like to see?", options).prompt();
+        match answer {
+            // We return the inquire error if their is one
+            Err(message) => Err(EditLeagueError::Inquire(message)),
+            Ok(value) => {
+                //Otherwise, we run a query for top pitchers or hitters.
+                let query_result = match value {
+                    RankingsChoice::Batters => self.display_top_hitters(conn),
+                    RankingsChoice::Pitchers => self.display_top_pitchers(conn),
+                };
+                // Finally, we check if their was an error running the query.
+                match query_result {
+                    Ok(()) => Ok(()),
+                    Err(message) => Err(EditLeagueError::DatabaseError(message)),
+                }
+            }
+        }
+    }
+
+    /*  Take a new abbreviation and name for a team, a thread for random number, a league id and connection to the the database.
+        If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it succeeds, an Ok is returned
     */
     pub fn new_team(
         &mut self,
@@ -690,9 +715,11 @@ pub fn load_league(
     } = wrapper;
 
     if let Err(message) = league.display_standings(conn) {
+        println!("Error Displaying Standings");
         return Err(EditLeagueError::DatabaseError(message));
     }
     if let Err(message) = load_teams_from_sql(league_id, &mut league, conn) {
+        println!("Error loading teams");
         return Err(EditLeagueError::DatabaseError(message));
     }
 
@@ -728,13 +755,9 @@ pub fn get_all_leagues_from_db(
             league: League {
                 name: row.get(1)?,
                 era: serde_json::from_value(row.get(2)?).unwrap(),
-
-                //
                 gender: serde_json::from_value(row.get(3)?).unwrap(),
                 note: serde_json::from_value(row.get(4)?).unwrap(),
                 league_id: row.get(0)?,
-
-                //PlayerGender::from_string(row.get(3)?),
                 teams: Vec::new(),
             },
         })
@@ -783,6 +806,7 @@ pub fn league_check(
                     Ok(())
                 }
                 LoadLeagueInput::ViewSchedule => view_schedule(&select.league, conn),
+                LoadLeagueInput::ViewRankings => select.league.display_ranking(conn),
             },
             Err(message) => inquire_check(message),
         }
