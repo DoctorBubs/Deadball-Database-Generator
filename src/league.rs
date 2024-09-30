@@ -70,12 +70,19 @@ pub enum BatterPosType{
 
 impl BatterPosType{
     // Returns a string that is formatted like a touple of positions that match the batter type.
-    pub fn get_tup_string(&self) -> &str{
+    fn get_tup_string(&self) -> &str{
          match self{
             Self::Catchers => "('C')",
             Self::Infielders => "('1B','2B','3B','SS','INF')",
             Self::Outfielders => "('LF','CF','RF','OF')",
             Self::All => "('C','1B','2B','3B','SS','INF','LF','CF','RF','OF')"
+        }
+    }
+    // Returns a string that can be used in a SQL query to filter players that fit the type.
+    pub fn get_sql_text(&self) -> String{
+        match self{
+            Self::All => "\n\t AND players.PD IS NULL\n".to_string(),
+            _ => format!("\n\t AND players.pos IN {}\n",self.get_tup_string())
         }
     }
 }
@@ -277,32 +284,9 @@ impl League {
     /// The query is structured so that batters with high on base targets, power, and the platoon
     /// advntage will be higher in the leaderboard
     pub fn display_top_hitters(&self, conn: &mut Connection, filter_choice: Option<BatterPosType>) -> Result<(), rusqlite::Error> {
+        // We get a sql filter from the filter choice, we use BatterPosType::All if the option is none.
+       let sql_filter = filter_choice.unwrap_or(BatterPosType::All).get_sql_text();
        
-        let filter_opt = match filter_choice{
-            None => None,
-            Some(value) => {
-                match value{
-                    // We don't need the tup string if we are querying for all batters, so we let filter_opt be none
-                    BatterPosType::All => None,
-                    _ => {
-                        // Otherwise, we get the tup string from the enum and wrap it in Some.
-                        let tup_string = value.get_tup_string().to_owned();
-                        Some(tup_string)
-                    }
-                }
-            }
-        };
-
-        let filter_text = match filter_opt{
-            // If there is no filter for players, we will just ask for players that have a null pd.
-            None => "\n AND players.PD IS NULL\n".to_string(),
-            // Otherwise, we filter by players who position is in the tup string
-            Some(value) => format!("\n AND players.pos IN {}\n",value)
-        };
-        /* We use the filter text to create a sql query.
-         
-         We do not need to query for data regarding a players pitching ability or their id, as we will use a default later to fill in the empty fields.
-        */
         let sql_input = format!("
             SELECT
                 teams.team_name,
@@ -383,7 +367,7 @@ impl League {
                 players.age ASC
                 -- And we limit the players in the query to 10.
           LIMIT 10;
-        ",filter_text);
+        ",sql_filter);
         // And we prepare the statement.
         let mut stmt = conn.prepare(&sql_input)?;
         let player_iter = stmt.query_map([self.league_id], |row| {

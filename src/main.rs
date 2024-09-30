@@ -399,7 +399,7 @@ mod tests {
         assert!(double_abrv_check.is_err());
         println!("Now lets check the leaderboards");
         current_league
-            .display_top_hitters(&mut test_conn, Some(BatterPosType::All))
+            .display_top_hitters(&mut test_conn, None)
             .unwrap();
         println!("Now the pitcher leaderboard");
         current_league.display_top_pitchers(&mut test_conn).unwrap();
