@@ -7,7 +7,7 @@ The program also creates a folder for each league, and in each league folder a p
 # Installation and Use
 
 To run the program, you must have Rust installed on your machine. If you are using Windows, try using the [Rustup tool.](https://www.rust-lang.org/learn/get-started).
-Next,clone the repo and 
+Next,clone the repo and save the output to a folder of your choice, open the folder via your command line, and run the program via entering "cargo run" in the command line.
 
 # Scheduling and Issues
 
