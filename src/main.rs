@@ -276,7 +276,7 @@ fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
 #[cfg(test)]
 mod tests {
 
-    use league::{get_all_leagues_from_db, load_teams_from_sql};
+    use league::{get_all_leagues_from_db, load_teams_from_sql, BatterPosType};
     use league_template::{load_league_templates, new_league_from_template};
 
     /// Used to test Leagues in database.
@@ -398,7 +398,9 @@ mod tests {
         );
         assert!(double_abrv_check.is_err());
         println!("Now lets check the leaderboards");
-        current_league.display_top_hitters(&mut test_conn).unwrap();
+        current_league
+            .display_top_hitters(&mut test_conn, Some(BatterPosType::All))
+            .unwrap();
         println!("Now the pitcher leaderboard");
         current_league.display_top_pitchers(&mut test_conn).unwrap();
         /*let series_per_matchup = 6;

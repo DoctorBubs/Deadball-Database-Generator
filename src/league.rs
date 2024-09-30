@@ -2,10 +2,11 @@ use core::fmt;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
+use std::path::Display;
 use std::path::Path;
 
-use inquire::validator::ErrorMessage;
 use inquire::validator::MinLengthValidator;
+use inquire::Confirm;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
@@ -21,7 +22,7 @@ use crate::main_menu::RankingsChoice;
 use crate::note::Notable;
 use crate::note::Note;
 use crate::player::select_gender;
-use crate::player::Hand;
+
 use crate::player::Player;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -58,6 +59,39 @@ enum _PlayerSortBy<T: PlayerTrait> {
     Age,
     B_Trait(T),
 }
+// Used when filtering batters.
+#[derive(Debug, Clone, Copy)]
+pub enum BatterPosType{
+    Catchers,
+    Infielders,
+    Outfielders,
+    All
+}
+
+impl BatterPosType{
+    // Returns a string that is formatted like a touple of positions that match the batter type.
+    pub fn get_tup_string(&self) -> &str{
+         match self{
+            Self::Catchers => "('C')",
+            Self::Infielders => "('1B','2B','3B','SS','INF')",
+            Self::Outfielders => "('LF','CF','RF','OF')",
+            Self::All => "('C','1B','2B','3B','SS','INF','LF','CF','RF','OF')"
+        }
+    }
+}
+
+impl fmt::Display for BatterPosType{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let text = match self{
+            Self::Catchers => "Catchers",
+            Self::Infielders => "Infielders",
+            Self::Outfielders => "Outfielders",
+            Self::All => "All"
+        };
+        write!(f, "{}", text)
+    }
+}
+
 /// Used when adding players to leaderboards, this struct contains a player and the name of it's teams.
 #[derive(Debug)]
 struct PlayerRankWrapper {
@@ -242,12 +276,34 @@ impl League {
     /// Displays a leaderboard of the top 10 batters in the league.
     /// The query is structured so that batters with high on base targets, power, and the platoon
     /// advntage will be higher in the leaderboard
-    pub fn display_top_hitters(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
-        /* We create a SQL query for data on the top 10 batters.
+    pub fn display_top_hitters(&self, conn: &mut Connection, filter_choice: Option<BatterPosType>) -> Result<(), rusqlite::Error> {
+       
+        let filter_opt = match filter_choice{
+            None => None,
+            Some(value) => {
+                match value{
+                    // We don't need the tup string if we are querying for all batters, so we let filter_opt be none
+                    BatterPosType::All => None,
+                    _ => {
+                        // Otherwise, we get the tup string from the enum and wrap it in Some.
+                        let tup_string = value.get_tup_string().to_owned();
+                        Some(tup_string)
+                    }
+                }
+            }
+        };
+
+        let filter_text = match filter_opt{
+            // If there is no filter for players, we will just ask for players that have a null pd.
+            None => "\n AND players.PD IS NULL\n".to_string(),
+            // Otherwise, we filter by players who position is in the tup string
+            Some(value) => format!("\n AND players.pos IN {}\n",value)
+        };
+        /* We use the filter text to create a sql query.
+         
          We do not need to query for data regarding a players pitching ability or their id, as we will use a default later to fill in the empty fields.
         */
-        let mut stmt = conn.prepare(
-            "
+        let sql_input = format!("
             SELECT
                 teams.team_name,
                 players.player_name,
@@ -302,8 +358,8 @@ impl League {
             ON
                 players.team_id = teams.team_id
             WHERE
-                teams.league_id = ?1
-                AND players.PD IS NULL
+                -- We have filter text selected earlier in the function.
+                teams.league_id = ?1{}
             ORDER BY
                 /*To Sort, we add the players obt + power_number + hand number
                  The idea that is that players with high obts, powers and platoon
@@ -327,8 +383,9 @@ impl League {
                 players.age ASC
                 -- And we limit the players in the query to 10.
           LIMIT 10;
-        ",
-        )?;
+        ",filter_text);
+        // And we prepare the statement.
+        let mut stmt = conn.prepare(&sql_input)?;
         let player_iter = stmt.query_map([self.league_id], |row| {
             Ok(
                 // We Save the team name in the PlayerRankWrapper
@@ -464,9 +521,37 @@ impl League {
             // We return the inquire error if their is one
             Err(message) => Err(EditLeagueError::Inquire(message)),
             Ok(value) => {
-                //Otherwise, we run a query for top pitchers or hitters.
+                //If they choose to view batters, we ask if they would like to filter batters byy position.
+
+                let filter_choice = {
+                    if let RankingsChoice::Batters = value {
+                        let filter_answer = Confirm::new(
+                            "Would you like to filter the batters by their position type?",
+                        )
+                        .prompt();
+                        match filter_answer {
+                            Ok(false) => None,
+                            Ok(true) => {
+                                let options = vec![BatterPosType::Catchers,BatterPosType::Infielders,BatterPosType::Outfielders];
+                                let pos = Select::new(
+                                    "Please pick the position you would like to view.",
+                                    options,
+                                )
+                                .prompt();
+                                match pos {
+                                    Ok(value) => Some(value),
+                                    Err(message) => return Err(EditLeagueError::Inquire(message)),
+                                }
+                            }
+                            Err(message) => return Err(EditLeagueError::Inquire(message)),
+                        }
+                    } else {
+                        //If the user wants to only view pitchers, the filter choice is none.
+                        None
+                    }
+                };
                 let query_result = match value {
-                    RankingsChoice::Batters => self.display_top_hitters(conn),
+                    RankingsChoice::Batters => self.display_top_hitters(conn,filter_choice),
                     RankingsChoice::Pitchers => self.display_top_pitchers(conn),
                 };
                 // Finally, we check if their was an error running the query.
