@@ -399,7 +399,7 @@ impl League {
             )
         })?;
         // We print a line of headers for each category to display
-        println!("Team_name,Player_Name, Age,Pos,Hand,Bt,OBT_Mod,OBT,Traits");
+        println!("Team_name,Player_Name,Pos,Age,Hand,Bt,OBT_Mod,OBT,Traits");
         // We then loop over the player iter to print what we need.
         for result in player_iter {
             // We remove the PlayerRankWrapper from the ok, and deconstruct it
