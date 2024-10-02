@@ -4,7 +4,7 @@ use crate::edit_league_error::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::note::Notable;
 use crate::note::Note;
-use crate::pd;
+
 use crate::pitcher_rank_info::PitcherRankInfo;
 
 use crate::player_error::CompTable;
@@ -26,7 +26,7 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::Connection;
 
-use std::default;
+
 use std::fmt;
 pub enum AgeCat {
     Prospect,
@@ -281,7 +281,7 @@ impl Player {
             player_name: &self.name,
             pos: &self.pos,
             age: self.age,
-            hand: serde_json::to_value(&self.hand)?,
+            hand: serde_json::to_value(self.hand)?,
             bt: self.bt.to_string(),
             obt_mod: self.obt_mod.to_string(),
             obt: self.obt.to_string(),

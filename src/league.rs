@@ -2,7 +2,7 @@ use core::fmt;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use std::path::Display;
+
 use std::path::Path;
 
 use inquire::validator::MinLengthValidator;
@@ -13,7 +13,7 @@ use inquire::Text;
 use rusqlite::Result;
 
 use crate::b_traits::BTraits;
-use crate::edit_league_error;
+
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
@@ -26,7 +26,7 @@ use crate::pd::PD;
 use crate::player::select_gender;
 
 use crate::player::Player;
-use crate::player_pd_test;
+
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::PlayerTrait;
@@ -648,10 +648,10 @@ impl League {
         let expected_batting_decimal = expected_batting / decimal;
         let expected_obp_decimal = expected_obp / decimal;
         println!("Average bt: {}", bt);
-        println!("Average obt {}", obt);
-        println!("Average pd {}", pd_result);
+        println!("Average obt: {}", obt);
+        println!("Average pdL {}", pd_result);
         println!("Expected batting average: {:.3}", expected_batting_decimal);
-        println!("Expected obp: {:.3}", expected_obp_decimal);
+        println!("Expected on base percentage: {:.3}", expected_obp_decimal);
 
         Ok(())
     }

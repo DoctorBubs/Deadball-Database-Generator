@@ -1,11 +1,11 @@
-use std::thread;
+
 
 use crate::b_traits::BTraits;
-use crate::note::Note;
+
 use crate::pd::PD;
 use crate::player::Hand;
 use crate::player::Player;
-use crate::traits::Contact;
+
 use crate::traits::PitcherTrait;
 use crate::Era;
 use crate::ThreadRng;
