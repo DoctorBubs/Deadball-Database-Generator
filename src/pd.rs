@@ -41,6 +41,7 @@ pub enum PD {
 }
 
 impl PD {
+    // Returns the max value possible for a pitch die.
     pub fn to_int(self) -> i32 {
         match self {
             Self::D20 => 20,
@@ -54,6 +55,7 @@ impl PD {
             Self::DM8 => -8,
             Self::DM12 => -12,
             Self::DM20 => -20,
+            //
             Self::Custom(value) => value,
         }
     }
@@ -75,12 +77,12 @@ impl PD {
             false => (1..=max).collect(),
         }
     }
+    // Calculates the average result of a roll of the pitch die.
     pub fn get_average(&self) -> f32 {
         let range = self.get_range();
-        let range_len = range.len() as usize;
+        let range_len = range.len() as f32;
         let range_sum: i32 = range.iter().sum();
-        let average_roll = range_sum as f32 / range_len as f32;
-        average_roll
+        range_sum as f32 / range_len
     }
 }
 

@@ -13,6 +13,7 @@ use inquire::Text;
 use rusqlite::Result;
 
 use crate::b_traits::BTraits;
+use crate::edit_league_error;
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
@@ -560,8 +561,8 @@ impl League {
             }
         }
     }
-
-    pub fn display_league_averages(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
+    /// Query's the database to create the average player for the league.
+    pub fn get_average_player(&self, conn: &mut Connection) -> Result<Player, rusqlite::Error> {
         let mut stmt = conn.prepare(
             "
             WITH pitching_data AS(
@@ -576,12 +577,23 @@ impl League {
                 players.PD IS NOT NULL
             GROUP BY
                 leagues.league_id
+            ),
+            gen_data AS (
+                SELECT
+                    leagues.league_id AS league_id,
+                    ROUND(AVG(players.age)) as avg_age
+                FROM leagues
+                INNER JOIN
+                    teams ON teams.league_id = leagues.league_id
+                INNER JOIN
+                    players ON players.team_id = teams.team_id
+                GROUP BY leagues.league_id
             )
-
             SELECT
                 CAST(ROUND(AVG(players.bt)) AS INT)  AS average_bt,
                 CAST(ROUND(AVG(players.obt)) AS INT) AS average_obt,
-                CAST(pitching_data.avg_pd AS INT)
+                CAST(pitching_data.avg_pd AS INT) AS average_pd,
+                CAST(gen_data.avg_age AS INT) AS average_age
             FROM leagues
             INNER JOIN
                teams ON teams.league_id = leagues.league_id
@@ -589,6 +601,8 @@ impl League {
                 players ON players.team_id = teams.team_id
             INNER JOIN
                 pitching_data ON pitching_data.league_id = leagues.league_id
+            INNER JOIN
+                gen_data ON gen_data.league_id = leagues.league_id
             WHERE
                 players.PD IS NULL
             AND leagues.league_id = ?1
@@ -603,30 +617,44 @@ impl League {
                 // We can use a player struct for the type inference.
                 // Creating an average player for a league is a intersting concept that should be explored further,
                 Player {
+                    name: self.name.clone(),
                     bt: row.get(0)?,
                     obt: row.get(1)?,
                     pd: Some(PD::new_custom_pd(row.get(2)?)),
+                    age: row.get(3)?,
                     ..Player::default()
                 },
             )
         })?;
-        let decimal = 100 as f32;
-        for wrapper in player_iter {
-            let player = wrapper?;
-            let Player { bt, obt, pd, .. } = player;
-            let pd_result = pd.unwrap();
-            let (expected_batting, expected_obp) = player.expected_batting_obp(pd_result);
-            let expected_batting_decimal = expected_batting / decimal;
-            let expected_obp_decimal = expected_obp / decimal;
-            println!("Average bt: {}", bt);
-            println!("Average obt {}", obt);
-            println!("Average pd {}", pd_result);
-            println!("Expected batting average: {:.3}", expected_batting_decimal);
-            println!("Expected obp: {:.3}", expected_obp_decimal)
-        }
-        Ok(())
+
+        let mut all_players: Vec<Player> = player_iter.map(|x| x.unwrap()).collect();
+        let result = match all_players[..] {
+            [Player { .. }] => all_players.remove(0),
+            _ => {
+                println!("Unable to calculate , please make sure there are players in this league in the database");
+                return Err(rusqlite::Error::InvalidQuery);
+            }
+        };
+        Ok(result)
     }
 
+    pub fn display_league_averages(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
+        let decimal = 100.0;
+        // We create the average player for the league
+        let player = self.get_average_player(conn)?;
+        let Player { bt, obt, pd, .. } = player;
+        let pd_result = pd.unwrap();
+        let (expected_batting, expected_obp) = player.expected_batting_obp(pd_result);
+        let expected_batting_decimal = expected_batting / decimal;
+        let expected_obp_decimal = expected_obp / decimal;
+        println!("Average bt: {}", bt);
+        println!("Average obt {}", obt);
+        println!("Average pd {}", pd_result);
+        println!("Expected batting average: {:.3}", expected_batting_decimal);
+        println!("Expected obp: {:.3}", expected_obp_decimal);
+
+        Ok(())
+    }
     /*  Take a new abbreviation and name for a team, a thread for random number, a league id and connection to the the database.
         If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it succeeds, an Ok is returned
     */
