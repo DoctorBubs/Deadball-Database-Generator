@@ -4,6 +4,7 @@ use crate::edit_league_error::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::note::Notable;
 use crate::note::Note;
+
 use crate::pitcher_rank_info::PitcherRankInfo;
 
 use crate::player_error::CompTable;
@@ -25,7 +26,7 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::Connection;
 
-use std::default;
+
 use std::fmt;
 pub enum AgeCat {
     Prospect,
@@ -280,7 +281,7 @@ impl Player {
             player_name: &self.name,
             pos: &self.pos,
             age: self.age,
-            hand: serde_json::to_value(&self.hand)?,
+            hand: serde_json::to_value(self.hand)?,
             bt: self.bt.to_string(),
             obt_mod: self.obt_mod.to_string(),
             obt: self.obt.to_string(),
@@ -361,6 +362,13 @@ impl Player {
             pos,
             ..generated_player
         }
+    }
+
+    pub fn expected_batting_obp(&self, pd: PD) -> (f32, f32) {
+        let pd_average = pd.get_average();
+        let expected_batting = self.bt as f32 - pd_average;
+        let expected_obp = self.obt as f32 - pd_average;
+        (expected_batting, expected_obp)
     }
 }
 

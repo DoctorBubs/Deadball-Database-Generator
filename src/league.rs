@@ -2,7 +2,7 @@ use core::fmt;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
-use std::path::Display;
+
 use std::path::Path;
 
 use inquire::validator::MinLengthValidator;
@@ -13,6 +13,7 @@ use inquire::Text;
 use rusqlite::Result;
 
 use crate::b_traits::BTraits;
+
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
@@ -21,9 +22,11 @@ use crate::main_menu::LoadLeagueInput;
 use crate::main_menu::RankingsChoice;
 use crate::note::Notable;
 use crate::note::Note;
+use crate::pd::PD;
 use crate::player::select_gender;
 
 use crate::player::Player;
+
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::PlayerTrait;
@@ -61,39 +64,39 @@ enum _PlayerSortBy<T: PlayerTrait> {
 }
 // Used when filtering batters.
 #[derive(Debug, Clone, Copy)]
-pub enum BatterPosType{
+pub enum BatterPosType {
     Catchers,
     Infielders,
     Outfielders,
-    All
+    All,
 }
 
-impl BatterPosType{
+impl BatterPosType {
     // Returns a string that is formatted like a touple of positions that match the batter type.
-    fn get_tup_string(&self) -> &str{
-         match self{
+    fn get_tup_string(&self) -> &str {
+        match self {
             Self::Catchers => "('C')",
             Self::Infielders => "('1B','2B','3B','SS','INF')",
             Self::Outfielders => "('LF','CF','RF','OF')",
-            Self::All => "('C','1B','2B','3B','SS','INF','LF','CF','RF','OF')"
+            Self::All => "('C','1B','2B','3B','SS','INF','LF','CF','RF','OF')",
         }
     }
     // Returns a string that can be used in a SQL query to filter players that fit the type.
-    pub fn get_sql_text(&self) -> String{
-        match self{
+    pub fn get_sql_text(&self) -> String {
+        match self {
             Self::All => "\n\t AND players.PD IS NULL\n".to_string(),
-            _ => format!("\n\t AND players.pos IN {}\n",self.get_tup_string())
+            _ => format!("\n\t AND players.pos IN {}\n", self.get_tup_string()),
         }
     }
 }
 
-impl fmt::Display for BatterPosType{
+impl fmt::Display for BatterPosType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let text = match self{
+        let text = match self {
             Self::Catchers => "Catchers",
             Self::Infielders => "Infielders",
             Self::Outfielders => "Outfielders",
-            Self::All => "All"
+            Self::All => "All",
         };
         write!(f, "{}", text)
     }
@@ -283,11 +286,16 @@ impl League {
     /// Displays a leaderboard of the top 10 batters in the league.
     /// The query is structured so that batters with high on base targets, power, and the platoon
     /// advntage will be higher in the leaderboard
-    pub fn display_top_hitters(&self, conn: &mut Connection, filter_choice: Option<BatterPosType>) -> Result<(), rusqlite::Error> {
+    pub fn display_top_hitters(
+        &self,
+        conn: &mut Connection,
+        filter_choice: Option<BatterPosType>,
+    ) -> Result<(), rusqlite::Error> {
         // We get a sql filter from the filter choice, we use BatterPosType::All if the option is none.
-       let sql_filter = filter_choice.unwrap_or(BatterPosType::All).get_sql_text();
-       
-        let sql_input = format!("
+        let sql_filter = filter_choice.unwrap_or(BatterPosType::All).get_sql_text();
+
+        let sql_input = format!(
+            "
             SELECT
                 teams.team_name,
                 players.player_name,
@@ -367,7 +375,9 @@ impl League {
                 players.age ASC
                 -- And we limit the players in the query to 10.
           LIMIT 10;
-        ",sql_filter);
+        ",
+            sql_filter
+        );
         // And we prepare the statement.
         let mut stmt = conn.prepare(&sql_input)?;
         let player_iter = stmt.query_map([self.league_id], |row| {
@@ -499,6 +509,7 @@ impl League {
     /// Prompts the user to what player rankings they would like to see.
     pub fn display_ranking(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
         // We give the user the chance to pick if we are going to rank batters or pitchers.
+        self.display_league_averages(conn).unwrap();
         let options = vec![RankingsChoice::Batters, RankingsChoice::Pitchers];
         let answer = Select::new("Which player rankings would you like to see?", options).prompt();
         match answer {
@@ -516,7 +527,11 @@ impl League {
                         match filter_answer {
                             Ok(false) => None,
                             Ok(true) => {
-                                let options = vec![BatterPosType::Catchers,BatterPosType::Infielders,BatterPosType::Outfielders];
+                                let options = vec![
+                                    BatterPosType::Catchers,
+                                    BatterPosType::Infielders,
+                                    BatterPosType::Outfielders,
+                                ];
                                 let pos = Select::new(
                                     "Please pick the position you would like to view.",
                                     options,
@@ -535,7 +550,7 @@ impl League {
                     }
                 };
                 let query_result = match value {
-                    RankingsChoice::Batters => self.display_top_hitters(conn,filter_choice),
+                    RankingsChoice::Batters => self.display_top_hitters(conn, filter_choice),
                     RankingsChoice::Pitchers => self.display_top_pitchers(conn),
                 };
                 // Finally, we check if their was an error running the query.
@@ -546,7 +561,100 @@ impl League {
             }
         }
     }
+    /// Query's the database to create the average player for the league.
+    pub fn get_average_player(&self, conn: &mut Connection) -> Result<Player, rusqlite::Error> {
+        let mut stmt = conn.prepare(
+            "
+            WITH pitching_data AS(
+                SELECT leagues.league_id AS league_id,
+                ROUND(AVG(players.pd_int)) as avg_pd
+            FROM leagues
+            INNER JOIN
+                teams ON teams.league_id = leagues.league_id
+            INNER JOIN 
+                players ON players.team_id = teams.team_id
+            WHERE
+                players.PD IS NOT NULL
+            GROUP BY
+                leagues.league_id
+            ),
+            gen_data AS (
+                SELECT
+                    leagues.league_id AS league_id,
+                    ROUND(AVG(players.age)) as avg_age
+                FROM leagues
+                INNER JOIN
+                    teams ON teams.league_id = leagues.league_id
+                INNER JOIN
+                    players ON players.team_id = teams.team_id
+                GROUP BY leagues.league_id
+            )
+            SELECT
+                CAST(ROUND(AVG(players.bt)) AS INT)  AS average_bt,
+                CAST(ROUND(AVG(players.obt)) AS INT) AS average_obt,
+                CAST(pitching_data.avg_pd AS INT) AS average_pd,
+                CAST(gen_data.avg_age AS INT) AS average_age
+            FROM leagues
+            INNER JOIN
+               teams ON teams.league_id = leagues.league_id
+            INNER JOIN
+                players ON players.team_id = teams.team_id
+            INNER JOIN
+                pitching_data ON pitching_data.league_id = leagues.league_id
+            INNER JOIN
+                gen_data ON gen_data.league_id = leagues.league_id
+            WHERE
+                players.PD IS NULL
+            AND leagues.league_id = ?1
+            GROUP BY
+                leagues.league_id;
 
+        
+        ",
+        )?;
+        let player_iter = stmt.query_map([self.league_id], |row| {
+            Ok(
+                // We can use a player struct for the type inference.
+                // Creating an average player for a league is a intersting concept that should be explored further,
+                Player {
+                    name: self.name.clone(),
+                    bt: row.get(0)?,
+                    obt: row.get(1)?,
+                    pd: Some(PD::new_custom_pd(row.get(2)?)),
+                    age: row.get(3)?,
+                    ..Player::default()
+                },
+            )
+        })?;
+
+        let mut all_players: Vec<Player> = player_iter.map(|x| x.unwrap()).collect();
+        let result = match all_players[..] {
+            [Player { .. }] => all_players.remove(0),
+            _ => {
+                println!("Unable to calculate , please make sure there are players in this league in the database");
+                return Err(rusqlite::Error::InvalidQuery);
+            }
+        };
+        Ok(result)
+    }
+
+    pub fn display_league_averages(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
+        let decimal = 100.0;
+        // We create the average player for the league
+        let player = self.get_average_player(conn)?;
+        let Player { bt, obt, pd, .. } = player;
+        let pd_result = pd.unwrap();
+        let (expected_batting, expected_obp) = player.expected_batting_obp(pd_result);
+        let expected_batting_decimal = expected_batting / decimal;
+        let expected_obp_decimal = expected_obp / decimal;
+        println!("Average bt: {}", bt);
+        println!("Average obt: {}", obt);
+        println!("Average pdL {}", pd_result);
+        println!("Expected batting average: {:.3}", expected_batting_decimal);
+        println!("Expected on base percentage: {:.3}", expected_obp_decimal);
+
+        Ok(())
+    }
     /*  Take a new abbreviation and name for a team, a thread for random number, a league id and connection to the the database.
         If there are no teams in the league that have the same name or abbreviation,  we attempt to add the team to the league. If it succeeds, an Ok is returned
     */
