@@ -35,7 +35,7 @@ pub enum PD {
     DM8,
     #[serde(rename = "-d12")]
     DM12,
-    #[serde(rename = "d20")]
+    #[serde(rename = "-d20")]
     DM20,
 }
 
