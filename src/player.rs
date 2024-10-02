@@ -4,6 +4,7 @@ use crate::edit_league_error::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::note::Notable;
 use crate::note::Note;
+use crate::pd;
 use crate::pitcher_rank_info::PitcherRankInfo;
 
 use crate::player_error::CompTable;
@@ -361,6 +362,13 @@ impl Player {
             pos,
             ..generated_player
         }
+    }
+
+    pub fn expected_batting_obp(&self, pd: PD) -> (f32, f32) {
+        let pd_average = pd.get_average();
+        let expected_batting = self.bt as f32 - pd_average;
+        let expected_obp = self.obt as f32 - pd_average;
+        (expected_batting, expected_obp)
     }
 }
 
