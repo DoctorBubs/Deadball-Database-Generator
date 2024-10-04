@@ -88,16 +88,16 @@ fn main() -> Result<(), EditLeagueError> {
                         println!("Something went wrong, please check that this folder is not read only.\nIt is also possible that {} is corrupted, please check that as well\nThe Error message was {}",default_path,output);
                     },
                     EditLeagueError::Inquire(_) | EditLeagueError::SerdeError(_) => {
-                        let output_string;
+
                         let library_type;
-                        match message{
+                        let output_string = match message{
                             EditLeagueError::SerdeError(output) => {
                                 library_type = "serde";
-                                output_string = output.to_string()
+                                output.to_string()
                             },
                             EditLeagueError::Inquire(output) => {
                                 library_type = "inquire";
-                                output_string = output.to_string()
+                               output.to_string()
                             }
                             // We break, as there are only 2 options that can lead to this path
                             _ => break
@@ -276,6 +276,7 @@ fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
 #[cfg(test)]
 mod tests {
 
+    use b_traits::BTraits;
     use league::{get_all_leagues_from_db, load_teams_from_sql, BatterPosType};
     use league_template::{load_league_templates, new_league_from_template};
 
@@ -403,6 +404,17 @@ mod tests {
             .unwrap();
         println!("Now the pitcher leaderboard");
         current_league.display_top_pitchers(&mut test_conn).unwrap();
+        let power_check = serde_json::to_string(&Power::P2).unwrap();
+        assert_eq!(power_check, "\"P++\"");
+        let manual_power: Power = serde_json::from_str("\"P++\"").unwrap();
+        let power = BTraits::from_string("P++").unwrap();
+        assert_eq!(BTraits::from_string("P+++++").is_err(), true);
+        BTraits::from_string("C+").unwrap();
+        BTraits::from_string(" C+").unwrap();
+        BTraits::from_string("S+").unwrap();
+        assert_eq!(BTraits::from_string("P +").is_err(), true);
+        BTraits::from_string("C+,P--").unwrap();
+
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(

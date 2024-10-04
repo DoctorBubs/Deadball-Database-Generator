@@ -26,7 +26,6 @@ use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::Connection;
 
-
 use std::fmt;
 pub enum AgeCat {
     Prospect,

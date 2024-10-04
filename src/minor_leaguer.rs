@@ -3,7 +3,7 @@ use rand::rngs::ThreadRng;
 use crate::{
     era::Era,
     player::{Hand, Player, PlayerGender},
-    player_quality::{PlayerQuality},
+    player_quality::PlayerQuality,
 };
 
 #[derive(Debug)]

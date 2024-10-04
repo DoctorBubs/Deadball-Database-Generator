@@ -56,6 +56,12 @@ impl PlayerTrait for Power {
     }
 }
 
+impl Default for Power {
+    fn default() -> Self {
+        Self::P0
+    }
+}
+
 impl fmt::Display for Power {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = match self {
@@ -90,6 +96,12 @@ impl PlayerTrait for Speed {
             Self::S0 => 0,
             Self::SM1 => -1,
         }
+    }
+}
+
+impl Default for Speed {
+    fn default() -> Self {
+        Self::S0
     }
 }
 
@@ -130,6 +142,12 @@ impl PlayerTrait for Contact {
     }
 }
 
+impl Default for Contact {
+    fn default() -> Self {
+        Self::C0
+    }
+}
+
 impl fmt::Display for Contact {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = match self {
@@ -162,6 +180,12 @@ impl PlayerTrait for Defense {
     }
 }
 
+impl Default for Defense {
+    fn default() -> Self {
+        Self::D0
+    }
+}
+
 impl fmt::Display for Defense {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = match self {
@@ -189,6 +213,12 @@ impl PlayerTrait for Toughness {
             Self::T1 => 1,
             Self::T0 => 0,
         }
+    }
+}
+
+impl Default for Toughness {
+    fn default() -> Self {
+        Self::T0
     }
 }
 

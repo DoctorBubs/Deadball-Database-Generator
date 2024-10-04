@@ -18,7 +18,7 @@ pub struct LineupInts {
 }
 
 // BTraits is a struct that contains an instance of all traits that are related to batting, and it represents what batting traits a player has.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct BTraits {
     pub contact: Contact,
     pub defense: Defense,
@@ -43,6 +43,63 @@ fn above_average(b_trait: impl PlayerTrait) -> bool {
 }
 
 impl BTraits {
+    /// Takes a string, and creates a btrait struct via the string.
+    /// Traits are separated by commas, and if the traits contradict each other then hte later trait will be used.
+    /// Any traits not specified will be the default trait.
+    pub fn from_string(input: &str) -> Result<BTraits, String> {
+        let mut result = Self::default();
+        // We convert the str into an iter, with each value separated by a comma and extra whitespace trimmed.
+        let words = input
+            // We split the input into multiple strs that are separated by commas.
+            .split(',')
+            // We trim the whitespace from the str
+            .map(|x| x.trim())
+            // We filter out strs that are empty.
+            .filter(|x| !x.is_empty())
+            .map(|x| format!("\"{}\"", x));
+        for word in words {
+            // If the value is empty, we continue the loop
+
+            // Next, we try to use serde to deserialize a power error
+            let power_attempt: Result<Power, serde_json::Error> = serde_json::from_str(&word);
+            // Wh check if the power attempt was an error. If not, we assign the to the Btraits struct.
+            if let Ok(power) = power_attempt {
+                result.power = power;
+                continue;
+            };
+            // We repeat the process for the other traits.
+            let contact_attempt: Result<Contact, serde_json::Error> = serde_json::from_str(&word);
+            if let Ok(contact) = contact_attempt {
+                result.contact = contact;
+                continue;
+            }
+            let defense_attempt: Result<Defense, serde_json::Error> = serde_json::from_str(&word);
+            if let Ok(defense) = defense_attempt {
+                result.defense = defense;
+                continue;
+            }
+            let speed_attempt: Result<Speed, serde_json::Error> = serde_json::from_str(&word);
+            if let Ok(speed) = speed_attempt {
+                result.speed = speed;
+                continue;
+            }
+            let toughness_attempt: Result<Toughness, serde_json::Error> =
+                serde_json::from_str(&word);
+            if let Ok(toughness) = toughness_attempt {
+                result.toughness = toughness;
+                continue;
+            }
+            // If we haven''t found a trait that matches the value, we return an error
+            let message = format!(
+                "Warning: Attempted to parse invalid string '{}' as a trait",
+                word
+            );
+            return Err(message);
+        }
+        // We return the Btrait struct in an Ok.
+        Ok(result)
+    }
+
     pub fn get_above_average(&self) -> BTraitAboveAverage {
         BTraitAboveAverage {
             contact: above_average(self.contact),
@@ -136,17 +193,6 @@ impl BTraits {
     */
 }
 
-impl Default for BTraits {
-    fn default() -> Self {
-        BTraits {
-            contact: Contact::C0,
-            defense: Defense::D0,
-            power: Power::P0,
-            speed: Speed::S0,
-            toughness: Toughness::T0,
-        }
-    }
-}
 impl fmt::Display for BTraits {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let chars = format!(
