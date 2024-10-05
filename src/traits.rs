@@ -249,9 +249,9 @@ pub enum PitcherTrait {
 
 impl PlayerTrait for PitcherTrait {
     fn to_int(&self) -> i32 {
-        match self{
+        match self {
             PitcherTrait::CNM => -1,
-            _ => 1
+            _ => 1,
         }
     }
 }

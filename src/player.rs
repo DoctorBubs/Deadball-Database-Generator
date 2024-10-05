@@ -371,31 +371,29 @@ impl Player {
         let expected_obp = self.obt as f32 - pd_average;
         (expected_batting, expected_obp)
     }
-    pub fn get_tier(&self) -> Tier{
-        if self.is_pitcher(){
+    pub fn get_tier(&self) -> Tier {
+        if self.is_pitcher() {
             let base_tier = self.pd.unwrap().get_tier();
-            match self.pitcher_trait{
+            match self.pitcher_trait {
                 None => base_tier,
-                Some(value) => base_tier.add(value.to_int())
+                Some(value) => base_tier.add(value.to_int()),
             }
-            
-        } else{
-            let base_tier = match self.obt{
+        } else {
+            let base_tier = match self.obt {
                 40.. => Tier::S(0),
                 37..=39 => Tier::A(0),
                 32..=36 => Tier::B(0),
                 31..=34 => Tier::C(0),
                 29..=30 => Tier::D(0),
-                ..=28 => Tier::F(0)
+                ..=28 => Tier::F(0),
             };
             let b_trait_num = self.b_traits.to_int();
-            match b_trait_num{
+            match b_trait_num {
                 0 => base_tier,
-                _ => base_tier.add(b_trait_num)
+                _ => base_tier.add(b_trait_num),
             }
         }
     }
-
 }
 
 impl Default for Player {

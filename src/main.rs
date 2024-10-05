@@ -1,4 +1,3 @@
-mod tier;
 mod b_traits;
 mod edit_league_error;
 mod era;
@@ -17,6 +16,7 @@ mod player_serde;
 mod sched_view;
 mod schedule;
 mod team;
+mod tier;
 mod traits;
 use crate::era::Era;
 use crate::main_menu::run_main_menu;

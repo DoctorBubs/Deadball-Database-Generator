@@ -61,22 +61,22 @@ impl PD {
         }
     }
 
-   pub fn get_tier(&self) -> Tier{
-    match self{
-        Self::D20 => Tier::S(0),
-        Self::D12 => Tier::A(0),
-        Self::D8 => Tier::B(0),
-        Self::D6 => Tier::B(-1),
-        Self::D4 => Tier::C(0),
-        Self::D0 => Tier::C(-1),
-        Self::DM4 => Tier::D(0),
-        Self::DM6 => Tier::F(1),
-        Self::DM8 => Tier::F(0),
-        Self::DM12 => Tier::F(-1),
-        Self::DM20 => Tier::F(-2),
-        Self::Custom(_) => Tier::C(0)
+    pub fn get_tier(&self) -> Tier {
+        match self {
+            Self::D20 => Tier::S(0),
+            Self::D12 => Tier::A(0),
+            Self::D8 => Tier::B(0),
+            Self::D6 => Tier::B(-1),
+            Self::D4 => Tier::C(0),
+            Self::D0 => Tier::C(-1),
+            Self::DM4 => Tier::D(0),
+            Self::DM6 => Tier::F(1),
+            Self::DM8 => Tier::F(0),
+            Self::DM12 => Tier::F(-1),
+            Self::DM20 => Tier::F(-2),
+            Self::Custom(_) => Tier::C(0),
+        }
     }
-   }
 
     fn get_info(&self) -> PDInfo {
         let num = self.to_int();

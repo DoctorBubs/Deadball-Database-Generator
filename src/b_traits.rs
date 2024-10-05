@@ -175,8 +175,12 @@ impl BTraits {
         }
     }
 
-    pub fn to_int(&self) -> i32{
-        self.power.to_int() + self.contact.to_int() + self.defense.to_int() + self.toughness.to_int() + self.speed.to_int()
+    pub fn to_int(&self) -> i32 {
+        self.power.to_int()
+            + self.contact.to_int()
+            + self.defense.to_int()
+            + self.toughness.to_int()
+            + self.speed.to_int()
     }
 
     /*

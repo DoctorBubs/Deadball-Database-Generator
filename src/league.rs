@@ -418,7 +418,7 @@ impl League {
             let tier = player.get_tier();
             /* Since we have already implemented the Display trait for Player, and
             the string generated matches what we want, we cna just print the player directly */
-            println!("{},{},{}", team_name, player,tier)
+            println!("{},{},{}", team_name, player, tier)
         }
         // We then return Ok as we have gotten this far without an error from the database.
         Ok(())
@@ -489,13 +489,10 @@ impl League {
                 pitcher_trait,
                 ..
             } = player;
-            
+
             // Since not all pitchers will have PitcherTraits, we match to create a string value.
-            let p_trait_value = match pitcher_trait {
-                Some(value) => Some(format!("{},", value)),
-                None => None,
-            };
-            
+            let p_trait_value = pitcher_trait.map(|value| format!("{},", value));
+
             // We print the fields. Since a player will always have a PD , we are OK to unwrap it.
             println!(
                 "{},{},{},{},{},{},{}{}",
