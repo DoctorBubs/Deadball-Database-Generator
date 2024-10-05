@@ -1,3 +1,4 @@
+mod tier;
 mod b_traits;
 mod edit_league_error;
 mod era;

@@ -409,15 +409,16 @@ impl League {
             )
         })?;
         // We print a line of headers for each category to display
-        println!("Team_name,Player_Name,Pos,Age,Hand,Bt,OBT_Mod,OBT,Traits");
+        println!("Team_name,Player_Name,Pos,Age,Hand,Bt,OBT_Mod,OBT,Traits,Tier");
         // We then loop over the player iter to print what we need.
         for result in player_iter {
             // We remove the PlayerRankWrapper from the ok, and deconstruct it
 
             let PlayerRankWrapper { team_name, player } = result?;
+            let tier = player.get_tier();
             /* Since we have already implemented the Display trait for Player, and
             the string generated matches what we want, we cna just print the player directly */
-            println!("{},{}", team_name, player)
+            println!("{},{},{}", team_name, player,tier)
         }
         // We then return Ok as we have gotten this far without an error from the database.
         Ok(())
@@ -475,9 +476,10 @@ impl League {
                 },
             })
         })?;
-        println!("Team,name,pos,hand,age,PD,Trait");
+        println!("Team,name,pos,hand,age,PD,Trait,Tier");
         for result in player_iter {
             let PlayerRankWrapper { team_name, player } = result.unwrap();
+            let tier = player.get_tier();
             let Player {
                 name,
                 pos,
@@ -487,21 +489,24 @@ impl League {
                 pitcher_trait,
                 ..
             } = player;
+            
             // Since not all pitchers will have PitcherTraits, we match to create a string value.
             let p_trait_value = match pitcher_trait {
-                Some(value) => format!("{}", value),
-                None => "".to_string(),
+                Some(value) => Some(format!("{},", value)),
+                None => None,
             };
+            
             // We print the fields. Since a player will always have a PD , we are OK to unwrap it.
             println!(
-                "{},{},{},{},{},{},{}",
+                "{},{},{},{},{},{},{}{}",
                 team_name,
                 name,
                 pos,
                 hand,
                 age,
                 pd.unwrap(),
-                p_trait_value
+                p_trait_value.unwrap_or("".to_string()),
+                tier
             )
         }
         Ok(())
