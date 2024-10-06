@@ -3,6 +3,8 @@
 # Summary
 Based off the [Deadball tabletop baseball game by W.M. Akers](http://wmakers.net/deadball), this Rust program creats a SQLite database on the users machine for information that is usefull if the user were running their own Deadball League. The program also provides an interface for the users to automatically generate leagues and teams based off the user's choice of options such as league era and gender. Once a league is created, the program can also add new teams to the league in the database.
 The program also creates a folder for each league, and in each league folder a plain text file for each team is created. If a user updates a team or play in the database(E.G Updating a player's batting) and wishes to see the changes in the text files, the program will also automate that via the "Refresh an existing league" option from the main menu.
+The program can also query the database to view the top 10 batters or pitchers in a league. Doing so will also display information regarding averages for the league. The program will display the top 10 player ranked by OBT for batters or PD for pitchers, and will also give the player a letter grade from S - F based off a tier list system. However, the letter grading system is still a WIP.
+
 
 # Installation and Use
 
