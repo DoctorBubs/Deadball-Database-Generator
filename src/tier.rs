@@ -33,22 +33,22 @@ impl Tier {
         }
     }
 
-    pub fn get_letter_num(&self) -> (&str, i32) {
+    pub fn get_letter_num(&self) -> (&str,i32){
         match self {
-            Self::F(num) => ("F", *num),
-            Self::D(num) => ("D", *num),
-            Self::C(num) => ("C", *num),
-            Self::B(num) => ("B", *num),
-            Self::A(num) => ("A", *num),
-            Self::S(num) => ("S", *num),
+            Self::F(num) => ("F",*num),
+            Self::D(num) => ("D",*num),
+            Self::C(num) => ("C",*num),
+            Self::B(num) => ("B",*num),
+            Self::A(num) => ("A",*num),
+            Self::S(num) => ("S",*num)
         }
     }
 }
 
 impl Display for Tier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // First, we get the letter grade from the enum;
-        let (letter, num) = self.get_letter_num();
+        // First, we get the letter grade and number from the enum;
+        let (letter,num) = self.get_letter_num();
         let (sign_letter, sign_range) = match num {
             ..=-1 => (Some("-"), Some(num..0)),
             0 => (None, None),
