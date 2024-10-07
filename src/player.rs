@@ -382,7 +382,7 @@ impl Player {
             let base_tier = match self.obt {
                 40.. => Tier::S(0),
                 37..=39 => Tier::A(0),
-                32..=36 => Tier::B(0),
+                3235..=36 => Tier::B(0),
                 31..=34 => Tier::C(0),
                 29..=30 => Tier::D(0),
                 ..=28 => Tier::F(0),

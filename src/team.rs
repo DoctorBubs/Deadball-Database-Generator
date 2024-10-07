@@ -218,48 +218,50 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
         WHERE team_id = ?1"
     )?;
     // We use the statement to query the database
-    let player_iter = stmt.query_map([team.team_id], |row| {
-        //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
-        Ok(PlayerWrapper {
-            // Team spot is deserialized from the team spot row.
-            team_spot: serde_json::from_value(row.get(0)?).unwrap(),
-            pd_int: serde_json::from_value(row.get(18)?).unwrap_or(0),
-            // And we use the rest to fill out the player.
-            player: Player {
-                name: row.get(1)?,
-                age: row.get(2)?,
-                pos: row.get(3)?,
-                hand: serde_json::from_value(row.get(4)?).unwrap(),
-                bt: row.get(5)?,
-                obt_mod: row.get(6)?,
-                obt: row.get(7)?,
-                pd: serde_json::from_value(row.get(8)?).unwrap(),
-                pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
-                b_traits: BTraits {
-                    contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
-                    defense: serde_json::from_value(row.get(11)?).unwrap_or(Defense::D0),
-                    power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
-                    speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
-                    toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
+    let player_iter = stmt
+        .query_map([team.team_id], |row| {
+            //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
+            Ok(PlayerWrapper {
+                // Team spot is deserialized from the team spot row.
+                team_spot: serde_json::from_value(row.get(0)?).unwrap(),
+                pd_int: serde_json::from_value(row.get(18)?).unwrap_or(0),
+                // And we use the rest to fill out the player.
+                player: Player {
+                    name: row.get(1)?,
+                    age: row.get(2)?,
+                    pos: row.get(3)?,
+                    hand: serde_json::from_value(row.get(4)?).unwrap(),
+                    bt: row.get(5)?,
+                    obt_mod: row.get(6)?,
+                    obt: row.get(7)?,
+                    pd: serde_json::from_value(row.get(8)?).unwrap(),
+                    pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
+                    b_traits: BTraits {
+                        contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
+                        defense: serde_json::from_value(row.get(11)?).unwrap_or(Defense::D0),
+                        power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
+                        speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
+                        toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
+                    },
+                    trade_value: row.get(15)?,
+                    team_id: row.get(16)?,
+                    player_id: row.get(17)?,
+                    note: serde_json::from_value(row.get(19)?).unwrap(),
                 },
-                trade_value: row.get(15)?,
-                team_id: row.get(16)?,
-                player_id: row.get(17)?,
-                note: serde_json::from_value(row.get(19)?).unwrap(),
-            },
-        })
-    })?;
+            })
+        })?
+        .filter_map(|x| x.ok());
 
-    for result in player_iter {
+    for pw in player_iter {
         // We remove the player wrapper from the Ok.
         //We destructure the player wrapper.
         let PlayerWrapper {
             team_spot,
             player,
             pd_int,
-        } = result?;
+        } = pw;
 
-        // We check if the loader player has any error, e.g age is 0 or obt != bt + obt_,mod
+        // We check if the loaded player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
         // If there is an error, we print a warning.
         if let Some(player_error) = player_error_opt {
@@ -463,25 +465,9 @@ pub fn add_new_team(
                     EditLeagueError::NameTaken => {
                         println!("This league already has a team with that name, please try again.")
                     }
-                    _ => return Err(message), /*
-
-                                              EditLeagueError::DatabaseError(message) => {
-                                                  println!("Error adding team to the data base, please check if the database file exists and has not been corrupted");
-                                                  println!("The error was:{}", message);
-                                                  return Ok(());
-                                              }
-                                              EditLeagueError::SerdeError(message) => {
-                                                  println!("Error serializing a league, please try again");
-                                                  println!("The error message was:{}.", message);
-                                                  return Ok(());
-                                              }
-
-                                              EditLeagueError::Inquire(message) => {
-                                                  println!("Inquire Error, message was {}",message);
-                                                  return Ok(())
-                                              } */
+                    _ => return Err(message),
                 };
-                //println!("Error {:?}",message);
+
                 prompt_string = "Enter a unique team name.";
             }
             // If the league returns OK, we ask the user if they would like to create a new team.

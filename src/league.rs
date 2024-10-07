@@ -10,6 +10,7 @@ use inquire::Confirm;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
+use itertools::Itertools;
 use rusqlite::Result;
 
 use crate::b_traits::BTraits;
@@ -256,20 +257,21 @@ impl League {
         ",
         )?;
 
-        let rows = stmt.query_map([self.league_id], |row| {
-            Ok({
-                StandingWrapper {
-                    name: row.get(0)?,
-                    team_score: row.get(1)?,
-                    wins: row.get(2)?,
-                    losses: row.get(3)?,
-                    games_behind: row.get(4)?,
-                }
-            })
-        })?;
+        let rows = stmt
+            .query_map([self.league_id], |row| {
+                Ok({
+                    StandingWrapper {
+                        name: row.get(0)?,
+                        team_score: row.get(1)?,
+                        wins: row.get(2)?,
+                        losses: row.get(3)?,
+                        games_behind: row.get(4)?,
+                    }
+                })
+            })?
+            .filter_map(|x| x.ok());
 
-        for row in rows {
-            let standing = row?;
+        for standing in rows {
             println!(
                 "{} {} {} {} {}",
                 standing.name,
@@ -380,41 +382,43 @@ impl League {
         );
         // And we prepare the statement.
         let mut stmt = conn.prepare(&sql_input)?;
-        let player_iter = stmt.query_map([self.league_id], |row| {
-            Ok(
-                // We Save the team name in the PlayerRankWrapper
-                PlayerRankWrapper {
-                    team_name: row.get(0)?,
-                    player: Player {
-                        // And we fill the fields in the player struct with values from the rows.
-                        name: row.get(1)?,
-                        age: row.get(2)?,
-                        pos: row.get(3)?,
-                        hand: serde_json::from_value(row.get(4)?).unwrap(),
-                        bt: row.get(5)?,
-                        obt_mod: row.get(6)?,
-                        obt: row.get(7)?,
-                        b_traits: BTraits {
-                            contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
-                            defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
-                            power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
-                            speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
-                            toughness: serde_json::from_value(row.get(12)?)
-                                .unwrap_or(Toughness::T0),
+        let player_iter = stmt
+            .query_map([self.league_id], |row| {
+                Ok(
+                    // We Save the team name in the PlayerRankWrapper
+                    PlayerRankWrapper {
+                        team_name: row.get(0)?,
+                        player: Player {
+                            // And we fill the fields in the player struct with values from the rows.
+                            name: row.get(1)?,
+                            age: row.get(2)?,
+                            pos: row.get(3)?,
+                            hand: serde_json::from_value(row.get(4)?).unwrap(),
+                            bt: row.get(5)?,
+                            obt_mod: row.get(6)?,
+                            obt: row.get(7)?,
+                            b_traits: BTraits {
+                                contact: serde_json::from_value(row.get(8)?).unwrap_or(Contact::C0),
+                                defense: serde_json::from_value(row.get(9)?).unwrap_or(Defense::D0),
+                                power: serde_json::from_value(row.get(10)?).unwrap_or(Power::P0),
+                                speed: serde_json::from_value(row.get(11)?).unwrap_or(Speed::S0),
+                                toughness: serde_json::from_value(row.get(12)?)
+                                    .unwrap_or(Toughness::T0),
+                            },
+                            // We use a default player to fill in the fields we did not query from.
+                            ..Player::default()
                         },
-                        // We use a default player to fill in the fields we did not query from.
-                        ..Player::default()
                     },
-                },
-            )
-        })?;
+                )
+            })?
+            .filter_map(|x| x.ok());
         // We print a line of headers for each category to display
         println!("Team_name,Player_Name,Pos,Age,Hand,Bt,OBT_Mod,OBT,Traits,Tier");
         // We then loop over the player iter to print what we need.
-        for result in player_iter {
+        for prw in player_iter {
             // We remove the PlayerRankWrapper from the ok, and deconstruct it
 
-            let PlayerRankWrapper { team_name, player } = result?;
+            let PlayerRankWrapper { team_name, player } = prw;
             let tier = player.get_tier();
             /* Since we have already implemented the Display trait for Player, and
             the string generated matches what we want, we cna just print the player directly */
@@ -461,24 +465,26 @@ impl League {
         ",
         )?;
 
-        let player_iter = stmt.query_map([self.league_id], |row| {
-            Ok(PlayerRankWrapper {
-                team_name: row.get(0)?,
-                player: Player {
-                    name: row.get(1)?,
-                    age: row.get(2)?,
-                    hand: serde_json::from_value(row.get(3)?).unwrap(),
-                    pd: serde_json::from_value(row.get(4)?).unwrap(),
-                    pitcher_trait: serde_json::from_value(row.get(5)?).unwrap(),
-                    pos: row.get(6)?,
-                    // We fill the rest of the player fields with default datat.
-                    ..Player::default()
-                },
-            })
-        })?;
+        let player_iter = stmt
+            .query_map([self.league_id], |row| {
+                Ok(PlayerRankWrapper {
+                    team_name: row.get(0)?,
+                    player: Player {
+                        name: row.get(1)?,
+                        age: row.get(2)?,
+                        hand: serde_json::from_value(row.get(3)?).unwrap(),
+                        pd: serde_json::from_value(row.get(4)?).unwrap(),
+                        pitcher_trait: serde_json::from_value(row.get(5)?).unwrap(),
+                        pos: row.get(6)?,
+                        // We fill the rest of the player fields with default datat.
+                        ..Player::default()
+                    },
+                })
+            })?
+            .filter_map(|x| x.ok());
         println!("Team,name,pos,hand,age,PD,Trait,Tier");
-        for result in player_iter {
-            let PlayerRankWrapper { team_name, player } = result.unwrap();
+        for prw in player_iter {
+            let PlayerRankWrapper { team_name, player } = prw;
             let tier = player.get_tier();
             let Player {
                 name,
@@ -614,24 +620,26 @@ impl League {
         
         ",
         )?;
-        let player_iter = stmt.query_map([self.league_id], |row| {
-            Ok(
-                // We can use a player struct for the type inference.
-                // Creating an average player for a league is a intersting concept that should be explored further,
-                Player {
-                    name: self.name.clone(),
-                    bt: row.get(0)?,
-                    obt: row.get(1)?,
-                    pd: Some(PD::new_custom_pd(row.get(2)?)),
-                    age: row.get(3)?,
-                    ..Player::default()
-                },
-            )
-        })?;
+        let mut player_iter = stmt
+            .query_map([self.league_id], |row| {
+                Ok(
+                    // We can use a player struct for the type inference.
+                    // Creating an average player for a league is a intersting concept that should be explored further,
+                    Player {
+                        name: self.name.clone(),
+                        bt: row.get(0)?,
+                        obt: row.get(1)?,
+                        pd: Some(PD::new_custom_pd(row.get(2)?)),
+                        age: row.get(3)?,
+                        ..Player::default()
+                    },
+                )
+            })?
+            .filter_map(|x| x.ok());
 
-        let mut all_players: Vec<Player> = player_iter.map(|x| x.unwrap()).collect();
-        let result = match all_players[..] {
-            [Player { .. }] => all_players.remove(0),
+        let top_player = player_iter.next();
+        let result = match top_player {
+            Some(avg_player) => avg_player,
             _ => {
                 println!("Unable to calculate , please make sure there are players in this league in the database");
                 return Err(rusqlite::Error::InvalidQuery);
@@ -864,10 +872,10 @@ pub fn load_teams_from_sql(
                 },
             )
         })?
-        .map(|x| x.unwrap())
+        .filter_map(|x| x.ok())
         .collect();
 
-    // We drop stmt so we can borrw conn later.
+    // We drop stmt so we can borrow conn later.
     drop(stmt);
     // We then loa
     for team in team_iter {
@@ -928,25 +936,22 @@ pub fn get_all_leagues_from_db(
     // We query the database to get all the leagues that already exist.
     let mut stmt = conn.prepare("SELECT * from leagues").unwrap();
     // We wrap the rows into a LeagueWrapper that is part of a Rust Ok.
-    let league_iter = stmt.query_map([], |row| {
-        Ok(LeagueWrapper {
-            league_id: row.get(0)?,
-            league: League {
-                name: row.get(1)?,
-                era: serde_json::from_value(row.get(2)?).unwrap(),
-                gender: serde_json::from_value(row.get(3)?).unwrap(),
-                note: serde_json::from_value(row.get(4)?).unwrap(),
+    let result = stmt
+        .query_map([], |row| {
+            Ok(LeagueWrapper {
                 league_id: row.get(0)?,
-                teams: Vec::new(),
-            },
-        })
-    })?;
-
-    let mut result = Vec::new();
-    // We unwrap the results in league iter, and push it to the options vec
-    for wrapper in league_iter {
-        result.push(wrapper?);
-    }
+                league: League {
+                    name: row.get(1)?,
+                    era: serde_json::from_value(row.get(2)?).unwrap(),
+                    gender: serde_json::from_value(row.get(3)?).unwrap(),
+                    note: serde_json::from_value(row.get(4)?).unwrap(),
+                    league_id: row.get(0)?,
+                    teams: Vec::new(),
+                },
+            })
+        })?
+        .filter_map(|x| x.ok())
+        .collect();
     Ok(result)
 }
 
