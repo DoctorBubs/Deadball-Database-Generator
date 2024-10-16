@@ -59,7 +59,7 @@ pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &[E]) -> HashMap<&E, 
     }
     result
 }
-fn main() -> Result<(), EditLeagueError> {
+fn main() -> Result<(), ()> {
     // First, we load the databsae, or create one if it doesn't exist.
     let default_path = "deadball.db";
     let conn_load = load_database(default_path);
@@ -89,6 +89,9 @@ fn main() -> Result<(), EditLeagueError> {
                     EditLeagueError::DatabaseError(output) => {
                         println!("Something went wrong, please check that this folder is not read only.\nIt is also possible that {} is corrupted, please check that as well\nThe Error message was {}",default_path,output);
                     },
+                    EditLeagueError::PennantError(message) => {
+                        println!("{}",message)
+                    },
                     EditLeagueError::Inquire(_) | EditLeagueError::SerdeError(_) => {
 
                         let library_type;
@@ -100,9 +103,9 @@ fn main() -> Result<(), EditLeagueError> {
                             EditLeagueError::Inquire(output) => {
                                 library_type = "inquire";
                                output.to_string()
-                            }
+                            },
                             // We break, as there are only 2 options that can lead to this path
-                            _ => break
+                            _ => unreachable!()
 
                         };
                         println!("Something went wrong with the {} library, please make sure that all dependencies have been installed correctly",library_type);
@@ -110,8 +113,6 @@ fn main() -> Result<(), EditLeagueError> {
                     },
                     _ => println!("Something went wrong regarding a team name, please restart the program and try again")
                 }
-
-                break;
             }
         }
         //If there was no error, we ask the user if they would like to return to the main menu.
@@ -124,7 +125,7 @@ fn main() -> Result<(), EditLeagueError> {
             _ => break,
         };
     }
-    user_input
+    Ok(())
 }
 
 fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {

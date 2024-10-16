@@ -1,5 +1,7 @@
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
+use crate::edit_league_error::handle_serde_error;
+use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
 use crate::lineup_score::LineupScore;
 use crate::note::Notable;
@@ -307,15 +309,10 @@ impl Player {
         team_spot: TeamSpot,
     ) -> Result<(), EditLeagueError> {
         self.team_id = team_id;
-        let p_serde = match self.get_serde(team_spot) {
-            Ok(data) => data,
-            Err(message) => return Err(EditLeagueError::SerdeError(message)),
-        };
+        let p_serde = handle_serde_error(self.get_serde(team_spot))?;
 
-        let new_player_id = match p_serde.save_to_sql(conn) {
-            Ok(num) => num,
-            Err(message) => return Err(EditLeagueError::DatabaseError(message)),
-        };
+        let new_player_id = handle_sql_error(p_serde.save_to_sql(conn))?;
+
         self.player_id = new_player_id;
         Ok(())
     }

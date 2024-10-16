@@ -19,6 +19,7 @@ pub enum LoadLeagueInput {
 pub enum EditLeagueInput {
     CreateNewTeam,
     CreateSchedule,
+    GeneratePennant,
 }
 // MenuInput contains all the valid choices a user can use at the main menu.
 #[derive(Copy, Clone, Debug)]
@@ -38,6 +39,7 @@ impl fmt::Display for MenuInput {
                 LoadLeagueInput::EditLeague(edit_input) => match edit_input {
                     EditLeagueInput::CreateNewTeam => "Create a new team.",
                     EditLeagueInput::CreateSchedule => "Generate a schedule for an existing league",
+                    EditLeagueInput::GeneratePennant => "Generate a new pennant chase.",
                 },
                 LoadLeagueInput::ViewSchedule => "View schedule.",
                 LoadLeagueInput::ViewRankings => "View the top 10 batter or pitchers for a league.",
@@ -67,10 +69,12 @@ impl fmt::Display for RankingsChoice {
 pub fn run_main_menu(conn: &mut Connection, thread: &mut ThreadRng) -> Result<(), EditLeagueError> {
     // We load a vector of the possible options a view can pick in the main menu.
     let new_team = EditLeagueInput::CreateNewTeam;
+    let new_pennant = EditLeagueInput::GeneratePennant;
     //let new_sched = EditLeagueInput::CreateSchedule;
     let starting_options: Vec<MenuInput> = vec![
         MenuInput::CreateNewLeague,
         MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_team)),
+        MenuInput::LoadExistingLeague(LoadLeagueInput::EditLeague(new_pennant)),
         MenuInput::LoadExistingLeague(LoadLeagueInput::RefreshLeague),
         MenuInput::LoadExistingLeague(LoadLeagueInput::ViewRankings),
         // Uncomment the next 2 lines to enable schedule generation.

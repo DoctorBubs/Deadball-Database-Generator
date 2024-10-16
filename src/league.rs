@@ -6,6 +6,7 @@ use std::io::Write;
 use std::path::Path;
 
 use crate::b_traits::BTraits;
+use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
@@ -20,16 +21,18 @@ use crate::pennantgen::PennantStanding;
 use crate::player::select_gender;
 use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
+use inquire::CustomType;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
 use itertools::Itertools;
 use rand::prelude::*;
+use rand::Error;
 use rusqlite::Result;
+use serde::de::value;
 
 use crate::player::Player;
 
-use crate::team;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::PlayerTrait;
@@ -726,12 +729,11 @@ impl League {
         thread: &mut ThreadRng,
         conn: &mut Connection,
         games_played: i32,
-    ) -> Result<(), ()> {
+    ) -> Result<(), EditLeagueError> {
         // First, we check to see if there are already any pennant races associated with the leauge.
 
-        let mut existing_stmt = conn
-            .prepare(
-                "
+        let mut existing_stmt = conn.prepare(
+            "
             SELECT 
                 COUNT(pennants.pennant_id)
             FROM 
@@ -741,18 +743,20 @@ impl League {
         
         
         ",
-            )
-            .unwrap();
+        );
+        let mut pennant_stmt = match existing_stmt {
+            Ok(value) => value,
+            Err(message) => return Err(EditLeagueError::DatabaseError(message)),
+        };
+        let pennants_iter = pennant_stmt.query_map([self.league_id], |row| {
+            let num: i32 = row.get(0).unwrap();
+            Ok(num)
+        });
 
-        let mut pennants_iter = existing_stmt
-            .query_map([self.league_id], |row| {
-                let num: i32 = row.get(0).unwrap();
-                Ok(num)
-            })
-            .unwrap()
-            .filter_map(|x| x.ok());
-        // We save the count as a variable.
-        let count = pennants_iter.next().unwrap();
+        let count: i32 = handle_sql_error(pennants_iter)?
+            .filter_map(|x| x.ok())
+            .next()
+            .unwrap_or(0);
         // And use it to determine the file name we will be writing to.
         let file_name = format!("{}_Pennant_{}.txt", self.name, count);
         // We map all teams to a vector of team pennant wrappers.
@@ -790,20 +794,13 @@ impl League {
         }
         // We retrieve the pennant standing, which is a vector of vectors of i32.
         // The first value represents a teams wins, and the second represents the teams losses.
-        let input_standings =
-            match generate_pennant_standings(games_played, thread, target_len as i32) {
-                Ok(value) => value,
-                Err(message) => {
-                    println!("{}", message);
-                    return Err(());
-                }
-            };
+        let input_standings = generate_pennant_standings(games_played, thread, target_len as i32)?;
+
         let final_standings = team_ranks.iter().zip(input_standings);
-        conn.execute(
+        handle_sql_error(conn.execute(
             "INSERT INTO pennants(league_id) VALUES(?1)",
             [self.league_id],
-        )
-        .unwrap();
+        ))?;
         let pennant_id = conn.last_insert_rowid();
 
         let mut file_string = "Name,Wins,Losses, Games Behind,Team Score".to_string();
@@ -826,15 +823,14 @@ impl League {
                 name, wins, losses, games_behind, team_score
             );
             file_string.push_str(&standing_line);
-            conn.execute(
+            handle_sql_error(conn.execute(
                 "
                 INSERT INTO pennants_standings(team_id,pennant_id,wins,losses) VALUES(?1,?2,?3,?4)
             
             
             ",
                 [id, &pennant_id, &(wins as i64), &(losses as i64)],
-            )
-            .unwrap();
+            ))?;
         }
         println!("{}", file_string);
         fs::write(file_name, file_string).unwrap();
@@ -1049,6 +1045,23 @@ pub fn load_league(
                     save_league(&league);
                 }
             };
+        }
+        EditLeagueInput::GeneratePennant => {
+            if league.teams.len() <= 3 {
+                return Err(EditLeagueError::PennantError(
+                    "Error: A league must have 4 or more teams in order to generate a pennant."
+                        .to_string(),
+                ));
+            };
+            let games_played_input = CustomType::<i32>::new(
+                "Please enter how many games have been played in the season.",
+            )
+            .with_error_message("Please enter a valid whole number.")
+            .prompt();
+            match games_played_input {
+                Ok(games_played) => league.create_pennant_race(thread, conn, games_played)?,
+                Err(err) => return inquire_check(err),
+            }
         }
     };
     Ok(())
