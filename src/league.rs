@@ -5,16 +5,7 @@ use std::io::Write;
 
 use std::path::Path;
 
-use inquire::validator::MinLengthValidator;
-use inquire::Confirm;
-use inquire::InquireError;
-use inquire::Select;
-use inquire::Text;
-use itertools::Itertools;
-use rusqlite::Result;
-
 use crate::b_traits::BTraits;
-
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
 use crate::inquire_check;
@@ -24,10 +15,21 @@ use crate::main_menu::RankingsChoice;
 use crate::note::Notable;
 use crate::note::Note;
 use crate::pd::PD;
+use crate::pennantgen::generate_pennant_standings;
+use crate::pennantgen::PennantStanding;
 use crate::player::select_gender;
+use inquire::validator::MinLengthValidator;
+use inquire::Confirm;
+use inquire::InquireError;
+use inquire::Select;
+use inquire::Text;
+use itertools::Itertools;
+use rand::prelude::*;
+use rusqlite::Result;
 
 use crate::player::Player;
 
+use crate::team;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::PlayerTrait;
@@ -109,6 +111,14 @@ struct PlayerRankWrapper {
     team_name: String,
     player: Player,
 }
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+struct TeamPennantWrapper<'a> {
+    id: i64,
+    team_score: i32,
+    weight: i32,
+    name: &'a String,
+}
+
 // A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
 #[derive(Debug, Serialize, Deserialize)]
@@ -569,6 +579,7 @@ impl League {
             }
         }
     }
+
     /// Query's the database to create the average player for the league.
     pub fn get_average_player(&self, conn: &mut Connection) -> Result<Player, rusqlite::Error> {
         let mut stmt = conn.prepare(
@@ -622,18 +633,14 @@ impl League {
         )?;
         let mut player_iter = stmt
             .query_map([self.league_id], |row| {
-                Ok(
-                    // We can use a player struct for the type inference.
-                    // Creating an average player for a league is a intersting concept that should be explored further,
-                    Player {
-                        name: self.name.clone(),
-                        bt: row.get(0)?,
-                        obt: row.get(1)?,
-                        pd: Some(PD::new_custom_pd(row.get(2)?)),
-                        age: row.get(3)?,
-                        ..Player::default()
-                    },
-                )
+                Ok(Player {
+                    name: self.name.clone(),
+                    bt: row.get(0)?,
+                    obt: row.get(1)?,
+                    pd: Some(PD::new_custom_pd(row.get(2)?)),
+                    age: row.get(3)?,
+                    ..Player::default()
+                })
             })?
             .filter_map(|x| x.ok());
 
@@ -641,7 +648,7 @@ impl League {
         let result = match top_player {
             Some(avg_player) => avg_player,
             _ => {
-                println!("Unable to calculate , please make sure there are players in this league in the database");
+                println!("Unable to calculate, please make sure there are players in this league in the database");
                 return Err(rusqlite::Error::InvalidQuery);
             }
         };
@@ -712,6 +719,126 @@ impl League {
             result.insert(team.team_id, team);
         }
         result
+    }
+    /// Creates a randomly generated pennant race that is saved to the database and is also exported as a file.
+    pub fn create_pennant_race(
+        &self,
+        thread: &mut ThreadRng,
+        conn: &mut Connection,
+        games_played: i32,
+    ) -> Result<(), ()> {
+        // First, we check to see if there are already any pennant races associated with the leauge.
+
+        let mut existing_stmt = conn
+            .prepare(
+                "
+            SELECT 
+                COUNT(pennants.pennant_id)
+            FROM 
+                pennants
+            WHERE
+                pennants.league_id = ?1
+        
+        
+        ",
+            )
+            .unwrap();
+
+        let mut pennants_iter = existing_stmt
+            .query_map([self.league_id], |row| {
+                let num: i32 = row.get(0).unwrap();
+                Ok(num)
+            })
+            .unwrap()
+            .filter_map(|x| x.ok());
+        // We save the count as a variable.
+        let count = pennants_iter.next().unwrap();
+        // And use it to determine the file name we will be writing to.
+        let file_name = format!("{}_Pennant_{}.txt", self.name, count);
+        // We map all teams to a vector of team pennant wrappers.
+        let mut pennant_wrappers: Vec<TeamPennantWrapper> = self
+            .teams
+            .iter()
+            .map(|x| TeamPennantWrapper {
+                id: x.team_id,
+                team_score: x.team_score,
+                weight: (100 - x.team_score).abs(),
+                name: &x.name,
+            })
+            .collect();
+        // We create a target len that is used to calculate how many stands are needed.
+        let target_len = self.teams.len();
+        // We create a team ranks vector.
+        let mut team_ranks = Vec::new();
+        // This is a litte complicated, but basically we
+        while team_ranks.len() != target_len {
+            // First we create a temporary vector.
+            let mut temp_vec = Vec::new();
+            // We take an iter of the penant wrappers that also has an enumerate, so we know where in the vector is located.
+            let modified_ranks = pennant_wrappers.iter().enumerate();
+            // We take the index and value for each listing in the vecotr, and save it in a tuple, which is saved in the temp_vec/
+            for (i, rank) in modified_ranks {
+                let new_tup = (i, rank);
+                temp_vec.push(new_tup)
+            }
+            // We pick a random value from temp vec via a weighted selection.
+            let (j, sample) = temp_vec.choose_weighted(thread, |x| x.1.weight).unwrap();
+            // We push the sample to team ranks.
+            team_ranks.push(**sample);
+            // And using the index, we remove the value from pennant wrappers.
+            pennant_wrappers.remove(*j);
+        }
+        // We retrieve the pennant standing, which is a vector of vectors of i32.
+        // The first value represents a teams wins, and the second represents the teams losses.
+        let input_standings =
+            match generate_pennant_standings(games_played, thread, target_len as i32) {
+                Ok(value) => value,
+                Err(message) => {
+                    println!("{}", message);
+                    return Err(());
+                }
+            };
+        let final_standings = team_ranks.iter().zip(input_standings);
+        conn.execute(
+            "INSERT INTO pennants(league_id) VALUES(?1)",
+            [self.league_id],
+        )
+        .unwrap();
+        let pennant_id = conn.last_insert_rowid();
+
+        let mut file_string = "Name,Wins,Losses, Games Behind,Team Score".to_string();
+        let mut top_wins = None;
+        for (i, standing) in final_standings.rev().enumerate() {
+            let (pennant_wrapper, win_loss) = standing;
+            let TeamPennantWrapper {
+                id,
+                name,
+                team_score,
+                ..
+            } = pennant_wrapper;
+            let PennantStanding { wins, losses } = win_loss;
+            if i == 0 {
+                top_wins = Some(wins)
+            };
+            let games_behind = top_wins.unwrap_or(wins) - wins;
+            let standing_line = format!(
+                "\n{},{},{},{},{}",
+                name, wins, losses, games_behind, team_score
+            );
+            file_string.push_str(&standing_line);
+            conn.execute(
+                "
+                INSERT INTO pennants_standings(team_id,pennant_id,wins,losses) VALUES(?1,?2,?3,?4)
+            
+            
+            ",
+                [id, &pennant_id, &(wins as i64), &(losses as i64)],
+            )
+            .unwrap();
+        }
+        println!("{}", file_string);
+        fs::write(file_name, file_string).unwrap();
+        Ok(())
     }
 }
 
@@ -867,6 +994,7 @@ pub fn load_teams_from_sql(
                         Era::Ancient => None,
                         Era::Modern => Some(Vec::new()),
                     },
+
                     team_score: 0,
                     note: serde_json::from_value(row.get(5)?).unwrap(),
                 },

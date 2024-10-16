@@ -8,6 +8,7 @@ mod main_menu;
 mod minor_leaguer;
 mod note;
 mod pd;
+mod pennantgen;
 mod pitcher_rank_info;
 mod player;
 mod player_error;
@@ -236,6 +237,33 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         (),
     )?;
 
+    conn.execute(
+        "
+        CREATE TABLE IF NOT EXISTS pennants(
+            pennant_id INTEGER PRIMARY KEY,
+            league_id INTEGER NOT NULL,
+            FOREIGN KEY (league_id) REFERENCES leagues(league_id)
+        
+        )
+    ",
+        (),
+    )?;
+
+    conn.execute(
+        "
+        CREATE TABLE IF NOT EXISTS pennants_standings(
+        standings_id INTEGER PRIMARY KEY,
+        pennant_id INTEGER NOT NULL,
+        team_id INTEGER NOT NULL,
+        wins INTEGER NOT NULL,
+        losses INTEGER NOT NULL,
+        FOREIGN KEY (pennant_id) REFERENCES pennants(pennant_id),
+        FOREIGN KEY(team_id) REFERENCES teams(team_id)
+        )
+    
+    ",
+        (),
+    )?;
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
     team_season_id INTEGER PRIMARY KEY,st
     league_season_id INTEGER,
@@ -415,7 +443,9 @@ mod tests {
         BTraits::from_string("S+").unwrap();
         assert_eq!(BTraits::from_string("P +").is_err(), true);
         BTraits::from_string("C+,P--").unwrap();
-
+        current_league
+            .create_pennant_race(&mut r_thread, &mut test_conn, 144)
+            .unwrap();
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(
