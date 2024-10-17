@@ -1004,10 +1004,15 @@ pub fn load_teams_from_sql(
     // We then loa
     for team in team_iter {
         // We load the team from the database in the form of a Rust struct.
-        let loaded_team = load_team(conn, team)?;
-
+        println!("Loading Team {}",team.name);
+        let loaded_team = load_team(conn, team).unwrap();
+        if loaded_team.lineup.len() == 0{
+            panic!("Team has an empty lineup!")
+        }
         // And add the team to the league's teams vector.
-        league.teams.push(loaded_team)
+        league.teams.push(loaded_team);
+    
+        println!("Teams added{}",league.teams.len())
     }
 
     Ok(())

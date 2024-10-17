@@ -6,6 +6,7 @@ use crate::inquire_check;
 use crate::note::Notable;
 use crate::note::Note;
 
+use crate::team;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
@@ -16,6 +17,8 @@ use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
 use inquire::Text;
 use rusqlite::Connection;
+use serde::de::value;
+use serde_json::Value;
 
 use crate::league::save_league;
 use crate::league::League;
@@ -33,6 +36,7 @@ use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
 
+use core::panic;
 use std::fmt::Write;
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
@@ -204,71 +208,97 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
             output
         })
 }
-
+/// PlayerWrapper contains fields that need to be deserialzed by serde.
 struct PlayerWrapper {
-    team_spot: TeamSpot,
+    team_spot: Value,
     player: Player,
+    hand: Value,
+    pd: Value,
     pd_int: i32,
+    pitcher_trait: Value,
+    contact: Value,
+    defense: Value,
+    power:Value,
+    speed: Value,
+    toughness:Value,
+    note: Value
 }
 
-pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite::Error> {
+impl PlayerWrapper{
+    fn gen_player(&self) -> Result<(TeamSpot,Player,i32), serde_json::Error>{
+        let team_spot = serde_json::from_value(self.team_spot.clone())?;
+        println!("{:?}",team_spot);
+        let new_player = Player{
+            name: self.player.name.clone(),
+            pos: self.player.pos.clone(),
+            hand: serde_json::from_value(self.hand.clone())?,
+            pd: serde_json::from_value(self.pd.clone())?,
+            pitcher_trait: serde_json::from_value(self.pitcher_trait.clone())?,
+            b_traits: BTraits{
+                contact: serde_json::from_value(self.contact.clone()).unwrap_or(   Contact::C0),
+                defense: serde_json::from_value(self.defense.clone()).unwrap_or(Defense::D0),
+                power: serde_json::from_value(self.power.clone()).unwrap_or(Power::P0),
+                speed: serde_json::from_value(self.speed.clone()).unwrap_or(Speed::S0),
+                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::T0)
+            },
+            note: serde_json::from_value(self.note.clone())?,
+            ..self.player
+        };
+        Ok((team_spot,new_player,self.pd_int))
+    }
+}
+
+pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeagueError> {
     // We prepare a statement that will select all players from the database that has a matching team id
-    let mut stmt = conn.prepare(
+    println!("Loading Teams");
+    let mut stmt = handle_sql_error(conn.prepare(
         "SELECT 
         team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int,player_note
         FROM players 
         WHERE team_id = ?1"
-    )?;
+    ))?;
     // We use the statement to query the database
-    let player_iter = stmt
-        .query_map([team.team_id], |row| {
-            //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
-            Ok(PlayerWrapper {
-                // Team spot is deserialized from the team spot row.
-                team_spot: serde_json::from_value(row.get(0)?).unwrap(),
-                pd_int: serde_json::from_value(row.get(18)?).unwrap_or(0),
-                // And we use the rest to fill out the player.
-                player: Player {
-                    name: row.get(1)?,
-                    age: row.get(2)?,
-                    pos: row.get(3)?,
-                    hand: serde_json::from_value(row.get(4)?).unwrap(),
-                    bt: row.get(5)?,
-                    obt_mod: row.get(6)?,
-                    obt: row.get(7)?,
-                    pd: serde_json::from_value(row.get(8)?).unwrap(),
-                    pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
-                    b_traits: BTraits {
-                        contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
-                        defense: serde_json::from_value(row.get(11)?).unwrap_or(Defense::D0),
-                        power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
-                        speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
-                        toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0),
-                    },
-                    trade_value: row.get(15)?,
-                    team_id: row.get(16)?,
-                    player_id: row.get(17)?,
-                    note: serde_json::from_value(row.get(19)?).unwrap(),
-                },
-            })
-        })?
-        .filter_map(|x| x.ok());
-
-    for pw in player_iter {
-        // We remove the player wrapper from the Ok.
-        //We destructure the player wrapper.
-        let PlayerWrapper {
-            team_spot,
-            player,
-            pd_int,
-        } = pw;
+    let rows_received = stmt.query_map([team.team_id], |row| {
+        //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
+        Ok(PlayerWrapper {
+            // Team spot is deserialized from the team spot row.
+            team_spot: row.get(0)?,
+            hand:row.get(4)?,
+            pd:row.get(8)?,
+            pitcher_trait:row.get(9)?,
+            contact:row.get(10)?,
+            defense: row.get(11)?,
+            power: row.get(12)?,
+            speed: row.get(13)?,
+            toughness: row.get(14)?,
+            pd_int: row.get(18).unwrap_or(0),
+            note: row.get(19)?,
+            // And we use the rest to fill out the player.
+            player: Player {
+                name: row.get(1)?,
+                age: row.get(2)?,
+                pos: row.get(3)?,
+                bt: row.get(5)?,
+                obt_mod: row.get(6)?,
+                obt: row.get(7)?,
+                trade_value: row.get(15)?,
+                team_id: row.get(16)?,
+                player_id: row.get(17)?,
+                ..Player::default()
+            },
+        })
+    });
+    let player_iter = handle_sql_error(rows_received)?;
+    for r in player_iter {
+        let pw = handle_sql_error(r)?;
+        let (team_spot,player,pd_int) = handle_serde_error(pw.gen_player())?;
 
         // We check if the loaded player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
         // If there is an error, we print a warning.
         if let Some(player_error) = player_error_opt {
             println!("{}", player_error)
-        }
+        };
         // And based off the team spot, the player is assigned to the correct player pool.
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),
@@ -289,6 +319,9 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, rusqlite
         }
     }
     // We then have the team calculate it's team score
+    if team.lineup.len() == 0{
+        panic!("Before returniing, lineup len was 0!")
+    };
     team.calc_team_score();
     Ok(team)
 }

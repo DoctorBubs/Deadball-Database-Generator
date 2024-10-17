@@ -43,7 +43,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
 
-// Checks an inquire error to see if it is the result of the user cancelling. If not, there is a panic.
+/// Checks an inquire error to see if it is the result of the user cancelling. If not, returns the Error wrapped in an EditLeagueError
+/// This is usefull, as it allows the user to esc from a prompt without causing the program to crash
 pub fn inquire_check(err: InquireError) -> Result<(), EditLeagueError> {
     match err {
         inquire::InquireError::OperationCanceled => Ok(()),
@@ -59,7 +60,7 @@ pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &[E]) -> HashMap<&E, 
     }
     result
 }
-fn main() -> Result<(), ()> {
+fn main()->Result<(),()> {
     // First, we load the databsae, or create one if it doesn't exist.
     let default_path = "deadball.db";
     let conn_load = load_database(default_path);
@@ -111,8 +112,10 @@ fn main() -> Result<(), ()> {
                         println!("Something went wrong with the {} library, please make sure that all dependencies have been installed correctly",library_type);
                         println!("The error message was: {}", output_string)
                     },
-                    _ => println!("Something went wrong regarding a team name, please restart the program and try again")
+                    _ => println!("Something went wrong, please restart the program and try again")
                 }
+
+                
             }
         }
         //If there was no error, we ask the user if they would like to return to the main menu.
