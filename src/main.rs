@@ -60,7 +60,7 @@ pub fn vec_to_hash<E: std::hash::Hash + std::cmp::Eq>(vec: &[E]) -> HashMap<&E, 
     }
     result
 }
-fn main() -> Result<(), ()> {
+fn main()->Result<(),()> {
     // First, we load the databsae, or create one if it doesn't exist.
     let default_path = "deadball.db";
     let conn_load = load_database(default_path);
@@ -86,33 +86,37 @@ fn main() -> Result<(), ()> {
         match user_input {
             Ok(_) => {}
             Err(ref message) => {
-                match message {
+                match message{
                     EditLeagueError::DatabaseError(output) => {
                         println!("Something went wrong with the database, please check that this folder is not read only.\nIt is also possible that {} is corrupted or that the database contains invalid data, please check that as well.\nThe Error message was {}",default_path,output);
-                    }
+                    },
                     EditLeagueError::PennantError(message) => {
-                        println!("{}", message)
-                    }
+                        println!("{}",message)
+                    },
                     EditLeagueError::Inquire(_) | EditLeagueError::SerdeError(_) => {
+
                         let library_type;
-                        let output_string = match message {
+                        let output_string = match message{
                             EditLeagueError::SerdeError(output) => {
                                 library_type = "serde";
                                 output.to_string()
-                            }
+                            },
                             EditLeagueError::Inquire(output) => {
                                 library_type = "inquire";
-                                output.to_string()
-                            }
+                               output.to_string()
+                            },
                             // We break, as there are only 2 options that can lead to this path
-                            _ => unreachable!(),
+                            _ => unreachable!()
+
                         };
                         println!("Something went wrong with the {} library, please make sure that all dependencies have been installed correctly",library_type);
-                        println!("If this is an error with the serde library, it is possible there is incorrect data in the database.");
-                        println!("The error message was: {}", output_string);
-                    }
-                    _ => println!("Something went wrong, please restart the program and try again"),
+                        println!("If this is an error with the serde library, it is possible there is incorrect data in the database.")
+                        println!("The error message was: {}", output_string)
+                    },
+                    _ => println!("Something went wrong, please restart the program and try again")
                 }
+
+                
             }
         }
         //If there was no error, we ask the user if they would like to return to the main menu.
