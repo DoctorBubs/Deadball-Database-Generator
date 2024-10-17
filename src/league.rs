@@ -969,7 +969,7 @@ pub fn load_teams_from_sql(
 
     let team_iter: Vec<Result<Team, rusqlite::Error>> =
         handle_sql_error(stmt.query_map([league_id], |row| {
-            // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
+            // For each team that matchers, we create a new TeamWrapper that is wrapped in an ok.
             Ok(
                 // We use the remaining rows to deseirialize the team
                 Team {
@@ -1084,7 +1084,16 @@ pub fn get_all_leagues_from_db(
                 },
             })
         })?
-        .filter_map(|x| x.ok())
+        .filter_map(|x| match &x {
+            Ok(_) => x.ok(),
+            Err(message) => {
+                println!(
+                    "Error loading a league from the database.\nPlease check the data in the league table. The error was {}",
+                    message.to_string()
+                );
+                None
+            }
+        })
         .collect();
     Ok(result)
 }

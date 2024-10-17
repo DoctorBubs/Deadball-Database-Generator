@@ -207,46 +207,14 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
             output
         })
 }
-/// PlayerWrapper contains fields that need to be deserialzed by serde.
+/// Used when creating players from a database,
 struct PlayerWrapper {
-    team_spot: Value,
+    team_spot: TeamSpot,
     player: Player,
-    hand: Value,
-    pd: Value,
     pd_int: i32,
-    pitcher_trait: Value,
-    contact: Value,
-    defense: Value,
-    power: Value,
-    speed: Value,
-    toughness: Value,
-    note: Value,
+    
 }
 
-impl PlayerWrapper {
-    // Deserializes the JSON values in the wrapper, and creates a new player based off those values and the preexisting player in the wrappers
-    fn gen_player(&self) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
-        let team_spot = serde_json::from_value(self.team_spot.clone())?;
-        let new_player = Player {
-            name: self.player.name.clone(),
-            pos: self.player.pos.clone(),
-            hand: serde_json::from_value(self.hand.clone())?,
-            pd: serde_json::from_value(self.pd.clone())?,
-            pitcher_trait: serde_json::from_value(self.pitcher_trait.clone())?,
-            b_traits: BTraits {
-                contact: serde_json::from_value(self.contact.clone()).unwrap_or(Contact::C0),
-                defense: serde_json::from_value(self.defense.clone()).unwrap_or(Defense::D0),
-                power: serde_json::from_value(self.power.clone()).unwrap_or(Power::P0),
-                speed: serde_json::from_value(self.speed.clone()).unwrap_or(Speed::S0),
-                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::T0),
-            },
-            note: serde_json::from_value(self.note.clone())?,
-            // The remaining fields can be copied over from the original player saved in the wrapper.
-            ..self.player
-        };
-        Ok((team_spot, new_player, self.pd_int))
-    }
-}
 
 pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeagueError> {
     // We prepare a statement that will select all players from the database that has a matching team id
@@ -261,37 +229,39 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
     let rows_received = stmt.query_map([team.team_id], |row| {
         //For each result that matches the query, we create a new player wrapper that is wrapped in an Ok.
         Ok(PlayerWrapper {
-            // Team spot is deserialized from the team spot row.
-            team_spot: row.get(0)?,
-            hand: row.get(4)?,
-            pd: row.get(8)?,
-            pitcher_trait: row.get(9)?,
-            contact: row.get(10)?,
-            defense: row.get(11)?,
-            power: row.get(12)?,
-            speed: row.get(13)?,
-            toughness: row.get(14)?,
+            // We save the JSON value that needs to be deserialized for later.
+            // We don't deserialize it now, as we won't be able to return a rusqlite error if there is a proble,
+            team_spot: serde_json::from_value(row.get(0)?).unwrap(),
             pd_int: row.get(18).unwrap_or(0),
-            note: row.get(19)?,
-            // And we use the rest to fill out the player.
+            // The fields that do not need ot be deserialized are inserted directly into a player struct.
             player: Player {
                 name: row.get(1)?,
                 age: row.get(2)?,
                 pos: row.get(3)?,
+                hand: serde_json::from_value(row.get(4)?).unwrap(),
                 bt: row.get(5)?,
                 obt_mod: row.get(6)?,
                 obt: row.get(7)?,
+                pd: serde_json::from_value(row.get(8)?).unwrap(),
+                pitcher_trait: serde_json::from_value(row.get(9)?).unwrap(),
+                b_traits: BTraits {
+                    contact: serde_json::from_value(row.get(10)?).unwrap_or(Contact::C0),
+                    defense: serde_json::from_value(row.get(11)?).unwrap_or(Defense::D0),
+                    power: serde_json::from_value(row.get(12)?).unwrap_or(Power::P0),
+                    speed: serde_json::from_value(row.get(13)?).unwrap_or(Speed::S0),
+                    toughness: serde_json::from_value(row.get(14)?).unwrap_or(Toughness::T0)
+                },
                 trade_value: row.get(15)?,
                 team_id: row.get(16)?,
                 player_id: row.get(17)?,
-                ..Player::default()
+                note: serde_json::from_value(row.get(19)?).unwrap(),
             },
         })
     });
     let player_iter = handle_sql_error(rows_received)?;
     for r in player_iter {
         let pw = handle_sql_error(r)?;
-        let (team_spot, player, pd_int) = handle_serde_error(pw.gen_player())?;
+        let PlayerWrapper{team_spot,player,pd_int} = pw;
 
         // We check if the loaded player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
