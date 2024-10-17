@@ -30,8 +30,9 @@ fn generate_losers(
     thread: &mut ThreadRng,
     max_other_wins: i32,
 ) -> Option<Vec<PennantStanding>> {
+    // We set a result variable.
     let mut result = None;
-
+    // We calculate the minimum winning percentage that a team can have.
     let mut min_winning_percentage = 0.50;
     loop {
         // If we have gotten this far that winning percentage is less than 0, we return an error
@@ -66,7 +67,6 @@ fn generate_losers(
         // If we didn't create valid PennantStanding, we go for it again but with a lower min_winning percentage
         match loser_standings {
             None => min_winning_percentage += -0.05,
-
             Some(mut standings) => {
                 //otherwise, we sort the PennantStanding by wins, and return it in a some.
                 standings.sort_by(|a, b| a.wins.cmp(&b.wins));
