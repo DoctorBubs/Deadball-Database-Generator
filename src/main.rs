@@ -110,7 +110,7 @@ fn main()->Result<(),()> {
 
                         };
                         println!("Something went wrong with the {} library, please make sure that all dependencies have been installed correctly",library_type);
-                        println!("If this is an error with the serde library, it is possible there is incorrect data in the database.")
+                        println!("If this is an error with the serde library, it is possible there is incorrect data in the database.");
                         println!("The error message was: {}", output_string)
                     },
                     _ => println!("Something went wrong, please restart the program and try again")
