@@ -7,7 +7,7 @@ pub struct PennantStanding {
     pub losses: i32,
 }
 
-use tailcall::tailcall;
+
 
 use crate::edit_league_error::EditLeagueError;
 /// Creates a tuple containing the wins and losses of a first place team. The teams winning percntage will be approximately 60 - 70%.
@@ -22,9 +22,8 @@ fn get_first_place_standings(games_played: i32, thread: &mut ThreadRng) -> (i32,
     (wins, games_played - wins)
 }
 
-#[tailcall]
+
 fn generate_losers(
-    min_winning_percentage: f32,
     games_played: i32,
     total_games_played: i32,
     max_wins: i32,
@@ -34,57 +33,56 @@ fn generate_losers(
     thread: &mut ThreadRng,
     max_other_wins: i32,
 ) -> Option<Vec<PennantStanding>> {
-    // If we have gotten this far that winning percentage is less than 0, we return an error
-    if min_winning_percentage < 0.0 {
-        return None;
-    }
-    // We calculate the minimum number of wins based off the percentage.
-    let minimum_wins = ((games_played as f32) * min_winning_percentage).floor() as i32;
-    // Likewise, we calculate the max number of losses
-    let max_losses = games_played - minimum_wins;
-    // First, we use minimum wins and amx other wins to create a range,
-    let loser_standings = (minimum_wins..=max_other_wins)
-        // And we get permutations of 2. This create a vector, with value 0 being a teams wins, and 1 being a teams losses.
-        .permutations(2)
-        .map(|x| {
-            (PennantStanding {
-                wins: x[0],
-                losses: x[1],
+    let mut result = None;
+
+    let mut min_winning_percentage = 0.50;
+    loop {
+        // If we have gotten this far that winning percentage is less than 0, we return an error
+        if min_winning_percentage < 0.0 {
+            break;
+        }
+        // We calculate the minimum number of wins based off the percentage.
+        let minimum_wins = ((games_played as f32) * min_winning_percentage).floor() as i32;
+        // Likewise, we calculate the max number of losses
+        let max_losses = games_played - minimum_wins;
+        // First, we use minimum wins and amx other wins to create a range,
+        let loser_standings = (minimum_wins..=max_other_wins)
+            // And we get permutations of 2. This create a vector, with value 0 being a teams wins, and 1 being a teams losses.
+            .permutations(2)
+            .map(|x| {
+                (PennantStanding {
+                    wins: x[0],
+                    losses: x[1],
+                })
             })
-        })
-        // We filter to the permutations to ensure there are not too many losses, as well as making sure the sums of the wins and losses are correct.
-        .filter(|x| ((x.losses <= max_losses) & (x.wins + x.losses == games_played)))
-        // We next get get the combination of permutation that fits the number of teams we need PennantStandings for.
-        .combinations(standings_needed)
-        // Of the combos generated, we filter out the ones that have an incorrect numbers of wins and losses
-        .filter(|x| {
-            let total_wins = x.iter().fold(0, |acc, a| a.wins + acc) + top_3_wins;
-            let total_losses = x.iter().fold(0, |acc, a| a.losses + acc) + top_3_losses;
-            (((total_wins + total_losses) / 2) == total_games_played) & (total_wins == total_losses)
-        })
-        // And we choose a random selection.
-        .choose(thread);
-    // If we didn't create valid PennantStanding, we go for it again but with a lower min_winning percentage
-    match loser_standings {
-        None => generate_losers(
-            min_winning_percentage - 0.05,
-            games_played,
-            total_games_played,
-            max_wins,
-            standings_needed,
-            top_3_wins,
-            top_3_losses,
-            thread,
-            max_other_wins,
-        ),
-        Some(mut standings) => {
-            //otherwise, we sort the PennantStanding by wins, and return it in a some.
-            standings.sort_by(|a, b| a.wins.cmp(&b.wins));
-            Some(standings)
+            // We filter to the permutations to ensure there are not too many losses, as well as making sure the sums of the wins and losses are correct.
+            .filter(|x| ((x.losses <= max_losses) & (x.wins + x.losses == games_played)))
+            // We next get get the combination of permutation that fits the number of teams we need PennantStandings for.
+            .combinations(standings_needed)
+            // Of the combos generated, we filter out the ones that have an incorrect numbers of wins and losses
+            .filter(|x| {
+                let total_wins = x.iter().fold(0, |acc, a| a.wins + acc) + top_3_wins;
+                let total_losses = x.iter().fold(0, |acc, a| a.losses + acc) + top_3_losses;
+                (((total_wins + total_losses) / 2) == total_games_played)
+                    & (total_wins == total_losses)
+            })
+            // And we choose a random selection.
+            .choose(thread);
+        // If we didn't create valid PennantStanding, we go for it again but with a lower min_winning percentage
+        match loser_standings {
+            None => min_winning_percentage += -0.05,
+
+            Some(mut standings) => {
+                //otherwise, we sort the PennantStanding by wins, and return it in a some.
+                standings.sort_by(|a, b| a.wins.cmp(&b.wins));
+                result = Some(standings);
+                break;
+            }
         }
     }
+    result
 }
-#[tailcall]
+
 pub fn generate_pennant_standings(
     games_played: i32,
     thread: &mut ThreadRng,
@@ -136,7 +134,6 @@ pub fn generate_pennant_standings(
 
         // We generate the PennantStandings for the rest of the teams.
         let loser_standings = generate_losers(
-            0.50,
             games_played,
             total_games_played,
             max_other_wins,

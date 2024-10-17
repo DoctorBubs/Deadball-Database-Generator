@@ -218,33 +218,33 @@ struct PlayerWrapper {
     pitcher_trait: Value,
     contact: Value,
     defense: Value,
-    power:Value,
+    power: Value,
     speed: Value,
-    toughness:Value,
-    note: Value
+    toughness: Value,
+    note: Value,
 }
 
-impl PlayerWrapper{
-    fn gen_player(&self) -> Result<(TeamSpot,Player,i32), serde_json::Error>{
+impl PlayerWrapper {
+    fn gen_player(&self) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
-        println!("{:?}",team_spot);
-        let new_player = Player{
+        println!("{:?}", team_spot);
+        let new_player = Player {
             name: self.player.name.clone(),
             pos: self.player.pos.clone(),
             hand: serde_json::from_value(self.hand.clone())?,
             pd: serde_json::from_value(self.pd.clone())?,
             pitcher_trait: serde_json::from_value(self.pitcher_trait.clone())?,
-            b_traits: BTraits{
-                contact: serde_json::from_value(self.contact.clone()).unwrap_or(   Contact::C0),
+            b_traits: BTraits {
+                contact: serde_json::from_value(self.contact.clone()).unwrap_or(Contact::C0),
                 defense: serde_json::from_value(self.defense.clone()).unwrap_or(Defense::D0),
                 power: serde_json::from_value(self.power.clone()).unwrap_or(Power::P0),
                 speed: serde_json::from_value(self.speed.clone()).unwrap_or(Speed::S0),
-                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::T0)
+                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::T0),
             },
             note: serde_json::from_value(self.note.clone())?,
             ..self.player
         };
-        Ok((team_spot,new_player,self.pd_int))
+        Ok((team_spot, new_player, self.pd_int))
     }
 }
 
@@ -263,10 +263,10 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
         Ok(PlayerWrapper {
             // Team spot is deserialized from the team spot row.
             team_spot: row.get(0)?,
-            hand:row.get(4)?,
-            pd:row.get(8)?,
-            pitcher_trait:row.get(9)?,
-            contact:row.get(10)?,
+            hand: row.get(4)?,
+            pd: row.get(8)?,
+            pitcher_trait: row.get(9)?,
+            contact: row.get(10)?,
             defense: row.get(11)?,
             power: row.get(12)?,
             speed: row.get(13)?,
@@ -291,7 +291,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
     let player_iter = handle_sql_error(rows_received)?;
     for r in player_iter {
         let pw = handle_sql_error(r)?;
-        let (team_spot,player,pd_int) = handle_serde_error(pw.gen_player())?;
+        let (team_spot, player, pd_int) = handle_serde_error(pw.gen_player())?;
 
         // We check if the loaded player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
@@ -319,7 +319,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
         }
     }
     // We then have the team calculate it's team score
-    if team.lineup.len() == 0{
+    if team.lineup.len() == 0 {
         panic!("Before returniing, lineup len was 0!")
     };
     team.calc_team_score();

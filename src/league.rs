@@ -191,8 +191,8 @@ impl League {
         new_schedule(&self.teams,  series_length, series_per_matchup)
 
     }*/
-    pub fn display_standings(&self, conn: &mut Connection) -> Result<(), rusqlite::Error> {
-        let mut stmt = conn.prepare(
+    pub fn display_standings(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
+        let mut stmt = handle_sql_error(conn.prepare(
             "
          WITH batter_scores AS(
             SELECT 
@@ -268,23 +268,22 @@ impl League {
         ORDER BY 
             games_behind ASC, team_scores.team_score DESC;
         ",
-        )?;
+        ))?;
 
-        let rows = stmt
-            .query_map([self.league_id], |row| {
-                Ok({
-                    StandingWrapper {
-                        name: row.get(0)?,
-                        team_score: row.get(1)?,
-                        wins: row.get(2)?,
-                        losses: row.get(3)?,
-                        games_behind: row.get(4)?,
-                    }
-                })
-            })?
-            .filter_map(|x| x.ok());
+        let rows = handle_sql_error(stmt.query_map([self.league_id], |row| {
+            Ok({
+                StandingWrapper {
+                    name: row.get(0)?,
+                    team_score: row.get(1)?,
+                    wins: row.get(2)?,
+                    losses: row.get(3)?,
+                    games_behind: row.get(4)?,
+                }
+            })
+        }))?;
 
-        for standing in rows {
+        for entry in rows {
+            let standing = handle_sql_error(entry)?;
             println!(
                 "{} {} {} {} {}",
                 standing.name,
@@ -960,17 +959,17 @@ pub fn load_teams_from_sql(
     league_id: i64,
     league: &mut League,
     conn: &mut Connection,
-) -> Result<(), rusqlite::Error> {
+) -> Result<(), EditLeagueError> {
     let era = league.era;
     // We query the database to select all teams in the database that belong to the league via the league_id car
-    let mut stmt = conn.prepare(
+    let mut stmt = handle_sql_error(conn.prepare(
         "SELECT team_id,abrv,team_name,wins,losses,team_note
         FROM teams 
         WHERE league_id = ?1",
-    )?;
+    ))?;
 
-    let team_iter: Vec<Team> = stmt
-        .query_map([league_id], |row| {
+    let team_iter: Vec<Result<Team, rusqlite::Error>> =
+        handle_sql_error(stmt.query_map([league_id], |row| {
             // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
             Ok(
                 // We use the remaining rows to deseirialize the team
@@ -995,24 +994,19 @@ pub fn load_teams_from_sql(
                     note: serde_json::from_value(row.get(5)?).unwrap(),
                 },
             )
-        })?
-        .filter_map(|x| x.ok())
+        }))?
         .collect();
 
     // We drop stmt so we can borrow conn later.
     drop(stmt);
     // We then loa
-    for team in team_iter {
+    for entry in team_iter {
+        let team = handle_sql_error(entry)?;
         // We load the team from the database in the form of a Rust struct.
-        println!("Loading Team {}",team.name);
-        let loaded_team = load_team(conn, team).unwrap();
-        if loaded_team.lineup.len() == 0{
-            panic!("Team has an empty lineup!")
-        }
+        let loaded_team = load_team(conn, team)?;
+
         // And add the team to the league's teams vector.
         league.teams.push(loaded_team);
-    
-        println!("Teams added{}",league.teams.len())
     }
 
     Ok(())
@@ -1029,15 +1023,10 @@ pub fn load_league(
         league_id,
         mut league,
     } = wrapper;
-
-    if let Err(message) = league.display_standings(conn) {
-        println!("Error Displaying Standings");
-        return Err(EditLeagueError::DatabaseError(message));
-    }
-    if let Err(message) = load_teams_from_sql(league_id, &mut league, conn) {
-        println!("Error loading teams");
-        return Err(EditLeagueError::DatabaseError(message));
-    }
+    // First, we display the leage standing.
+    league.display_standings(conn)?;
+    // Then we load the teams.
+    load_teams_from_sql(league_id, &mut league, conn)?;
 
     // Now that we have loaded the existing league from the database, it is time to generate a new team or create a new schedule based off the input
     match edit_input {
