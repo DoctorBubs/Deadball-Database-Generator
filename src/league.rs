@@ -27,9 +27,8 @@ use inquire::Select;
 use inquire::Text;
 use itertools::Itertools;
 use rand::prelude::*;
-use rand::Error;
+
 use rusqlite::Result;
-use serde::de::value;
 
 use crate::player::Player;
 
@@ -731,7 +730,7 @@ impl League {
     ) -> Result<(), EditLeagueError> {
         // First, we check to see if there are already any pennant races associated with the leauge.
 
-        let mut existing_stmt = conn.prepare(
+        let existing_stmt = conn.prepare(
             "
             SELECT 
                 COUNT(pennants.pennant_id)

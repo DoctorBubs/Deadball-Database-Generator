@@ -6,7 +6,6 @@ use crate::inquire_check;
 use crate::note::Notable;
 use crate::note::Note;
 
-use crate::team;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
@@ -17,7 +16,7 @@ use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
 use inquire::Text;
 use rusqlite::Connection;
-use serde::de::value;
+
 use serde_json::Value;
 
 use crate::league::save_league;
@@ -319,7 +318,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
         }
     }
     // We then have the team calculate it's team score
-    if team.lineup.len() == 0 {
+    if team.lineup.is_empty() {
         panic!("Before returniing, lineup len was 0!")
     };
     team.calc_team_score();

@@ -7,8 +7,6 @@ pub struct PennantStanding {
     pub losses: i32,
 }
 
-
-
 use crate::edit_league_error::EditLeagueError;
 /// Creates a tuple containing the wins and losses of a first place team. The teams winning percntage will be approximately 60 - 70%.
 fn get_first_place_standings(games_played: i32, thread: &mut ThreadRng) -> (i32, i32) {
@@ -22,11 +20,10 @@ fn get_first_place_standings(games_played: i32, thread: &mut ThreadRng) -> (i32,
     (wins, games_played - wins)
 }
 
-
 fn generate_losers(
     games_played: i32,
     total_games_played: i32,
-    max_wins: i32,
+    _max_wins: i32,
     standings_needed: usize,
     top_3_wins: i32,
     top_3_losses: i32,
@@ -49,11 +46,9 @@ fn generate_losers(
         let loser_standings = (minimum_wins..=max_other_wins)
             // And we get permutations of 2. This create a vector, with value 0 being a teams wins, and 1 being a teams losses.
             .permutations(2)
-            .map(|x| {
-                (PennantStanding {
-                    wins: x[0],
-                    losses: x[1],
-                })
+            .map(|x| PennantStanding {
+                wins: x[0],
+                losses: x[1],
             })
             // We filter to the permutations to ensure there are not too many losses, as well as making sure the sums of the wins and losses are correct.
             .filter(|x| ((x.losses <= max_losses) & (x.wins + x.losses == games_played)))
