@@ -224,9 +224,9 @@ struct PlayerWrapper {
 }
 
 impl PlayerWrapper {
+    // Deserializes the JSON values in the wrapper, and creates a new player based off those values and the preexisting player in the wrappers
     fn gen_player(&self) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
-        println!("{:?}", team_spot);
         let new_player = Player {
             name: self.player.name.clone(),
             pos: self.player.pos.clone(),
@@ -241,6 +241,7 @@ impl PlayerWrapper {
                 toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::T0),
             },
             note: serde_json::from_value(self.note.clone())?,
+            // The remaining fields can be copied over from the original player saved in the wrapper.
             ..self.player
         };
         Ok((team_spot, new_player, self.pd_int))
@@ -317,10 +318,6 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
             },
         }
     }
-    // We then have the team calculate it's team score
-    if team.lineup.is_empty() {
-        panic!("Before returniing, lineup len was 0!")
-    };
     team.calc_team_score();
     Ok(team)
 }
