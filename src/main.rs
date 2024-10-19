@@ -1,4 +1,5 @@
 mod b_traits;
+mod user_fixable;
 mod edit_league_error;
 mod era;
 mod league;

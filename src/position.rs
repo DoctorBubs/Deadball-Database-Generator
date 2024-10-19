@@ -8,7 +8,7 @@ use crate::{
     edit_league_error::{handle_inquire_error, EditLeagueError},
     era::{self, Era},
     inquire_check,
-    pd::PD,
+    pd::PD, user_fixable::UserFixable,
 };
 
 /// If a player is a position player, we lists what type of pitcher they are, and what position they can field.
@@ -124,7 +124,7 @@ impl PlayerPosition {
             },
         }
     }
-
+    /// Returns true if a PlayerPosition is in a category
     pub fn matches_cat(&self, category: PositionCategory) -> bool {
         if let Self::TwoWay(two_way_info) = self {
             match category {
@@ -180,6 +180,27 @@ impl PlayerPosition {
         }
     }
 
+<<<<<<< HEAD
+    fn update_db_pos(conn: &mut Connection, pos: &PlayerPosition, player_id: i64){
+        conn.execute(
+                                
+            "UPDATE
+                players
+            SET pos = ?1 
+            WHERE players.player_id = ?2",
+                [pos.to_string(), player_id.to_string()],
+            )
+            .unwrap();
+    }
+    
+}
+
+
+impl UserFixable for PlayerPosition{
+    fn fix_via_prompt<'a, T:UserFixable + Deserialize<'a>>(conn: &mut Connection, era: Era, player_id: i64, player_name: &str,pd: Option<PD>, input_error: serde_json::Error) -> Option<Box<T>> {
+        /// Guides the user through the process of selecting a valid postion if a player is deserialized with an incorrect value.
+        // We let the user know what the problem was.
+=======
     pub fn fix_pos(
         conn: &mut Connection,
         player_id: i64,
@@ -188,9 +209,10 @@ impl PlayerPosition {
         pd: Option<PD>,
         input: &serde_json::Error,
     ) -> Option<PlayerPosition> {
+>>>>>>> parent of dee2e37 (Better documentation for fixing position.)
         println!(
             "There was an error loading the position of player {}, id {}.\n The error was {}",
-            player_name, player_id, input
+            player_name, player_id, input_error
         );
 
         let user_confirm =
