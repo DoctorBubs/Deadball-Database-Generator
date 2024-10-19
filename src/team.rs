@@ -6,6 +6,7 @@ use crate::inquire_check;
 use crate::note::Notable;
 use crate::note::Note;
 
+use crate::position::PlayerPosition;
 use crate::traits::Contact;
 use crate::traits::Defense;
 use crate::traits::Power;
@@ -214,6 +215,7 @@ struct PlayerWrapper {
     hand: Value,
     pd: Value,
     pd_int: i32,
+    pos: String,
     pitcher_trait: Value,
     contact: Value,
     defense: Value,
@@ -225,13 +227,29 @@ struct PlayerWrapper {
 
 impl PlayerWrapper {
     // Deserializes the JSON values in the wrapper, and creates a new player based off those values and the preexisting player in the wrappers
-    fn gen_player(&self) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
+    fn gen_player(
+        &self,
+        conn: &mut Connection,
+        era: Era,
+    ) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
+        let player_name = &self.player.name;
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
+        let player_id = self.player.player_id;
+        let pd = serde_json::from_value(self.pd.clone())?;
+        let pos: PlayerPosition = match serde_json::from_str(&self.pos) {
+            Ok(position) => position,
+            Err(input) => {
+                match PlayerPosition::fix_pos(conn, player_id, player_name, era, pd, &input) {
+                    None => return Err(input),
+                    Some(value) => value,
+                }
+            }
+        };
         let new_player = Player {
             name: self.player.name.clone(),
-            pos: self.player.pos.clone(),
+            pos,
             hand: serde_json::from_value(self.hand.clone())?,
-            pd: serde_json::from_value(self.pd.clone())?,
+            pd,
             pitcher_trait: serde_json::from_value(self.pitcher_trait.clone())?,
             b_traits: BTraits {
                 contact: serde_json::from_value(self.contact.clone()).unwrap_or(Contact::C0),
@@ -248,7 +266,7 @@ impl PlayerWrapper {
     }
 }
 
-pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeagueError> {
+pub fn load_team(conn: &mut Connection, mut team: Team, era: Era) -> Result<Team, EditLeagueError> {
     // We prepare a statement that will select all players from the database that has a matching team id
     println!("Loading Teams");
     let mut stmt = handle_sql_error(conn.prepare(
@@ -263,6 +281,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
         Ok(PlayerWrapper {
             // Team spot is deserialized from the team spot row.
             team_spot: row.get(0)?,
+            pos: row.get(3)?,
             hand: row.get(4)?,
             pd: row.get(8)?,
             pitcher_trait: row.get(9)?,
@@ -277,7 +296,6 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
             player: Player {
                 name: row.get(1)?,
                 age: row.get(2)?,
-                pos: row.get(3)?,
                 bt: row.get(5)?,
                 obt_mod: row.get(6)?,
                 obt: row.get(7)?,
@@ -288,10 +306,12 @@ pub fn load_team(conn: &mut Connection, mut team: Team) -> Result<Team, EditLeag
             },
         })
     });
-    let player_iter = handle_sql_error(rows_received)?;
+    let player_iter: Vec<Result<PlayerWrapper, rusqlite::Error>> =
+        handle_sql_error(rows_received)?.collect();
+    drop(stmt);
     for r in player_iter {
         let pw = handle_sql_error(r)?;
-        let (team_spot, player, pd_int) = handle_serde_error(pw.gen_player())?;
+        let (team_spot, player, pd_int) = handle_serde_error(pw.gen_player(conn, era))?;
 
         // We check if the loaded player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
@@ -331,7 +351,7 @@ fn new_player_vec<T: Copy + PlayerQuality>(
     era: Era,
 ) -> Vec<Player> {
     vec.into_iter()
-        .map(|x| Player::new(x.to_string(), gender, quality, thread, era))
+        .map(|x| Player::new(x.into(), gender, quality, thread, era))
         .collect()
 }
 

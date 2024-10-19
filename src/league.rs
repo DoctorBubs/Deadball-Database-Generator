@@ -403,7 +403,7 @@ impl League {
                             // And we fill the fields in the player struct with values from the rows.
                             name: row.get(1)?,
                             age: row.get(2)?,
-                            pos: row.get(3)?,
+                            pos: serde_json::from_value(row.get(3)?).unwrap(),
                             hand: serde_json::from_value(row.get(4)?).unwrap(),
                             bt: row.get(5)?,
                             obt_mod: row.get(6)?,
@@ -486,7 +486,7 @@ impl League {
                         hand: serde_json::from_value(row.get(3)?).unwrap(),
                         pd: serde_json::from_value(row.get(4)?).unwrap(),
                         pitcher_trait: serde_json::from_value(row.get(5)?).unwrap(),
-                        pos: row.get(6)?,
+                        pos: serde_json::from_value(row.get(6)?).unwrap(),
                         // We fill the rest of the player fields with default datat.
                         ..Player::default()
                     },
@@ -1002,7 +1002,7 @@ pub fn load_teams_from_sql(
     for entry in team_iter {
         let team = handle_sql_error(entry)?;
         // We load the team from the database in the form of a Rust struct.
-        let loaded_team = load_team(conn, team)?;
+        let loaded_team = load_team(conn, team, league.era)?;
 
         // And add the team to the league's teams vector.
         league.teams.push(loaded_team);

@@ -31,3 +31,12 @@ pub fn handle_serde_error<T>(input: Result<T, serde_json::Error>) -> Result<T, E
         Ok(value) => Ok(value),
     }
 }
+
+pub fn handle_inquire_error<T>(
+    input: Result<T, inquire::InquireError>,
+) -> Result<T, EditLeagueError> {
+    match input {
+        Err(message) => Err(EditLeagueError::Inquire(message)),
+        Ok(value) => Ok(value),
+    }
+}

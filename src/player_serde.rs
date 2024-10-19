@@ -5,7 +5,7 @@ pub struct PlayerSerde<'a> {
     pub team_id: i64,
     pub player_name: &'a String,
     pub age: i32,
-    pub pos: &'a String,
+    pub pos: serde_json::Value,
     pub hand: serde_json::Value,
     pub bt: String,
     pub obt_mod: String,

@@ -13,6 +13,7 @@ use crate::player_error::CompTable;
 use crate::player_error::PlayerError;
 use crate::player_quality::PlayerQuality;
 use crate::player_serde::PlayerSerde;
+use crate::position::PlayerPosition;
 use crate::team::TeamSpot;
 use crate::tier::Tier;
 use crate::traits::player_trait_option;
@@ -29,6 +30,7 @@ use name_maker::RandomNameGenerator;
 use rand::rngs::ThreadRng;
 use rand::Rng;
 use rusqlite::Connection;
+use serde_json::Value;
 
 use std::fmt;
 pub enum AgeCat {
@@ -130,7 +132,7 @@ fn get_greater<T: Eq + std::cmp::PartialOrd>(target: T, actual: T) -> Option<T> 
 pub struct Player {
     pub name: String,
     pub age: i32,
-    pub pos: String,
+    pub pos: PlayerPosition,
     pub hand: Hand,
     pub bt: i32,        // BT is essentially a players batting average.
     pub obt_mod: i32,   // Used to calculate a players obt via summing with it's bt.'
@@ -282,7 +284,7 @@ impl Player {
         let new_player_serde = PlayerSerde {
             team_id: self.team_id,
             player_name: &self.name,
-            pos: &self.pos,
+            pos: serde_json::to_value(self.pos.clone())?,
             age: self.age,
             hand: serde_json::to_value(self.hand)?,
             bt: self.bt.to_string(),
@@ -310,9 +312,7 @@ impl Player {
     ) -> Result<(), EditLeagueError> {
         self.team_id = team_id;
         let p_serde = handle_serde_error(self.get_serde(team_spot))?;
-
         let new_player_id = handle_sql_error(p_serde.save_to_sql(conn))?;
-
         self.player_id = new_player_id;
         Ok(())
     }
@@ -329,10 +329,10 @@ impl Player {
         }
     }
 
-    /// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new palyter
-    pub fn get_default_info() -> (i32, String, String, i64, i64, Note) {
+    /// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new player
+    pub fn get_default_info() -> (i32, PlayerPosition, String, i64, i64, Note) {
         let age = 0;
-        let pos = "".to_string();
+        let pos = PlayerPosition::default();
         let name = "".to_string();
         let player_id = 0;
         let team_id = 0;
@@ -341,7 +341,7 @@ impl Player {
     }
 
     pub fn new(
-        pos: String,
+        pos_value: Value,
         gender: PlayerGender,
         quality: impl PlayerQuality,
         thread: &mut ThreadRng,
@@ -351,6 +351,7 @@ impl Player {
         let name = gender.new_name();
         let age_cat = AgeCat::random(thread);
         let age = age_cat.new_age(thread);
+        let pos = serde_json::from_value(pos_value).unwrap();
         //Next we use the quality to generate the players stats such as bt and pd.
         let generated_player = quality.gen_player(thread, era);
         // and we fill out the players fields.
