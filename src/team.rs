@@ -6,6 +6,7 @@ use crate::inquire_check;
 use crate::note::Notable;
 use crate::note::Note;
 
+use crate::pd::PD;
 use crate::player::Hand;
 use crate::position::PlayerPosition;
 use crate::traits::Contact;
@@ -37,7 +38,6 @@ use crate::Serialize;
 use crate::ThreadRng;
 use core::fmt;
 
-use core::panic;
 use std::fmt::Write;
 
 /* A teams consists of a name, a vector for the starting lineup, bench, pitching rotation, and an option for the bullpen.
@@ -236,7 +236,10 @@ impl PlayerWrapper {
         let player_name = &self.player.name;
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
         let player_id = self.player.player_id;
-        let pd = serde_json::from_value(self.pd.clone())?;
+        let pd = {
+            let first_attempt = serde_json::from_value(self.pd.clone());
+            PD::fix_db(first_attempt, conn, player_id, player_name, era)?
+        };
         let hand = Hand::fix_hand_db(&self.hand, pd, conn, player_name, player_id)?;
         let pos: PlayerPosition = match serde_json::from_str(&self.pos) {
             Ok(position) => position,

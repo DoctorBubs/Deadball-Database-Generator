@@ -4,6 +4,7 @@ use rusqlite::Connection;
 
 use crate::era::Era;
 use crate::tier::Tier;
+
 use crate::update_player_db;
 use crate::update_player_db::update_player_db_option;
 use crate::update_player_db::UpdatePlayerDb;
@@ -11,7 +12,6 @@ use crate::Deserialize;
 
 use crate::Serialize;
 use core::fmt;
-use std::default;
 
 struct PDInfo(i32, bool);
 
@@ -24,6 +24,7 @@ Inversely, a pitcher with a PD of -D4 rolls a 4 sided die, the the number genera
 */
 // Via Serde, the pitch die is serialized via traditional dice notation.
 /// The pitch die enum.
+#[derive(Default)]
 pub enum PD {
     #[serde(rename = "d20")]
     D20,
@@ -34,6 +35,7 @@ pub enum PD {
     #[serde(rename = "d6")]
     D6,
     #[serde(rename = "d4")]
+    #[default]
     D4,
     #[serde(rename = "No dice")]
     D0,
@@ -113,12 +115,12 @@ impl PD {
     }
 
     pub fn fix_db(
-        input_opt: Result<Self, serde_json::Error>,
+        input_opt: Result<Option<Self>, serde_json::Error>,
         conn: &mut Connection,
         player_id: i64,
         player_name: &str,
         era: Era,
-    ) -> Result<Self, serde_json::Error> {
+    ) -> Result<Option<Self>, serde_json::Error> {
         match input_opt {
             Ok(value) => Ok(value),
             Err(message) => {
@@ -156,10 +158,10 @@ impl PD {
                     };
 
                 let update_attempt = update_player_db_option(user_choice, conn, player_id);
-                if let Err(_) = update_attempt {
+                if update_attempt.is_err() {
                     default_error
                 } else {
-                    Ok(user_choice.unwrap())
+                    Ok(user_choice)
                 }
             }
         }
@@ -183,12 +185,6 @@ impl PartialOrd for PD {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         let other_int = other.to_int();
         Some(self.to_int().cmp(&other_int))
-    }
-}
-
-impl Default for PD {
-    fn default() -> Self {
-        PD::D4
     }
 }
 

@@ -1,15 +1,10 @@
 use core::fmt;
 
 use inquire::{Confirm, Select};
-use rusqlite::{AndThenRows, Connection};
+use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    edit_league_error::{handle_inquire_error, EditLeagueError},
-    era::{self, Era},
-    inquire_check,
-    pd::PD,
-};
+use crate::{era::Era, pd::PD};
 
 /// If a player is a position player, we lists what type of pitcher they are, and what position they can field.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
@@ -52,7 +47,7 @@ impl TwoWayInfo {
                 let error_message = format!("{}\n{}", error_str, self);
                 Err(error_message)
             }
-            None => Ok(&self),
+            None => Ok(self),
         }
     }
 
@@ -79,7 +74,7 @@ pub enum PositionCategory {
 }
 
 /// Represents the position that is assigned to a player.
-#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, Eq, Default)]
 pub enum PlayerPosition {
     P,
     SP,
@@ -97,14 +92,9 @@ pub enum PlayerPosition {
     RF,
     OF,
     INF,
+    #[default]
     UT,
     TwoWay(Box<TwoWayInfo>),
-}
-
-impl Default for PlayerPosition {
-    fn default() -> Self {
-        PlayerPosition::UT
-    }
 }
 
 impl fmt::Display for PlayerPosition {
@@ -117,10 +107,10 @@ impl fmt::Display for PlayerPosition {
 impl PlayerPosition {
     pub fn get_pitcher_type(&self) -> Result<&PlayerPosition, String> {
         match self {
-            Self::TwoWay(TwoWayInfo) => TwoWayInfo.get_pitcher_type(),
+            Self::TwoWay(two_way_info) => two_way_info.get_pitcher_type(),
             _ => match self.matches_cat(PositionCategory::Pitcher) {
                 false => Err("Not a pitcher".to_string()),
-                true => Ok(&self),
+                true => Ok(self),
             },
         }
     }
@@ -133,26 +123,21 @@ impl PlayerPosition {
             }
         } else {
             match category {
-                PositionCategory::Outfielder => match self {
-                    Self::LF | Self::CF | Self::RF | Self::OF | Self::UT => true,
-                    _ => false,
-                },
-
+                PositionCategory::Outfielder => {
+                    matches!(self, Self::LF | Self::CF | Self::RF | Self::OF | Self::UT)
+                }
                 PositionCategory::Catcher => self == &Self::C,
-                PositionCategory::Infielder => match self {
+                PositionCategory::Infielder => matches!(
+                    self,
                     Self::FirstBase
-                    | Self::SecondBase
-                    | Self::ThirdBase
-                    | Self::SS
-                    | Self::INF
-                    | Self::UT => true,
-                    _ => false,
-                },
+                        | Self::SecondBase
+                        | Self::ThirdBase
+                        | Self::SS
+                        | Self::INF
+                        | Self::UT,
+                ),
 
-                PositionCategory::Pitcher => match self {
-                    Self::P | Self::SP | Self::RP => true,
-                    _ => false,
-                },
+                PositionCategory::Pitcher => matches!(self, Self::P | Self::SP | Self::RP),
             }
         }
     }
@@ -206,7 +191,7 @@ impl PlayerPosition {
                     Some(_) => PlayerPosition::get_all_pitcher_positions(era),
                 };
                 if options.len() == 1 {
-                    let new_pos = options.get(0).unwrap().clone();
+                    let new_pos = options.first().unwrap().clone();
                     println!("Setting position to {}", new_pos);
                     Some(new_pos)
                 } else {
