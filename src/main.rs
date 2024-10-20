@@ -20,6 +20,7 @@ mod schedule;
 mod team;
 mod tier;
 mod traits;
+mod update_player_db;
 use crate::era::Era;
 use crate::main_menu::run_main_menu;
 use crate::pd::PD;

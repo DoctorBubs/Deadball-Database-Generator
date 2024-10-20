@@ -19,10 +19,12 @@ use crate::tier::Tier;
 use crate::traits::player_trait_option;
 use crate::traits::PitcherTrait;
 use crate::traits::PlayerTrait;
+use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
 use crate::Era;
 use crate::Serialize;
 use crate::PD;
+use inquire::Confirm;
 use inquire::InquireError;
 use inquire::Select;
 use name_maker::Gender;
@@ -80,6 +82,55 @@ impl fmt::Display for Hand {
         };
 
         write!(f, "{}", chars)
+    }
+}
+
+impl UpdatePlayerDb for Hand {
+    fn get_column_name(&self) -> &str {
+        "hand"
+    }
+}
+
+impl Hand {
+    /// Takes an &str, and attempts to deserialize it into a Hand.
+    /// If that fails, the user is prompted to select a hand for the associated player id.
+    /// If the user cancels or otherwise makes an error, the serde error from the original attempt to deserialize is returned
+    pub fn fix_hand_db(
+        input: &str,
+        pd: Option<PD>,
+        conn: &mut Connection,
+        player_name: &str,
+        player_id: i64,
+    ) -> Result<Self, serde_json::Error> {
+        let attempt = serde_json::from_str(input);
+        match attempt {
+            Ok(value) => Ok(value),
+            Err(message) => {
+                println!(
+                    "There was an error loading the hand for {}, player ID {}. The error was {}",
+                    player_name, player_id, message
+                );
+                let user_confirm = Confirm::new("Would you like to select a hand for the player? If not, the process will abort.").prompt().unwrap_or(false);
+                match user_confirm {
+                    false => Err(message),
+                    true => {
+                        let options = match pd {
+                            Some(_) => vec![Hand::L, Hand::R],
+                            None => vec![Hand::L, Hand::R, Hand::S],
+                        };
+                        let choice =
+                            Select::new("Choose a hand type for the player", options).prompt();
+                        match choice {
+                            Err(_) => Err(message),
+                            Ok(hand) => {
+                                hand.update_player_db(conn, player_id).unwrap();
+                                Ok(hand)
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

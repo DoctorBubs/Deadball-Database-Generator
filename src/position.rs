@@ -214,8 +214,7 @@ impl PlayerPosition {
                     match choice {
                         Ok(value) => {
                             conn.execute(
-                                
-                            "UPDATE
+                                "UPDATE
                                 players
                             SET pos = ?1 
                             WHERE players.player_id = ?2",

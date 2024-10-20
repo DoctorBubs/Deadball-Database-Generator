@@ -6,6 +6,7 @@ use crate::inquire_check;
 use crate::note::Notable;
 use crate::note::Note;
 
+use crate::player::Hand;
 use crate::position::PlayerPosition;
 use crate::traits::Contact;
 use crate::traits::Defense;
@@ -212,7 +213,7 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
 struct PlayerWrapper {
     team_spot: Value,
     player: Player,
-    hand: Value,
+    hand: String,
     pd: Value,
     pd_int: i32,
     pos: String,
@@ -236,6 +237,7 @@ impl PlayerWrapper {
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
         let player_id = self.player.player_id;
         let pd = serde_json::from_value(self.pd.clone())?;
+        let hand = Hand::fix_hand_db(&self.hand, pd, conn, player_name, player_id)?;
         let pos: PlayerPosition = match serde_json::from_str(&self.pos) {
             Ok(position) => position,
             Err(input) => {
@@ -248,7 +250,7 @@ impl PlayerWrapper {
         let new_player = Player {
             name: self.player.name.clone(),
             pos,
-            hand: serde_json::from_value(self.hand.clone())?,
+            hand,
             pd,
             pitcher_trait: serde_json::from_value(self.pitcher_trait.clone())?,
             b_traits: BTraits {
