@@ -309,7 +309,7 @@ fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
 mod tests {
 
     use b_traits::BTraits;
-    use league::{get_all_leagues_from_db, load_teams_from_sql, BatterPosType};
+    use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
     use position::{PlayerPosition, TwoWayInfo};
 
@@ -451,8 +451,8 @@ mod tests {
         current_league.display_top_pitchers(&mut test_conn).unwrap();
         let power_check = serde_json::to_string(&Power::P2).unwrap();
         assert_eq!(power_check, "\"P++\"");
-        let manual_power: Power = serde_json::from_str("\"P++\"").unwrap();
-        let power = BTraits::from_string("P++").unwrap();
+        let _manual_power: Power = serde_json::from_str("\"P++\"").unwrap();
+        let _power = BTraits::from_string("P++").unwrap();
         assert_eq!(BTraits::from_string("P+++++").is_err(), true);
         BTraits::from_string("C+").unwrap();
         BTraits::from_string(" C+").unwrap();

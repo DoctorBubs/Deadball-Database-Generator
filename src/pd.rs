@@ -5,7 +5,6 @@ use rusqlite::Connection;
 use crate::era::Era;
 use crate::tier::Tier;
 
-use crate::update_player_db;
 use crate::update_player_db::update_player_db_option;
 use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
