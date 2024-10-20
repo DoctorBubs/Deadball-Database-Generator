@@ -44,6 +44,22 @@ impl Era {
             }
         }
     }
+    /// Returns a vector of all pitch die that pitchers in this era can be generated to have.
+    pub fn get_all_pd(&self) -> Vec<PD> {
+        match self {
+            Self::Ancient => vec![
+                PD::D20,
+                PD::D12,
+                PD::D8,
+                PD::D6,
+                PD::D4,
+                PD::D0,
+                PD::DM4,
+                PD::DM8,
+            ],
+            Self::Modern => vec![PD::D12, PD::D8, PD::D4, PD::DM4],
+        }
+    }
 }
 
 impl fmt::Display for Era {

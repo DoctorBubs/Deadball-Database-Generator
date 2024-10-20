@@ -1,8 +1,17 @@
+use inquire::Confirm;
+use inquire::Select;
+use rusqlite::Connection;
+
+use crate::era::Era;
 use crate::tier::Tier;
+use crate::update_player_db;
+use crate::update_player_db::update_player_db_option;
+use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
 
 use crate::Serialize;
 use core::fmt;
+use std::default;
 
 struct PDInfo(i32, bool);
 
@@ -102,6 +111,59 @@ impl PD {
         let range_sum: i32 = range.iter().sum();
         range_sum as f32 / range_len
     }
+
+    pub fn fix_db(
+        input_opt: Result<Self, serde_json::Error>,
+        conn: &mut Connection,
+        player_id: i64,
+        player_name: &str,
+        era: Era,
+    ) -> Result<Self, serde_json::Error> {
+        match input_opt {
+            Ok(value) => Ok(value),
+            Err(message) => {
+                let message_string = message.to_string();
+                let default_error = Err(message);
+                println!("There was an error in the pitch dice column for {}, player ID {}. The error was {}.",player_name,player_id ,message_string);
+                let user_confirm = Confirm::new(
+                    "Would you like to fix this error now? Otherwise, the process will abort",
+                )
+                .prompt()
+                .unwrap_or(false);
+                if let false = user_confirm {
+                    return default_error;
+                };
+                let user_choice =
+                    match Confirm::new("Would you like to assign a pitch die to this player?")
+                        .prompt()
+                    {
+                        Err(_) => return default_error,
+                        Ok(value) => match value {
+                            false => None,
+                            true => {
+                                let pd_options = era.get_all_pd();
+                                match Select::new(
+                                    "Please select the pitch die you would like to assign.",
+                                    pd_options,
+                                )
+                                .prompt()
+                                {
+                                    Err(_) => return default_error,
+                                    Ok(value) => Some(value),
+                                }
+                            }
+                        },
+                    };
+
+                let update_attempt = update_player_db_option(user_choice, conn, player_id);
+                if let Err(_) = update_attempt {
+                    default_error
+                } else {
+                    Ok(user_choice.unwrap())
+                }
+            }
+        }
+    }
 }
 
 impl fmt::Display for PD {
@@ -121,5 +183,17 @@ impl PartialOrd for PD {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         let other_int = other.to_int();
         Some(self.to_int().cmp(&other_int))
+    }
+}
+
+impl Default for PD {
+    fn default() -> Self {
+        PD::D4
+    }
+}
+
+impl UpdatePlayerDb for PD {
+    fn get_column_name(&self) -> &str {
+        "PD"
     }
 }

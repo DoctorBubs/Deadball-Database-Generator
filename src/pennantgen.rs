@@ -78,6 +78,7 @@ fn generate_losers(
     result
 }
 
+/// Generates the wins and losses for a pennant race.
 pub fn generate_pennant_standings(
     games_played: i32,
     thread: &mut ThreadRng,

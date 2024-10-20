@@ -1,3 +1,4 @@
+use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
 
 use crate::fmt;
@@ -76,6 +77,12 @@ impl fmt::Display for Power {
     }
 }
 
+impl UpdatePlayerDb for Power {
+    fn get_column_name(&self) -> &str {
+        "power"
+    }
+}
+
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 pub enum Speed {
     #[serde(rename = "S++")]
@@ -115,6 +122,12 @@ impl fmt::Display for Speed {
         };
 
         write!(f, "{}", chars)
+    }
+}
+
+impl UpdatePlayerDb for Speed {
+    fn get_column_name(&self) -> &str {
+        "speed"
     }
 }
 
@@ -198,6 +211,12 @@ impl fmt::Display for Defense {
     }
 }
 
+impl UpdatePlayerDb for Defense {
+    fn get_column_name(&self) -> &str {
+        "defense"
+    }
+}
+
 #[derive(Copy, Clone, Serialize, Deserialize, Debug)]
 
 pub enum Toughness {
@@ -230,6 +249,12 @@ impl fmt::Display for Toughness {
         };
 
         write!(f, "{}", chars)
+    }
+}
+
+impl UpdatePlayerDb for Toughness {
+    fn get_column_name(&self) -> &str {
+        "toughness"
     }
 }
 
