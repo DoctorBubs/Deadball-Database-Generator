@@ -273,7 +273,6 @@ impl PlayerWrapper {
 
 pub fn load_team(conn: &mut Connection, mut team: Team, era: Era) -> Result<Team, EditLeagueError> {
     // We prepare a statement that will select all players from the database that has a matching team id
-    println!("Loading Teams");
     let mut stmt = handle_sql_error(conn.prepare(
         "SELECT 
         team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int,player_note
