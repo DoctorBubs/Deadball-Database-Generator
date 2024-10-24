@@ -209,7 +209,9 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
             output
         })
 }
-/// PlayerWrapper contains fields that need to be deserialzed by serde.
+/// PlayerWrapper contains fields that need to be deserialzed by serde, as well as a player struct with values that have already been filled in.
+/// When the gen_player functiion is called on the wrapper, it deserializes it's value, and provides the capability for the user to fix any valeus that are incorrect which are saved in the player table in the database.
+/// The fields are used to create a new player struct, with any missing data copierd over from the saved player.
 struct PlayerWrapper {
     team_spot: Value,
     player: Player,
@@ -234,8 +236,9 @@ impl PlayerWrapper {
         era: Era,
     ) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
         let player_name = &self.player.name;
-        let team_spot = serde_json::from_value(self.team_spot.clone())?;
         let player_id = self.player.player_id;
+        let team_spot = serde_json::from_value(self.team_spot.clone())?;
+        
         let pd = {
             let first_attempt = serde_json::from_value(self.pd.clone());
             PD::fix_db(first_attempt, conn, player_id, player_name, era)?
@@ -250,6 +253,7 @@ impl PlayerWrapper {
                 }
             }
         };
+        // We create a new player
         let new_player = Player {
             name: self.player.name.clone(),
             pos,
@@ -257,11 +261,11 @@ impl PlayerWrapper {
             pd,
             pitcher_trait: serde_json::from_value(self.pitcher_trait.clone())?,
             b_traits: BTraits {
-                contact: serde_json::from_value(self.contact.clone()).unwrap_or(Contact::C0),
-                defense: serde_json::from_value(self.defense.clone()).unwrap_or(Defense::D0),
-                power: serde_json::from_value(self.power.clone()).unwrap_or(Power::P0),
-                speed: serde_json::from_value(self.speed.clone()).unwrap_or(Speed::S0),
-                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::T0),
+                contact: serde_json::from_value(self.contact.clone()).unwrap_or(Contact::default()),
+                defense: serde_json::from_value(self.defense.clone()).unwrap_or(Defense::default()),
+                power: serde_json::from_value(self.power.clone()).unwrap_or(Power::default()),
+                speed: serde_json::from_value(self.speed.clone()).unwrap_or(Speed::default()),
+                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::default()),
             },
             note: serde_json::from_value(self.note.clone())?,
             // The remaining fields can be copied over from the original player saved in the wrapper.

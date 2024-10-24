@@ -425,7 +425,7 @@ mod tests {
                 serde_json::to_string(&top_batter.pos).unwrap(),
                 top_batter.player_id.to_string(),
             ],
-        );
+        ).unwrap();
         // Next, we check to make sure that a league will not allow the addition of a team with the same name as an existin team.
         let double_name_check = current_league.new_team(
             &"NY".to_string(),
