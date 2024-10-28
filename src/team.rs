@@ -123,13 +123,10 @@ impl Team {
             starter.save_sql(conn, team_id, TeamSpot::StartingPitcher)?;
         }
         // As not every team has a bullpen, we do a check to make sure.
-        match &mut self.bullpen {
-            Some(pen) => {
-                for reliever in pen {
-                    reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
-                }
-            }
-            None => (),
+        if let Some(pen) = &mut self.bullpen {
+           for reliever in pen {
+             reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
+             }
         };
         Ok(())
     }
