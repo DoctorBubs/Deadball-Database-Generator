@@ -202,9 +202,9 @@ fn get_sorted_batter_strings(vec: &[Player]) -> String {
             output
         })
 }
-/// PlayerWrapper contains fields that need to be deserialzed by serde, as well as a player struct with values that have already been filled in.
-/// When the gen_player functiion is called on the wrapper, it deserializes it's value, and provides the capability for the user to fix any valeus that are incorrect which are saved in the player table in the database.
-/// The fields are used to create a new player struct, with any missing data copierd over from the saved player.
+/// PlayerWrapper contains fields that need to be deserialized by serde, as well as a player struct with values that have already been filled in.
+/// When the gen_player function is called on the wrapper, it deserializes it's value, and provides the capability for the user to fix any values that are incorrect which are saved in the player table in the database.
+/// The fields are used to create a new player struct, with any missing data copied over from the saved player.
 struct PlayerWrapper {
     team_spot: Value,
     player: Player,
