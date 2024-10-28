@@ -90,12 +90,8 @@ impl Team {
         //Next, we add the the team score contribution from the pitching rotation to get a pitching score.
         let mut pitcher_score = team_score_from_vec(&self.starting_pitching);
         //If a team has a bullpen, the pitchers in the bullpen add to the pitching score.
-        match &self.bullpen {
-            Some(bullpen) => {
-                pitcher_score += team_score_from_vec(bullpen);
-            }
-
-            None => (),
+        if let Some(bullpen) = &self.bullpen {
+            pitcher_score += team_score_from_vec(bullpen);
         };
         // Next, we multiply the pitcher score by 7.
         pitcher_score *= 7;

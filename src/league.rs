@@ -697,7 +697,7 @@ impl League {
         // We enter the team into the database.
         let team_enter_result = conn.execute(
             "INSERT INTO teams(team_name,abrv, league_id) VALUES(?1,?2, ?3)",
-            [&new_name, &new_abrv, &league_id.to_string()],
+            [new_name, new_abrv, &league_id.to_string()],
         );
         // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
         let new_team_id = conn.last_insert_rowid();

@@ -131,7 +131,7 @@ impl PD {
                 )
                 .prompt()
                 .unwrap_or(false);
-                if let false = user_confirm {
+                if !user_confirm {
                     return default_error;
                 };
                 let user_choice =
