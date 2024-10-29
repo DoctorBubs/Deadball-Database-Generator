@@ -845,14 +845,18 @@ impl League {
     /// Creates a copy of the league in a Json obnject that is saved to a text file. The object is also saved in the database.
     pub fn create_json_archives(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
         let json_string = handle_serde_error(serde_json::to_string(self))?;
+        // We get the date and time to generate the file name
         let now = Local::now();
+        // We create a string for todays date
         let date_saved = format!("{}_{}_{}", now.year(), now.month(), now.day());
+        // We save the json string in the league archive table
         handle_sql_error(conn.execute(
             "INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)",
             [&self.league_id.to_string(), &date_saved, &json_string],
         ))?;
-
+        // We convert the json string to bytes so we can write the file later.
         let j_u = json_string.as_bytes();
+        // We create a file name
         let file_name;
         let base = format!("{}_{}_Archive", self.name, &date_saved);
         let mut i = 0;
@@ -869,7 +873,7 @@ impl League {
                 break;
             }
         }
-
+        // And we save the file
         let mut file = File::create(file_name).unwrap();
         file.write_all(j_u).unwrap();
         Ok(())
