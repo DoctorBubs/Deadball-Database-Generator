@@ -842,7 +842,7 @@ impl League {
         fs::write(file_name, file_string).unwrap();
         Ok(())
     }
-    /// Creates a copy of the league in a J
+    /// Creates a copy of the league in a Json obnject that is saved to a text file. The object is also saved in the database.
     pub fn create_json_archives(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
         let json_string = handle_serde_error(serde_json::to_string(self))?;
         let now = Local::now();
@@ -1088,7 +1088,8 @@ pub fn load_league(
                 Ok(games_played) => league.create_pennant_race(thread, conn, games_played)?,
                 Err(err) => return inquire_check(err),
             }
-        }
+        },
+        EditLeagueInput::CreateArchive => league.create_json_archives(conn)?
     };
     Ok(())
 }
