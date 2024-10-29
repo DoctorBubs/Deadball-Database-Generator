@@ -1,12 +1,10 @@
 use core::fmt;
-use std::fmt::format;
 use std::fs;
 use std::fs::exists;
 use std::fs::File;
 use std::io::Write;
 
 use crate::b_traits::BTraits;
-use crate::edit_league_error;
 use crate::edit_league_error::handle_serde_error;
 use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
@@ -851,7 +849,7 @@ impl League {
         let date_saved = format!("{}_{}_{}", now.year(), now.month(), now.day());
         handle_sql_error(conn.execute(
             "INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)",
-            ([&self.league_id.to_string(), &date_saved, &json_string]),
+            [&self.league_id.to_string(), &date_saved, &json_string],
         ))?;
 
         let j_u = json_string.as_bytes();
