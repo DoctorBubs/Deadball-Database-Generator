@@ -268,6 +268,12 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         (),
     )?;
 
+    conn.execute("CREATE TABLE IF NOT EXISTS league_archive(
+    archive_id INTEGER PRIMARY KEY,
+    league_id INTEGER NOT NULL,
+    date_saved TEXT NOT NULL,
+    league_data TEXT NOT NULL,
+    FOREIGN KEY (league_id) REFERENCES leagues(league_id))", ())?;
 
     // We create some indexes to optimize queries
     
@@ -279,6 +285,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
     conn.execute("CREATE INDEX IF NOT EXISTS player_pd_index ON players(PD);", ())?;
     // As well as an index that tracks a players team ID as well as PD.
     conn.execute("CREATE INDEX IF NOT EXISTS player_team_id_pd_index ON players(team_id,PD)",())?;
+    conn.execute("CREATE INDEX IF NOT EXISTS archive_index ON league_archive(league_id)",())?;
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
     team_season_id INTEGER PRIMARY KEY,st
     league_season_id INTEGER,
@@ -474,7 +481,8 @@ mod tests {
         current_league
             .create_pennant_race(&mut r_thread, &mut test_conn, 144)
             .unwrap();
-
+        current_league.create_json_archives(&mut test_conn).unwrap();
+        current_league.create_json_archives(&mut test_conn).unwrap();
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(

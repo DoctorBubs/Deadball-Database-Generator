@@ -1,11 +1,13 @@
 use core::fmt;
+use std::fmt::format;
 use std::fs;
 use std::fs::File;
 use std::io::Write;
 
 use std::path::Path;
-
 use crate::b_traits::BTraits;
+use crate::edit_league_error;
+use crate::edit_league_error::handle_serde_error;
 use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
@@ -26,6 +28,7 @@ use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
 use rand::prelude::*;
+use chrono::{Local, Datelike};
 
 use rusqlite::Result;
 
@@ -782,11 +785,14 @@ impl League {
                 let new_tup = (i, rank);
                 temp_vec.push(new_tup)
             }
-            // We pick a random value from temp vec via a weighted selection.
-            let (j, sample) = temp_vec.choose_weighted(thread, |x| x.1.weight).unwrap();
+            // We pick a random value from temp vec via a weighted selection. This can potentially fail, so we return a Database error if it does,
+            let (j, sample) = match temp_vec.choose_weighted(thread, |x| x.1.weight){
+                Ok(value) => value,
+                Err(_) => return  Err(EditLeagueError::DatabaseError(rusqlite::Error::InvalidQuery))
+            };
             // We push the sample to team ranks.
             team_ranks.push(**sample);
-            // And using the index, we remove the value from pennant wrappers.
+            // And using the index, we remove the value from pennant wrappers.s
             pennant_wrappers.remove(*j);
         }
         // We retrieve the pennant standing, which is a vector of vectors of i32.
@@ -833,8 +839,22 @@ impl League {
         fs::write(file_name, file_string).unwrap();
         Ok(())
     }
-}
 
+    pub fn create_json_archives(&self,conn: &mut Connection) -> Result<(),EditLeagueError>{
+        let json_string = handle_serde_error(serde_json::to_string(self))?;
+        let now = Local::now();
+        let date_saved = format!("{}_{}_{}",now.year(),now.month(),now.day());
+        conn.execute("INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)", ([&self.league_id.to_string(),&date_saved,&json_string])).unwrap();
+        let j_u = json_string.as_bytes();
+        let file_name = format!("{}_{}.txt",self.name,&date_saved);
+        let mut file = File::create(file_name).unwrap();
+        file.write_all(j_u).unwrap();
+        Ok(())
+    }
+
+
+}
+/// Checks database to make sure that a name is not already used by a league in the database.
 pub fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     let mut stmt = conn.prepare("SELECT league_name FROM leagues")?;
     let rows = stmt.query_map([], |row| row.get(0))?;
