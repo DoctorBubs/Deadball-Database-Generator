@@ -945,12 +945,7 @@ pub fn create_new_league(
     }
 }
 
-#[derive(Debug)]
-//Teamwrapper contains a team id from the database, as well as the team struct that correspond ot the id.
-pub struct TeamWrapper {
-    pub team_id: i64,
-    pub team: Team,
-}
+
 
 /// Loads teams from SQL database and adds to league struct.
 pub fn load_teams_from_sql(

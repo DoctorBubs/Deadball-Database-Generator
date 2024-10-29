@@ -269,12 +269,15 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
     )?;
 
 
-
-    conn.execute("CREATE INDEX IF NOT EXISTS player_pd_index ON players(PD);", ())?;
-
-    conn.execute("CREATE INDEX IF NOT EXISTS players_teamid_index ON players(team_id);",())?;
+    // We create some indexes to optimize queries
+    
+    // we create indexes on the foreign keys for the most importan tables
+    conn.execute("CREATE INDEX IF NOT EXISTS players_team_id_index ON players(team_id);",())?;
     conn.execute(" CREATE INDEX IF NOT EXISTS teams_league_id_index ON teams(league_id);", ())?;
     conn.execute("CREATE INDEX IF NOT EXISTS teams_league_id_index ON teams(league_id);", ())?;
+    // We also use querys that check if a player has a PD, so we create an index that tracks a players pd.
+    conn.execute("CREATE INDEX IF NOT EXISTS player_pd_index ON players(PD);", ())?;
+    // As well as an index that tracks a players team ID as well as PD.
     conn.execute("CREATE INDEX IF NOT EXISTS player_team_id_pd_index ON players(team_id,PD)",())?;
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
     team_season_id INTEGER PRIMARY KEY,st
