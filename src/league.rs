@@ -1,11 +1,11 @@
 use core::fmt;
 use std::fs;
-use std::fs::exists;
 use std::fs::File;
 use std::io::Write;
 
+use std::path::Path;
+
 use crate::b_traits::BTraits;
-use crate::edit_league_error::handle_serde_error;
 use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
 use crate::era::select_era;
@@ -19,7 +19,6 @@ use crate::pd::PD;
 use crate::pennantgen::generate_pennant_standings;
 use crate::pennantgen::PennantStanding;
 use crate::player::select_gender;
-use chrono::{Datelike, Local};
 use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
 use inquire::CustomType;
@@ -27,7 +26,6 @@ use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
 use rand::prelude::*;
-use std::path::Path;
 
 use rusqlite::Result;
 
@@ -784,18 +782,11 @@ impl League {
                 let new_tup = (i, rank);
                 temp_vec.push(new_tup)
             }
-            // We pick a random value from temp vec via a weighted selection. This can potentially fail, so we return a Database error if it does,
-            let (j, sample) = match temp_vec.choose_weighted(thread, |x| x.1.weight) {
-                Ok(value) => value,
-                Err(_) => {
-                    return Err(EditLeagueError::DatabaseError(
-                        rusqlite::Error::InvalidQuery,
-                    ))
-                }
-            };
+            // We pick a random value from temp vec via a weighted selection.
+            let (j, sample) = temp_vec.choose_weighted(thread, |x| x.1.weight).unwrap();
             // We push the sample to team ranks.
             team_ranks.push(**sample);
-            // And using the index, we remove the value from pennant wrappers.s
+            // And using the index, we remove the value from pennant wrappers.
             pennant_wrappers.remove(*j);
         }
         // We retrieve the pennant standing, which is a vector of vectors of i32.
@@ -842,44 +833,8 @@ impl League {
         fs::write(file_name, file_string).unwrap();
         Ok(())
     }
-    /// Creates a copy of the league in a Json obnject that is saved to a text file. The object is also saved in the database.
-    pub fn create_json_archives(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
-        let json_string = handle_serde_error(serde_json::to_string(self))?;
-        // We get the date and time to generate the file name
-        let now = Local::now();
-        // We create a string for todays date
-        let date_saved = format!("{}_{}_{}", now.year(), now.month(), now.day());
-        // We save the json string in the league archive table
-        handle_sql_error(conn.execute(
-            "INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)",
-            [&self.league_id.to_string(), &date_saved, &json_string],
-        ))?;
-        // We convert the json string to bytes so we can write the file later.
-        let j_u = json_string.as_bytes();
-        // We create a file name
-        let file_name;
-        let base = format!("{}_{}_Archive", self.name, &date_saved);
-        let mut i = 0;
-        // We loop to ensure the archive is saved in a unique file name.
-        loop {
-            let path = match i {
-                0 => format!("{}.txt", base),
-                _ => format!("{}_{}.txt", base, i),
-            };
-            if exists(&path).unwrap() {
-                i += 1
-            } else {
-                file_name = path;
-                break;
-            }
-        }
-        // And we save the file
-        let mut file = File::create(file_name).unwrap();
-        file.write_all(j_u).unwrap();
-        Ok(())
-    }
 }
-/// Checks database to make sure that a name is not already used by a league in the database.
+
 pub fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
     let mut stmt = conn.prepare("SELECT league_name FROM leagues")?;
     let rows = stmt.query_map([], |row| row.get(0))?;
@@ -990,6 +945,8 @@ pub fn create_new_league(
     }
 }
 
+
+
 /// Loads teams from SQL database and adds to league struct.
 pub fn load_teams_from_sql(
     league_id: i64,
@@ -1092,8 +1049,7 @@ pub fn load_league(
                 Ok(games_played) => league.create_pennant_race(thread, conn, games_played)?,
                 Err(err) => return inquire_check(err),
             }
-        },
-        EditLeagueInput::CreateArchive => league.create_json_archives(conn)?
+        }
     };
     Ok(())
 }
