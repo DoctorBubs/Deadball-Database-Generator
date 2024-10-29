@@ -25,7 +25,6 @@ use inquire::CustomType;
 use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
-use itertools::Itertools;
 use rand::prelude::*;
 
 use rusqlite::Result;
@@ -63,9 +62,9 @@ use std::collections::HashMap;
 enum _PlayerSortBy<T: PlayerTrait> {
     Bt,
     Obt,
-    Obt_Mod,
+    ObtMod,
     Age,
-    B_Trait(T),
+    BTrait(T),
 }
 // Used when filtering batters.
 #[derive(Debug, Clone, Copy)]
@@ -424,7 +423,7 @@ impl League {
             })?
             .filter_map(|x| x.ok());
         // We print a line of headers for each category to display
-        println!("Team_name,Player_Name,Pos,Age,Hand,Bt,OBT_Mod,OBT,Traits,Tier");
+        println!("Team_name,Player_Name,Pos,Age,Hand,Bt,obt_mod,OBT,Traits,Tier");
         // We then loop over the player iter to print what we need.
         for prw in player_iter {
             // We remove the PlayerRankWrapper from the ok, and deconstruct it
