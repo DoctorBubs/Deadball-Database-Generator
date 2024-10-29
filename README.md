@@ -1,4 +1,3 @@
-![akers_logo](https://github.com/user-attachments/assets/f1ae08f7-4324-4923-9e41-dabdda777994)
 
 # Summary
 Based off the [Deadball tabletop baseball game by W.M. Akers](http://wmakers.net/deadball), this Rust program creats a SQLite database on the users machine for information that is usefull if the user were running their own Deadball League. The program also provides an interface for the users to automatically generate leagues and teams based off the user's choice of options such as league era and gender. Once a league is created, the program can also add new teams to the league in the database.
