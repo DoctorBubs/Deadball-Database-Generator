@@ -844,20 +844,21 @@ impl League {
         fs::write(file_name, file_string).unwrap();
         Ok(())
     }
-
+    /// Creates a copy of the league in a J
     pub fn create_json_archives(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
         let json_string = handle_serde_error(serde_json::to_string(self))?;
         let now = Local::now();
         let date_saved = format!("{}_{}_{}", now.year(), now.month(), now.day());
-        conn.execute(
+        handle_sql_error(conn.execute(
             "INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)",
             ([&self.league_id.to_string(), &date_saved, &json_string]),
-        )
-        .unwrap();
+        ))?;
+
         let j_u = json_string.as_bytes();
         let file_name;
         let base = format!("{}_{}_Archive", self.name, &date_saved);
         let mut i = 0;
+        // We loop to ensure the archive is saved in a unique file name.
         loop {
             let path = match i {
                 0 => format!("{}.txt", base),
