@@ -1,10 +1,10 @@
 use core::fmt;
 use std::fmt::format;
 use std::fs;
+use std::fs::exists;
 use std::fs::File;
 use std::io::Write;
 
-use std::path::Path;
 use crate::b_traits::BTraits;
 use crate::edit_league_error;
 use crate::edit_league_error::handle_serde_error;
@@ -21,6 +21,7 @@ use crate::pd::PD;
 use crate::pennantgen::generate_pennant_standings;
 use crate::pennantgen::PennantStanding;
 use crate::player::select_gender;
+use chrono::{Datelike, Local};
 use inquire::validator::MinLengthValidator;
 use inquire::Confirm;
 use inquire::CustomType;
@@ -28,7 +29,7 @@ use inquire::InquireError;
 use inquire::Select;
 use inquire::Text;
 use rand::prelude::*;
-use chrono::{Local, Datelike};
+use std::path::Path;
 
 use rusqlite::Result;
 
@@ -786,9 +787,13 @@ impl League {
                 temp_vec.push(new_tup)
             }
             // We pick a random value from temp vec via a weighted selection. This can potentially fail, so we return a Database error if it does,
-            let (j, sample) = match temp_vec.choose_weighted(thread, |x| x.1.weight){
+            let (j, sample) = match temp_vec.choose_weighted(thread, |x| x.1.weight) {
                 Ok(value) => value,
-                Err(_) => return  Err(EditLeagueError::DatabaseError(rusqlite::Error::InvalidQuery))
+                Err(_) => {
+                    return Err(EditLeagueError::DatabaseError(
+                        rusqlite::Error::InvalidQuery,
+                    ))
+                }
             };
             // We push the sample to team ranks.
             team_ranks.push(**sample);
@@ -840,19 +845,36 @@ impl League {
         Ok(())
     }
 
-    pub fn create_json_archives(&self,conn: &mut Connection) -> Result<(),EditLeagueError>{
+    pub fn create_json_archives(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
         let json_string = handle_serde_error(serde_json::to_string(self))?;
         let now = Local::now();
-        let date_saved = format!("{}_{}_{}",now.year(),now.month(),now.day());
-        conn.execute("INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)", ([&self.league_id.to_string(),&date_saved,&json_string])).unwrap();
+        let date_saved = format!("{}_{}_{}", now.year(), now.month(), now.day());
+        conn.execute(
+            "INSERT INTO league_archive(league_id,date_saved,league_data) VALUES(?1,?2,?3)",
+            ([&self.league_id.to_string(), &date_saved, &json_string]),
+        )
+        .unwrap();
         let j_u = json_string.as_bytes();
-        let file_name = format!("{}_{}.txt",self.name,&date_saved);
+        let file_name;
+        let base = format!("{}_{}_Archive", self.name, &date_saved);
+        let mut i = 0;
+        loop {
+            let path = match i {
+                0 => format!("{}.txt", base),
+                _ => format!("{}_{}.txt", base, i),
+            };
+            if exists(&path).unwrap() {
+                i += 1
+            } else {
+                file_name = path;
+                break;
+            }
+        }
+
         let mut file = File::create(file_name).unwrap();
         file.write_all(j_u).unwrap();
         Ok(())
     }
-
-
 }
 /// Checks database to make sure that a name is not already used by a league in the database.
 pub fn check_name_vec(conn: &Connection) -> Result<Vec<String>, rusqlite::Error> {
@@ -964,8 +986,6 @@ pub fn create_new_league(
         Err(message) => Err(message),
     }
 }
-
-
 
 /// Loads teams from SQL database and adds to league struct.
 pub fn load_teams_from_sql(

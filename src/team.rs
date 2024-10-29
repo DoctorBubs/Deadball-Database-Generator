@@ -120,9 +120,9 @@ impl Team {
         }
         // As not every team has a bullpen, we do a check to make sure.
         if let Some(pen) = &mut self.bullpen {
-           for reliever in pen {
-             reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
-             }
+            for reliever in pen {
+                reliever.save_sql(conn, team_id, TeamSpot::Bullpen)?;
+            }
         };
         Ok(())
     }
@@ -231,7 +231,7 @@ impl PlayerWrapper {
         let player_name = &self.player.name;
         let player_id = self.player.player_id;
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
-        
+
         let pd = {
             let first_attempt = serde_json::from_value(self.pd.clone());
             PD::fix_db(first_attempt, conn, player_id, player_name, era)?
@@ -258,7 +258,8 @@ impl PlayerWrapper {
                 defense: serde_json::from_value(self.defense.clone()).unwrap_or(Defense::default()),
                 power: serde_json::from_value(self.power.clone()).unwrap_or(Power::default()),
                 speed: serde_json::from_value(self.speed.clone()).unwrap_or(Speed::default()),
-                toughness: serde_json::from_value(self.toughness.clone()).unwrap_or(Toughness::default()),
+                toughness: serde_json::from_value(self.toughness.clone())
+                    .unwrap_or(Toughness::default()),
             },
             note: serde_json::from_value(self.note.clone())?,
             // The remaining fields can be copied over from the original player saved in the wrapper.

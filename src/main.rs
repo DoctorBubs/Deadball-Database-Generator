@@ -268,24 +268,45 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         (),
     )?;
 
-    conn.execute("CREATE TABLE IF NOT EXISTS league_archive(
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS league_archive(
     archive_id INTEGER PRIMARY KEY,
     league_id INTEGER NOT NULL,
     date_saved TEXT NOT NULL,
     league_data TEXT NOT NULL,
-    FOREIGN KEY (league_id) REFERENCES leagues(league_id))", ())?;
+    FOREIGN KEY (league_id) REFERENCES leagues(league_id))",
+        (),
+    )?;
 
     // We create some indexes to optimize queries
-    
+
     // we create indexes on the foreign keys for the most importan tables
-    conn.execute("CREATE INDEX IF NOT EXISTS players_team_id_index ON players(team_id);",())?;
-    conn.execute(" CREATE INDEX IF NOT EXISTS teams_league_id_index ON teams(league_id);", ())?;
-    conn.execute("CREATE INDEX IF NOT EXISTS teams_league_id_index ON teams(league_id);", ())?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS players_team_id_index ON players(team_id);",
+        (),
+    )?;
+    conn.execute(
+        " CREATE INDEX IF NOT EXISTS teams_league_id_index ON teams(league_id);",
+        (),
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS teams_league_id_index ON teams(league_id);",
+        (),
+    )?;
     // We also use querys that check if a player has a PD, so we create an index that tracks a players pd.
-    conn.execute("CREATE INDEX IF NOT EXISTS player_pd_index ON players(PD);", ())?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS player_pd_index ON players(PD);",
+        (),
+    )?;
     // As well as an index that tracks a players team ID as well as PD.
-    conn.execute("CREATE INDEX IF NOT EXISTS player_team_id_pd_index ON players(team_id,PD)",())?;
-    conn.execute("CREATE INDEX IF NOT EXISTS archive_index ON league_archive(league_id)",())?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS player_team_id_pd_index ON players(team_id,PD)",
+        (),
+    )?;
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS archive_index ON league_archive(league_id)",
+        (),
+    )?;
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
     team_season_id INTEGER PRIMARY KEY,st
     league_season_id INTEGER,
@@ -437,14 +458,16 @@ mod tests {
         let new_two_way = TwoWayInfo::new(PlayerPosition::SP, PlayerPosition::FirstBase);
         new_two_way.is_valid().unwrap();
         top_batter.pos = PlayerPosition::TwoWay(Box::new(new_two_way));
-        test_conn.execute(
-            "UPDATE players
+        test_conn
+            .execute(
+                "UPDATE players
         SET POS = ?1 WHERE player_id = ?2",
-            [
-                serde_json::to_string(&top_batter.pos).unwrap(),
-                top_batter.player_id.to_string(),
-            ],
-        ).unwrap();
+                [
+                    serde_json::to_string(&top_batter.pos).unwrap(),
+                    top_batter.player_id.to_string(),
+                ],
+            )
+            .unwrap();
         // Next, we check to make sure that a league will not allow the addition of a team with the same name as an existin team.
         let double_name_check = current_league.new_team(
             &"NY".to_string(),
