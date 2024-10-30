@@ -1,5 +1,6 @@
 use core::fmt;
 
+use chrono::format;
 use inquire::{Confirm, Select};
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};
@@ -15,7 +16,9 @@ pub struct TwoWayInfo {
 
 impl fmt::Display for TwoWayInfo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let chars = serde_json::to_string(self).unwrap();
+        let pitcher_string = serde_json::to_string(&self.pitcher_type).unwrap();
+        let fielder_string = serde_json::to_string(&self.fielder_type).unwrap();
+        let chars = format!("{}/{}", pitcher_string, fielder_string);
         write!(f, "{}", chars)
     }
 }
@@ -99,8 +102,12 @@ pub enum PlayerPosition {
 
 impl fmt::Display for PlayerPosition {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let chars = serde_json::to_string(&self).unwrap();
-        write!(f, "{}", chars)
+        if let Self::TwoWay(info) = self {
+            info.fmt(f)
+        } else {
+            let chars = serde_json::to_string(&self).unwrap();
+            write!(f, "{}", chars)
+        }
     }
 }
 

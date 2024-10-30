@@ -20,7 +20,7 @@ pub enum EditLeagueInput {
     CreateNewTeam,
     CreateSchedule,
     GeneratePennant,
-    CreateArchive
+    CreateArchive,
 }
 // MenuInput contains all the valid choices a user can use at the main menu.
 #[derive(Copy, Clone, Debug)]

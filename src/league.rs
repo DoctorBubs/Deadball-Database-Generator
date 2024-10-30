@@ -78,7 +78,7 @@ pub enum BatterPosType {
 }
 
 impl BatterPosType {
-    /// Returns a string that is formatted like a tuple of positions that match the batter type. 
+    /// Returns a string that is formatted like a tuple of positions that match the batter type.
     /// This is used so that SQL can filter a by position, as this work with the IN keyword
     fn get_tup_string(&self) -> &str {
         match self {
@@ -1093,8 +1093,8 @@ pub fn load_league(
                 Ok(games_played) => league.create_pennant_race(thread, conn, games_played)?,
                 Err(err) => return inquire_check(err),
             }
-        },
-        EditLeagueInput::CreateArchive => league.create_json_archives(conn)?
+        }
+        EditLeagueInput::CreateArchive => league.create_json_archives(conn)?,
     };
     Ok(())
 }
