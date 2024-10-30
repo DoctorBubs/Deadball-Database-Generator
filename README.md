@@ -16,6 +16,5 @@ Next,clone the repo and save the output to a folder of your choice, open the fol
 
 The plan is to enable schedule generation in the program as well, however this has turned out to be tricky to solve, so the option to generate a schedule is currently commented out until a solution is implemented.  The program will also not work if it is run in a folder that does not allow writing inside.
 
-Also, as of 10/29/2024, viewing the top 10 batters in a league does not currently work when filtering by position.
 
 If you would like to generate a Deadball like to an Excel workbook, please [consider my other repo.](https://github.com/DoctorBubs/Deadball_WorkBook_Generator/tree/main)
