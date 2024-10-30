@@ -68,7 +68,7 @@ enum _PlayerSortBy<T: PlayerTrait> {
     Age,
     BTrait(T),
 }
-// Used when filtering batters.
+// Used when filtering batters. Doesn't account for two way players.
 #[derive(Debug, Clone, Copy)]
 pub enum BatterPosType {
     Catchers,
@@ -78,16 +78,17 @@ pub enum BatterPosType {
 }
 
 impl BatterPosType {
-    // Returns a string that is formatted like a touple of positions that match the batter type.
+    /// Returns a string that is formatted like a tuple of positions that match the batter type. 
+    /// This is used so that SQL can filter a by position, as this work with the IN keyword
     fn get_tup_string(&self) -> &str {
         match self {
-            Self::Catchers => "('C')",
-            Self::Infielders => "('1B','2B','3B','SS','INF')",
-            Self::Outfielders => "('LF','CF','RF','OF')",
-            Self::All => "('C','1B','2B','3B','SS','INF','LF','CF','RF','OF')",
+            Self::Catchers => "('\"C\"')",
+            Self::Infielders => "('\"1B\"','\"2B\"','\"3B\"','\"SS\"','\"INF\"','\"UT\"')",
+            Self::Outfielders => "('\"LF\"','\"CF\"','\"RF\"','\"OF\"','\"UT\"')",
+            Self::All => "('\"C\"','\"1B\"','\"2B\"','\"3B\"','\"SS\"','\"INF\"','\"UT\"','\"LF\"','\"CF\"','\"RF\"','\"OF\"')"
         }
     }
-    // Returns a string that can be used in a SQL query to filter players that fit the type.
+    /// Returns a string that can be used in a SQL query to filter players that fit the type.
     pub fn get_sql_text(&self) -> String {
         match self {
             Self::All => "\n\t AND players.PD IS NULL\n".to_string(),
