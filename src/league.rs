@@ -40,7 +40,6 @@ use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
 use rusqlite::Connection;
-//use crate::sched_view::view_schedule;
 
 use crate::sched_view::view_schedule;
 use crate::schedule::save_schedule_sql;
@@ -82,6 +81,7 @@ impl BatterPosType {
     /// This is used so that SQL can filter a by position, as this work with the IN keyword
     fn get_tup_string(&self) -> &str {
         match self {
+            // We have to format the str this way work in SQL queries.
             Self::Catchers => "('\"C\"')",
             Self::Infielders => "('\"1B\"','\"2B\"','\"3B\"','\"SS\"','\"INF\"','\"UT\"')",
             Self::Outfielders => "('\"LF\"','\"CF\"','\"RF\"','\"OF\"','\"UT\"')",
@@ -123,7 +123,7 @@ struct TeamPennantWrapper<'a> {
     name: &'a String,
 }
 
-// A league containts a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
+// A league contains a vector of teams, but also keeps track of the gender and era enums. A league can create team, an also ensure that
 // each team follows the gender and era rules.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct League {
@@ -150,7 +150,7 @@ pub struct LeagueWrapper {
     pub league: League,
 }
 
-// We implement display for LeagueWrapper, as we will need to see print a list of all leagues to the console when a user wants to open an existing leaghue
+// We implement display for LeagueWrapper, as we will need to see print a list of all leagues to the console when a user wants to open an existing league
 impl fmt::Display for LeagueWrapper {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}_{}", self.league_id, self.league.name)
@@ -300,7 +300,7 @@ impl League {
 
     /// Displays a leaderboard of the top 10 batters in the league.
     /// The query is structured so that batters with high on base targets, power, and the platoon
-    /// advntage will be higher in the leaderboard
+    /// advantage will be higher in the leaderboard
     pub fn display_top_hitters(
         &self,
         conn: &mut Connection,
@@ -489,7 +489,7 @@ impl League {
                         pd: serde_json::from_value(row.get(4)?).unwrap(),
                         pitcher_trait: serde_json::from_value(row.get(5)?).unwrap(),
                         pos: serde_json::from_value(row.get(6)?).unwrap(),
-                        // We fill the rest of the player fields with default datat.
+                        // We fill the rest of the player fields with default data.
                         ..Player::default()
                     },
                 })
@@ -701,7 +701,7 @@ impl League {
             "INSERT INTO teams(team_name,abrv, league_id) VALUES(?1,?2, ?3)",
             [new_name, new_abrv, &league_id.to_string()],
         );
-        // We save the team ID, so that we we generate the new players they can be saved in the databse with the league id as the foreign key.
+        // We save the team ID, so that we we generate the new players they can be saved in the database with the league id as the foreign key.
         let new_team_id = conn.last_insert_rowid();
         //new_team.team_id = team_id as i32;
         match team_enter_result {
@@ -730,7 +730,7 @@ impl League {
         conn: &mut Connection,
         games_played: i32,
     ) -> Result<(), EditLeagueError> {
-        // First, we check to see if there are already any pennant races associated with the leauge.
+        // First, we check to see if there are already any pennant races associated with the league.
 
         let existing_stmt = conn.prepare(
             "
@@ -774,13 +774,13 @@ impl League {
         let target_len = self.teams.len();
         // We create a team ranks vector.
         let mut team_ranks = Vec::new();
-        // This is a litte complicated, but basically we
+        // This is a little complicated, but basically we are going through a process of randomly removing teams, with teams removed earlier having worse records/
         while team_ranks.len() != target_len {
             // First we create a temporary vector.
             let mut temp_vec = Vec::new();
-            // We take an iter of the penant wrappers that also has an enumerate, so we know where in the vector is located.
+            // We take an iter of the pennant wrappers that also has an enumerate, so we know where in the vector is located.
             let modified_ranks = pennant_wrappers.iter().enumerate();
-            // We take the index and value for each listing in the vecotr, and save it in a tuple, which is saved in the temp_vec/
+            // We take the index and value for each listing in the vector, and save it in a tuple, which is saved in the temp_vec/
             for (i, rank) in modified_ranks {
                 let new_tup = (i, rank);
                 temp_vec.push(new_tup)
@@ -788,6 +788,7 @@ impl League {
             // We pick a random value from temp vec via a weighted selection. This can potentially fail, so we return a Database error if it does,
             let (j, sample) = match temp_vec.choose_weighted(thread, |x| x.1.weight) {
                 Ok(value) => value,
+                // This can possibly fail, need to find better way of handling this.
                 Err(_) => {
                     return Err(EditLeagueError::DatabaseError(
                         rusqlite::Error::InvalidQuery,
@@ -843,7 +844,7 @@ impl League {
         fs::write(file_name, file_string).unwrap();
         Ok(())
     }
-    /// Creates a copy of the league in a Json obnject that is saved to a text file. The object is also saved in the database.
+    /// Creates a copy of the league in a Json object that is saved to a text file. The object is also saved in the database.
     pub fn create_json_archives(&self, conn: &mut Connection) -> Result<(), EditLeagueError> {
         let json_string = handle_serde_error(serde_json::to_string(self))?;
         // We get the date and time to generate the file name
@@ -956,7 +957,7 @@ pub fn create_new_league(
     };
     // We then create a league struct.
 
-    // We then serialize the era and jender to json.
+    // We then serialize the era and gender to json.
     let era_json = match serde_json::to_string(&era) {
         Ok(data) => data,
         Err(message) => return Err(EditLeagueError::SerdeError(message)),
@@ -966,7 +967,7 @@ pub fn create_new_league(
         Ok(gender) => gender,
         Err(message) => return Err(EditLeagueError::SerdeError(message)),
     };
-    // And we create a new entry in the sql databse.
+    // And we create a new entry in the sql database.
     match conn.execute(
         "INSERT INTO leagues(league_name,era,gender) VALUES(?1, ?2, ?3)",
         [&league_name, &era_json, &gender_json],
@@ -979,9 +980,9 @@ pub fn create_new_league(
     // println!("Error creating a new league in the database.");
     // return Ok(());
     //};
-    // Via last_inster_rowid, we get the SQl id for the new league, as the teams we generate will need it.
+    // Via last_insert ow id, we get the SQl id for the new league, as the teams we generate will need it.
     let league_id = conn.last_insert_rowid();
-    // We then create a leage struct in rust.
+    // We then create a league struct in rust.
     let mut new_league = League::new(&league_name, gender, era, league_id);
     println!("{} created", &league_name);
     //And then prompt the user to create the first team for the league.
@@ -1009,7 +1010,7 @@ pub fn load_teams_from_sql(
         handle_sql_error(stmt.query_map([league_id], |row| {
             // For each team that matchers, we create a new TeamWrapper that is wrapped in an Ok.
             Ok(
-                // We use the remaining rows to deseirialize the team
+                // We use the remaining rows to deserialize the team
                 Team {
                     // We fill out the rest of the fields in the team struct from the database entry.
                     team_id: row.get(0)?,
@@ -1060,7 +1061,7 @@ pub fn load_league(
         league_id,
         mut league,
     } = wrapper;
-    // First, we display the leage standing.
+    // First, we display the league standing.
     league.display_standings(conn)?;
     // Then we load the teams.
     load_teams_from_sql(league_id, &mut league, conn)?;
@@ -1101,7 +1102,7 @@ pub fn load_league(
 
 /*  The League Wrapper struct is used when the program checks to see what leagues are saved in the database.
 
- It contains the ID which the leagues is saved in the database, as well a deserialzied League struct from the database
+ It contains the ID which the leagues is saved in the database, as well a deserialized League struct from the database
 */
 pub fn get_all_leagues_from_db(
     conn: &mut Connection,
@@ -1173,8 +1174,8 @@ pub fn league_check(
 // Once a league is saved, we save a copy of the league data in a folder.
 pub fn save_league_to_folders(league: &League) -> std::io::Result<()> {
     println!();
-    let flder_path_string = league.name.to_string();
-    let folder_path = Path::new(&flder_path_string);
+    let folder_path_string = league.name.to_string();
+    let folder_path = Path::new(&folder_path_string);
     fs::create_dir_all(folder_path)?;
 
     for team in &league.teams {

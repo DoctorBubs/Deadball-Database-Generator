@@ -27,7 +27,7 @@ pub struct BTraits {
     pub toughness: Toughness,
 }
 
-/*This is is a simmilar struct to B_Traits, however instead of an enum each field contains a bool regarding if a trait is above average.
+/*This is is a similar struct to B_Traits, however instead of an enum each field contains a bool regarding if a trait is above average.
 This is used in constructing a lineup. */
 pub struct BTraitAboveAverage {
     pub contact: bool,
@@ -37,13 +37,13 @@ pub struct BTraitAboveAverage {
     pub toughness: bool,
 }
 
-// To caclulate if a trait is above average, we convert the trait to an int and see if the value is above 0.
+// To calculate if a trait is above average, we convert the trait to an int and see if the value is above 0.
 fn above_average(b_trait: impl PlayerTrait) -> bool {
     b_trait.to_int() > 0
 }
 
 impl BTraits {
-    /// Takes a string, and creates a btrait struct via the string.
+    /// Takes a string, and creates a BTrait struct via the string.
     /// Traits are separated by commas, and if the traits contradict each other then hte later trait will be used.
     /// Any traits not specified will be the default trait.
     pub fn from_string(input: &str) -> Result<BTraits, String> {
