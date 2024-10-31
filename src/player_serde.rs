@@ -1,6 +1,7 @@
 use rusqlite::{named_params, Connection};
 #[derive(Debug)]
 /// Used to convert Player struct into Serde values.
+/// We do not serialize the player directly, as there are a few things in the database that are need but aren't saved in the player struct
 pub struct PlayerSerde<'a> {
     pub team_id: i64,
     pub player_name: &'a String,

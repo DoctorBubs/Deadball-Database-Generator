@@ -62,7 +62,7 @@ impl BTraits {
 
             // Next, we try to use serde to deserialize a power error
             let power_attempt: Result<Power, serde_json::Error> = serde_json::from_str(&word);
-            // Wh check if the power attempt was an error. If not, we assign the to the Btraits struct.
+            // Wh check if the power attempt was an error. If not, we assign the to the BTraits struct.
             if let Ok(power) = power_attempt {
                 result.power = power;
                 continue;
@@ -96,7 +96,7 @@ impl BTraits {
             );
             return Err(message);
         }
-        // We return the Btrait struct in an Ok.
+        // We return the BTrait struct in an Ok.
         Ok(result)
     }
 

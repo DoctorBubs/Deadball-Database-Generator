@@ -101,7 +101,7 @@ pub fn new_league_from_template(
             let name_hash = check_name_hash(conn)?;
             loop {
                 let potential_name = format!("{}_{}", template.name, id_num + 1);
-                match name_hash.get(&potential_name).is_none() {
+                match !name_hash.contains_key(&potential_name) {
                     //If there is already a league saved with the file name, we add 1 to id_num
                     false => id_num += 1,
                     //Otherwise, we

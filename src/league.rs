@@ -935,7 +935,7 @@ pub fn create_new_league(
             Ok(input) => input,
             Err(message) => return inquire_check(message),
         };
-        if taken_hash.get(&potential_name).is_none() {
+        if !taken_hash.contains_key(&potential_name) {
             league_name = potential_name;
             break;
         } else {

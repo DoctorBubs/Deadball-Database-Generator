@@ -1,6 +1,5 @@
 use core::fmt;
 
-use chrono::format;
 use inquire::{Confirm, Select};
 use rusqlite::Connection;
 use serde::{Deserialize, Serialize};

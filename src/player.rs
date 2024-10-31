@@ -256,7 +256,9 @@ impl Player {
             None => "".to_string(),
         }
     }
-
+    /// Returns what a player contributes to the Team Score.
+    /// If the player has a pitch die, then it's highest absolute value is returned.
+    /// Otherwise, the players bt is returned.
     pub fn get_team_score_contribution(&self) -> i32 {
         match self.is_pitcher() {
             true => self.get_base_pd().to_int(),
@@ -313,7 +315,7 @@ impl Player {
             _ => Some(result),
         }
     }
-
+    /// Serializes the player
     pub fn get_serde(&mut self, team_spot: TeamSpot) -> Result<PlayerSerde, serde_json::Error> {
         //  self.team_id = team_id;
         let BTraits {
@@ -380,7 +382,7 @@ impl Player {
         }
     }
 
-    /// Generates data that can be used a a deault for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new player
+    /// Generates data that can be used a a default for player structs. Most of the data will be overwritten when a player is created, it is important to set the player_id and team_id to 0 when creating a new player
     pub fn get_default_info() -> (i32, PlayerPosition, String, i64, i64, Note) {
         let age = 0;
         let pos = PlayerPosition::default();
@@ -413,7 +415,7 @@ impl Player {
             ..generated_player
         }
     }
-
+    /// Returns the expected batting average and expected batting average against a specific pitch die.
     pub fn expected_batting_obp(&self, pd: PD) -> (f32, f32) {
         let pd_average = pd.get_average();
         let expected_batting = self.bt as f32 - pd_average;
