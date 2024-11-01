@@ -1,8 +1,7 @@
 use rusqlite::{named_params, Connection};
 #[derive(Debug)]
-/// Used to convert Player struct into Serde values.
-/// We do not serialize the player directly, as there are a few things in the database that are need but aren't saved in the player struct
-pub struct PlayerSerde<'a> {
+/// Contains all the values to save a player to a row in the database.
+pub struct PlayerRow<'a> {
     pub team_id: i64,
     pub player_name: &'a String,
     pub age: i32,
@@ -23,8 +22,8 @@ pub struct PlayerSerde<'a> {
     pub trade_value: i32,
 }
 
-impl PlayerSerde<'_> {
-    /// Saves struct so SQl via a conn, returns an Option containing the row id.
+impl PlayerRow<'_> {
+    /// Saves player information to a row in the database. If no error occurred, the row ID is returned.
     pub fn save_to_sql(&self, conn: &mut Connection) -> Result<i64, rusqlite::Error> {
         conn.execute(
             "INSERT INTO players(

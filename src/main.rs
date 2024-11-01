@@ -13,7 +13,7 @@ mod pitcher_rank_info;
 mod player;
 mod player_error;
 mod player_quality;
-mod player_serde;
+mod player_row;
 mod position;
 mod sched_view;
 mod schedule;

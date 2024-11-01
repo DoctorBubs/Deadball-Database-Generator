@@ -12,7 +12,7 @@ use crate::pitcher_rank_info::PitcherRankInfo;
 use crate::player_error::CompTable;
 use crate::player_error::PlayerError;
 use crate::player_quality::PlayerQuality;
-use crate::player_serde::PlayerSerde;
+use crate::player_row::PlayerRow;
 use crate::position::PlayerPosition;
 use crate::team::TeamSpot;
 use crate::tier::Tier;
@@ -315,8 +315,8 @@ impl Player {
             _ => Some(result),
         }
     }
-    /// Serializes the player
-    pub fn get_serde(&mut self, team_spot: TeamSpot) -> Result<PlayerSerde, serde_json::Error> {
+    /// Serializeze the player into a data struct that can be used to create a row in the database.
+    pub fn get_row(&mut self, team_spot: TeamSpot) -> Result<PlayerRow, serde_json::Error> {
         //  self.team_id = team_id;
         let BTraits {
             contact,
@@ -334,7 +334,7 @@ impl Player {
 
         let pd_int = self.pd.map(|die| die.to_int());
 
-        let new_player_serde = PlayerSerde {
+        let new_row = PlayerRow {
             team_id: self.team_id,
             player_name: &self.name,
             pos: serde_json::to_value(self.pos.clone())?,
@@ -355,7 +355,7 @@ impl Player {
             trade_value: self.trade_value,
         };
 
-        Ok(new_player_serde)
+        Ok(new_row)
     }
     pub fn save_sql(
         &mut self,
@@ -364,7 +364,7 @@ impl Player {
         team_spot: TeamSpot,
     ) -> Result<(), EditLeagueError> {
         self.team_id = team_id;
-        let p_serde = handle_serde_error(self.get_serde(team_spot))?;
+        let p_serde = handle_serde_error(self.get_row(team_spot))?;
         let new_player_id = handle_sql_error(p_serde.save_to_sql(conn))?;
         self.player_id = new_player_id;
         Ok(())
