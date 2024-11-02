@@ -332,8 +332,6 @@ impl Player {
         let speed_option = player_trait_option(speed);
         let toughness_option = player_trait_option(toughness);
 
-        let pd_int = self.pd.map(|die| die.to_int());
-
         let new_row = PlayerRow {
             team_id: self.team_id,
             player_name: &self.name,
@@ -344,7 +342,6 @@ impl Player {
             obt_mod: self.obt_mod.to_string(),
             obt: self.obt.to_string(),
             pd: serde_json::to_value(self.pd)?,
-            pd_int: serde_json::to_value(pd_int)?,
             pitcher_trait: serde_json::to_value(self.pitcher_trait)?,
             team_spot: serde_json::to_string(&team_spot)?,
             contact: serde_json::to_value(contact_option)?,

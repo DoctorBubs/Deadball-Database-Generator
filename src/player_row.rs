@@ -11,7 +11,6 @@ pub struct PlayerRow<'a> {
     pub obt_mod: String,
     pub obt: String,
     pub pd: serde_json::Value,
-    pub pd_int: serde_json::Value,
     pub pitcher_trait: serde_json::Value,
     pub team_spot: String,
     pub contact: serde_json::Value,
@@ -29,7 +28,7 @@ impl PlayerRow<'_> {
             "INSERT INTO players(
                 team_id,player_name,age,pos,hand,
                 bt,obt_mod,obt,
-                pd,pd_int,pitcher_trait,team_spot,
+                pd,pitcher_trait,team_spot,
                 contact,defense,power,speed,toughness,trade_value) 
             VALUES(:team_id, 
                 :player_name, 
@@ -40,7 +39,6 @@ impl PlayerRow<'_> {
                 :obt_mod, 
                 :obt, 
                 :pd,
-                :pd_int, 
                 :pitcher_trait, 
                 :team_spot, 
                 :contact,
@@ -60,7 +58,6 @@ impl PlayerRow<'_> {
                 ":obt_mod":&self.obt_mod,
                 ":obt":&self.obt,
                 ":pd":self.pd,
-                ":pd_int": self.pd_int,
                 ":pitcher_trait": self.pitcher_trait,
                 ":team_spot":self.team_spot,
                 ":contact": self.contact,

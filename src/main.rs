@@ -178,9 +178,6 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
              obt_mod INTEGER NOT NULL, --OBT Modifier, which is used to calculate a players on base target by addition to a player batter target
              obt INTEGER NOT NULL, -- On base Target, indicates how often a player get's on base. Correlates to a player on base percentage in real life.
              PD TEXT , -- If a player is a pitcher, they are assigned a pitch die, which represents the stand rpg die, E.G. d12, d4. Pitch die can be negative.
-             pd_int INTEGER , /*If a player has a pitch die, PD_int represents the outcome of a pitch die roll that is the farthest away from 0.
-             For example, if a pitcher has a pd of d12, their pd_int would be 12, while a -d4 would be -4.
-            */
              pitcher_trait TEXT , -- Traits for pitchers
              team_spot TEXT NOT NULL, -- Represents where a player is on a team. E.G are they starting lineup or in the bullpen.
              contact TEXT ,
@@ -307,18 +304,42 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         "CREATE INDEX IF NOT EXISTS archive_index ON league_archive(league_id)",
         (),
     )?;
-
-    if let Ok(_) = conn.execute("CREATE TABLE pitch_die(
+    // We attempt to create a pitch die table. If we are able to create the table, we fill the table with the string version of each pitch die as well as the farthest value away from zero possible from the die.
+    //This is used to to make querying pitcher die values easier, as the maximum absolute value of every pitch die is saved in this table.
+    if conn
+        .execute(
+            "CREATE TABLE pitch_die(
         die_id INTEGER PRIMARY KEY ,
         die_text STRING UNIQUE NOT NULL,
-        die_int INTEGER NOT NULL)", ()){
-            let all_dice = [PD::D20, PD::D12, PD::D8, PD::D6, PD::D4, PD::D0, PD::DM4, PD::DM6, PD::DM8, PD::DM12, PD::DM20];
-            for die in all_dice{
-                conn.execute("INSERT INTO pitch_die(die_text, die_int) VALUES(?1, ?2)" , [serde_json::to_string(&die).unwrap(),die.to_int().to_string()])?;
-            }
+        die_int INTEGER NOT NULL)",
+            (),
+        )
+        .is_ok()
+    {
+        let all_dice = [
+            PD::D20,
+            PD::D12,
+            PD::D8,
+            PD::D6,
+            PD::D4,
+            PD::D0,
+            PD::DM4,
+            PD::DM6,
+            PD::DM8,
+            PD::DM12,
+            PD::DM20,
+        ];
+        for die in all_dice {
+            conn.execute(
+                "INSERT INTO pitch_die(die_text, die_int) VALUES(?1, ?2)",
+                [
+                    serde_json::to_string(&die).unwrap(),
+                    die.to_int().to_string(),
+                ],
+            )?;
         }
- 
- 
+    }
+
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
     team_season_id INTEGER PRIMARY KEY,st
     league_season_id INTEGER,

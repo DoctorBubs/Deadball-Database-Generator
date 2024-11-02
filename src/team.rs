@@ -210,7 +210,6 @@ struct PlayerWrapper {
     player: Player,
     hand: String,
     pd: Value,
-    pd_int: i32,
     pos: String,
     pitcher_trait: Value,
     contact: Value,
@@ -227,7 +226,7 @@ impl PlayerWrapper {
         &self,
         conn: &mut Connection,
         era: Era,
-    ) -> Result<(TeamSpot, Player, i32), serde_json::Error> {
+    ) -> Result<(TeamSpot, Player), serde_json::Error> {
         let player_name = &self.player.name;
         let player_id = self.player.player_id;
         let team_spot = serde_json::from_value(self.team_spot.clone())?;
@@ -265,7 +264,7 @@ impl PlayerWrapper {
             // The remaining fields can be copied over from the original player saved in the wrapper.
             ..self.player
         };
-        Ok((team_spot, new_player, self.pd_int))
+        Ok((team_spot, new_player))
     }
 }
 
@@ -273,7 +272,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team, era: Era) -> Result<Team
     // We prepare a statement that will select all players from the database that has a matching team id
     let mut stmt = handle_sql_error(conn.prepare(
         "SELECT 
-        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,pd_int,player_note
+        team_spot,player_name,age,pos,hand,bt,obt_mod,obt,PD,pitcher_trait,contact,defense,power,speed,toughness,trade_value,team_id,player_id,player_note
         FROM players 
         WHERE team_id = ?1"
     ))?;
@@ -292,8 +291,7 @@ pub fn load_team(conn: &mut Connection, mut team: Team, era: Era) -> Result<Team
             power: row.get(12)?,
             speed: row.get(13)?,
             toughness: row.get(14)?,
-            pd_int: row.get(18).unwrap_or(0),
-            note: row.get(19)?,
+            note: row.get(18)?,
             // And we use the rest to fill out the player.
             player: Player {
                 name: row.get(1)?,
@@ -313,14 +311,15 @@ pub fn load_team(conn: &mut Connection, mut team: Team, era: Era) -> Result<Team
     drop(stmt);
     for r in player_iter {
         let pw = handle_sql_error(r)?;
-        let (team_spot, player, pd_int) = handle_serde_error(pw.gen_player(conn, era))?;
+        let (team_spot, player) = handle_serde_error(pw.gen_player(conn, era))?;
 
+        /*  Commenting this for now. Having an error system for invalid players is a good idea, this should be reworked
         // We check if the loaded player has any error, e.g age is 0 or obt != bt + obt_,mod
         let player_error_opt = player.get_player_error(pd_int);
         // If there is an error, we print a warning.
         if let Some(player_error) = player_error_opt {
             println!("{}", player_error)
-        };
+        }; */
         // And based off the team spot, the player is assigned to the correct player pool.
         match team_spot {
             TeamSpot::StartingLineup => team.lineup.push(player),

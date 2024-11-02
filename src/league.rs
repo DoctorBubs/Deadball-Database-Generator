@@ -212,12 +212,14 @@ impl League {
         pitcher_scores AS(
             SELECT 
                 teams.team_id as team_id,
-                SUM(players.pd_int) * 7 as pd_score
+                SUM(pitch_die.die_int) * 7 as pd_score
                 
             FROM
                 players
             INNER JOIN 
                 teams ON teams.team_id = players.team_id
+            INNER JOIN
+                pitch_die ON pitch_die.die_text = players.PD
             WHERE
                 teams.league_id = ?1
                 AND
@@ -453,7 +455,7 @@ impl League {
                 players.PD,
                 players.pitcher_trait,
                 players.pos,
-                players.pd_int,
+                pitch_die.die_int AS pd_int,
                 CASE
                     WHEN players.pitcher_trait IS NULL THEN 0
                     WHEN players.pitcher_trait LIKE '%CN-%' THEN -1
@@ -469,11 +471,15 @@ impl League {
                 players
             ON
                 teams.team_id = players.team_id
+            INNER JOIN
+                pitch_die
+            ON
+                pitch_die.die_text = players.PD
             WHERE
                 teams.league_id = ?1
                 AND players.PD IS NOT NULL
             
-            ORDER BY players.pd_int DESC, pitcher_trait_num DESC, hand_num DESC, players.age DESC
+            ORDER BY pd_int DESC, pitcher_trait_num DESC, hand_num DESC, players.age DESC
         LIMIT 10;
         ",
         )?;
