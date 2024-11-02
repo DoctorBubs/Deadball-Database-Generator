@@ -92,10 +92,11 @@ fn main() -> Result<(), ()> {
                     EditLeagueError::DatabaseError(output) => {
                         println!("Something went wrong with the database, please check that this folder is not read only.\nIt is also possible that {} is corrupted or that the database contains invalid data, please check that as well.\nThe Error message was {}",default_path,output);
                     }
-                    EditLeagueError::PennantError(message) => {
-                        println!("{}", message)
+                    EditLeagueError::PennantError(err_message) => {
+                        println!("{}", err_message)
                     }
-                    EditLeagueError::Inquire(_) | EditLeagueError::SerdeError(_) => {
+                    EditLeagueError::SerdeError(err_message) => println!("There was an error deserializing data from the database.\nThe problem is most likely invalid data in the database. The error was: {}",err_message),
+                    EditLeagueError::Inquire(_)  => {
                         let library_type;
                         let output_string = match message {
                             EditLeagueError::SerdeError(output) => {
@@ -110,7 +111,6 @@ fn main() -> Result<(), ()> {
                             _ => unreachable!(),
                         };
                         println!("Something went wrong with the {} library, please make sure that all dependencies have been installed correctly",library_type);
-                        println!("If this is an error with the serde library, it is possible there is incorrect data in the database.");
                         println!("The error message was: {}", output_string)
                     }
                     _ => println!("Something went wrong, please restart the program and try again"),
