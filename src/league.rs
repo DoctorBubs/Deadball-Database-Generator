@@ -790,8 +790,8 @@ impl League {
                 Ok(value) => value,
                 // This can possibly fail, need to find better way of handling this.
                 Err(_) => {
-                    return Err(EditLeagueError::DatabaseError(
-                        rusqlite::Error::InvalidQuery,
+                    return Err(EditLeagueError::PennantError(
+                        "There was an error involving the random number generation in creating the pennant, please try again.\nIf the problem persists, try using a different setup for the league and/or pennant/".to_string(),
                     ))
                 }
             };

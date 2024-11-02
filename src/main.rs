@@ -307,6 +307,15 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         "CREATE INDEX IF NOT EXISTS archive_index ON league_archive(league_id)",
         (),
     )?;
+
+    if let Err(_) = conn.execute("CREATE TABLE pitch_die 
+        die_id INTEGER PRIMARY KEY 
+        die_text STRING UNIQUE NOT NULL
+        die_int INTEGER NOT NULL", ()){
+
+        }
+ 
+ 
     /*conn.execute("CREATE TABLE IF NOT EXISTS team_seasons(
     team_season_id INTEGER PRIMARY KEY,st
     league_season_id INTEGER,
