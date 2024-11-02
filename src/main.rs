@@ -465,7 +465,10 @@ mod tests {
         .unwrap();
         // We test to make sure the length of league.teams is what we expect.
         assert_eq!(current_league.teams.len(), 8);
-        // Next, we select the
+
+        current_league.get_average_player(&mut test_conn).unwrap();
+
+        // Next, we select the first team.
         let first_team = current_league.teams.get_mut(0).unwrap();
         let first_team_id = first_team.team_id;
         //Next we check the team's player pools to make sure they have all the players we expect.

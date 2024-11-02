@@ -595,12 +595,16 @@ impl League {
             "
             WITH pitching_data AS(
                 SELECT leagues.league_id AS league_id,
-                ROUND(AVG(players.pd_int)) as avg_pd
+                ROUND(AVG(pitch_die.die_int)) as avg_pd
             FROM leagues
             INNER JOIN
                 teams ON teams.league_id = leagues.league_id
             INNER JOIN 
                 players ON players.team_id = teams.team_id
+            INNER JOIN
+                pitch_die
+            ON
+                pitch_die.die_text = players.PD
             WHERE
                 players.PD IS NOT NULL
             GROUP BY
