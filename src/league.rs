@@ -607,6 +607,8 @@ impl League {
                 pitch_die.die_text = players.PD
             WHERE
                 players.PD IS NOT NULL
+            AND 
+                leagues.league_id = ?1
             GROUP BY
                 leagues.league_id
             ),
