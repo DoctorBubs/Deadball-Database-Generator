@@ -308,11 +308,14 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         (),
     )?;
 
-    if let Err(_) = conn.execute("CREATE TABLE pitch_die 
-        die_id INTEGER PRIMARY KEY 
-        die_text STRING UNIQUE NOT NULL
-        die_int INTEGER NOT NULL", ()){
-
+    if let Ok(_) = conn.execute("CREATE TABLE pitch_die(
+        die_id INTEGER PRIMARY KEY ,
+        die_text STRING UNIQUE NOT NULL,
+        die_int INTEGER NOT NULL)", ()){
+            let all_dice = [PD::D20, PD::D12, PD::D8, PD::D6, PD::D4, PD::D0, PD::DM4, PD::DM6, PD::DM8, PD::DM12, PD::DM20];
+            for die in all_dice{
+                conn.execute("INSERT INTO pitch_die(die_text, die_int) VALUES(?1, ?2)" , [serde_json::to_string(&die).unwrap(),die.to_int().to_string()])?;
+            }
         }
  
  
