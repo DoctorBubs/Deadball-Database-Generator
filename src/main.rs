@@ -36,7 +36,6 @@ use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
 use edit_league_error::EditLeagueError;
-use glob::glob;
 use inquire::Confirm;
 use inquire::InquireError;
 use league::league_check;
@@ -549,8 +548,9 @@ mod tests {
         current_league.create_json_archives(&mut test_conn).unwrap();
 
         drop(test_conn);
-        //And now we save the tests generated in a new folder.
-
+       
+        // Next we save the test results in a new directory that is saved 
+        // We get the data and time to use as a directory name.
         let now = Local::now();
         let dir_name = format!(
             "Tests_{}_{}_{}_{}_{}",
@@ -560,23 +560,20 @@ mod tests {
             now.hour(),
             now.second()
         );
+        // Which is used to create a new directory.
         fs::create_dir(&dir_name).unwrap();
         let dir_string = format!("{}/", dir_name);
-        for i in (1..=3) {
+        // We save the PCL directory.
+        for i in 1..=3 {
             let og_file_string = format!("PCL_{}", i);
             let new_file_string = format!("{}{}", dir_string, og_file_string);
             fs::rename(og_file_string, new_file_string).unwrap();
         }
-
+        // We move the test database to the new directory.
         let new_db_string = format!("{}{}", dir_string, "test.db");
         fs::rename("test.db", new_db_string).unwrap();
-        /*
-        let og_pennant_str = "PCL_1_Pennant_0.txt";
-        let new_pennant_string = format!("{}{}",dir_string,og_pennant_str);
-        fs::rename(og_pennant_str, new_pennant_string).unwrap();
-        */
-        //Next, we move all txt files
-        for entry in glob("*.txt").unwrap() {
+        //Next, we move all txt files that contain "PCL" in the title to the new directory.
+        for entry in glob("PCL*.txt").unwrap() {
             match entry {
                 Ok(value) => {
                     let value_string = value.display().to_string();
@@ -586,10 +583,9 @@ mod tests {
                 Err(message) => panic!("{}", message),
             }
         }
-
+        // And we save the new directory in the old_tests directory.
         let moved_dir_string = format!("old_tests/{}", dir_name);
         fs::rename(dir_name, moved_dir_string).unwrap();
-        // We rename the files created so they are saved in the new folder.
 
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
