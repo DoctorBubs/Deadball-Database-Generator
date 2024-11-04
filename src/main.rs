@@ -36,6 +36,7 @@ use crate::traits::Power;
 use crate::traits::Speed;
 use crate::traits::Toughness;
 use edit_league_error::EditLeagueError;
+use glob::glob;
 use inquire::Confirm;
 use inquire::InquireError;
 use league::league_check;
@@ -381,7 +382,11 @@ fn player_pool_test(input: &[Player], team_id: i64, for_pitchers: bool) {
 #[cfg(test)]
 mod tests {
 
+    use std::fs;
+
     use b_traits::BTraits;
+    use chrono::{format::format, Datelike, Local, Timelike};
+    use glob::glob_with;
     use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
     use position::{PlayerPosition, TwoWayInfo};
@@ -396,7 +401,7 @@ mod tests {
     #[test]
     fn generate_db() {
         // WARNING: This will automatically fail if there is a test.db in the folder, as well as if there are folders named PCL_1,PCL_2,or PCL_3.
-
+        use glob::glob;
         // We create a test database
         let mut test_conn = load_database("test.db").unwrap();
         let mut r_thread = rand::thread_rng();
@@ -542,6 +547,50 @@ mod tests {
             .unwrap();
         current_league.create_json_archives(&mut test_conn).unwrap();
         current_league.create_json_archives(&mut test_conn).unwrap();
+
+        drop(test_conn);
+        //And now we save the tests generated in a new folder.
+
+        let now = Local::now();
+        let dir_name = format!(
+            "Tests_{}_{}_{}_{}_{}",
+            now.year(),
+            now.month(),
+            now.day(),
+            now.hour(),
+            now.second()
+        );
+        fs::create_dir(&dir_name).unwrap();
+        let dir_string = format!("{}/", dir_name);
+        for i in (1..=3) {
+            let og_file_string = format!("PCL_{}", i);
+            let new_file_string = format!("{}{}", dir_string, og_file_string);
+            fs::rename(og_file_string, new_file_string).unwrap();
+        }
+
+        let new_db_string = format!("{}{}", dir_string, "test.db");
+        fs::rename("test.db", new_db_string).unwrap();
+        /*
+        let og_pennant_str = "PCL_1_Pennant_0.txt";
+        let new_pennant_string = format!("{}{}",dir_string,og_pennant_str);
+        fs::rename(og_pennant_str, new_pennant_string).unwrap();
+        */
+        //Next, we move all txt files
+        for entry in glob("*.txt").unwrap() {
+            match entry {
+                Ok(value) => {
+                    let value_string = value.display().to_string();
+                    let new_entry_string = format!("{}{}", dir_string, value_string);
+                    fs::rename(value_string, new_entry_string).unwrap()
+                }
+                Err(message) => panic!("{}", message),
+            }
+        }
+
+        let moved_dir_string = format!("old_tests/{}", dir_name);
+        fs::rename(dir_name, moved_dir_string).unwrap();
+        // We rename the files created so they are saved in the new folder.
+
         /*let series_per_matchup = 6;
         /let test_sched = new_schedule(&current_league.teams, 3, series_per_matchup);
         assert_eq!(
