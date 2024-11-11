@@ -877,8 +877,8 @@ impl League {
         // We loop to ensure the archive is saved in a unique file name.
         loop {
             let path = match i {
-                0 => format!("{}.txt", base),
-                _ => format!("{}_{}.txt", base, i),
+                0 => format!("{}.json", base),
+                _ => format!("{}_{}.json", base, i),
             };
             if exists(&path).unwrap() {
                 i += 1

@@ -548,8 +548,8 @@ mod tests {
         current_league.create_json_archives(&mut test_conn).unwrap();
 
         drop(test_conn);
-       
-        // Next we save the test results in a new directory that is saved 
+
+        // Next we save the test results in a new directory that is saved
         // We get the data and time to use as a directory name.
         let now = Local::now();
         let dir_name = format!(
@@ -572,17 +572,24 @@ mod tests {
         // We move the test database to the new directory.
         let new_db_string = format!("{}{}", dir_string, "test.db");
         fs::rename("test.db", new_db_string).unwrap();
-        //Next, we move all txt files that contain "PCL" in the title to the new directory.
-        for entry in glob("PCL*.txt").unwrap() {
-            match entry {
-                Ok(value) => {
-                    let value_string = value.display().to_string();
-                    let new_entry_string = format!("{}{}", dir_string, value_string);
-                    fs::rename(value_string, new_entry_string).unwrap()
+        // We create an array of end patterns that represent file extensions for each file we created in the test.
+        let end_patterns = ["txt", "json"];
+        for end_pattern in end_patterns {
+            // We create a new file pattern based off the end pattern.
+            let new_pattern = format!("PCL*.{}", end_pattern);
+            //And we move the files that fit the pattern to the dir.
+            for entry in glob(&new_pattern).unwrap() {
+                match entry {
+                    Ok(value) => {
+                        let value_string = value.display().to_string();
+                        let new_entry_string = format!("{}{}", dir_string, value_string);
+                        fs::rename(value_string, new_entry_string).unwrap()
+                    }
+                    Err(message) => panic!("{}", message),
                 }
-                Err(message) => panic!("{}", message),
             }
         }
+
         // And we save the new directory in the old_tests directory.
         let moved_dir_string = format!("old_tests/{}", dir_name);
         fs::rename(dir_name, moved_dir_string).unwrap();
