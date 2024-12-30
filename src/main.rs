@@ -277,7 +277,7 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
 
     // We create some indexes to optimize queries
 
-    // we create indexes on the foreign keys for the most importan tables
+    // we create indexes on the foreign keys for the most important tables
     conn.execute(
         "CREATE INDEX IF NOT EXISTS players_team_id_index ON players(team_id);",
         (),
@@ -304,8 +304,10 @@ fn load_database(path: &str) -> Result<Connection, rusqlite::Error> {
         "CREATE INDEX IF NOT EXISTS archive_index ON league_archive(league_id)",
         (),
     )?;
-    // We attempt to create a pitch die table. If we are able to create the table, we fill the table with the string version of each pitch die as well as the farthest value away from zero possible from the die.
-    //This is used to to make querying pitcher die values easier, as the maximum absolute value of every pitch die is saved in this table.
+    /*  We attempt to create a pitch die table. If we are able to create the table, we fill the table with the string version of each pitch die as well as the farthest value away from zero possible from the die.
+    This is used to to make querying pitcher die values easier, as the maximum absolute value of every pitch die is saved in this table.
+     Since we only want the table filled with values once, we use an if statement to see if the query to create a new table is valid, which it will not be if the table already exist.
+     */ 
     if conn
         .execute(
             "CREATE TABLE pitch_die(
