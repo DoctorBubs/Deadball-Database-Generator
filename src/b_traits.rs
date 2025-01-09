@@ -43,7 +43,7 @@ fn above_average(b_trait: impl PlayerTrait) -> bool {
 }
 
 impl BTraits {
-    /// Returns a vector of traits converted to integer. This is usefull in calcualting how many positive or negativve traits there are.
+    /// Returns a vector of traits converted to integer. This is useful in calculating how many positive or negative traits there are.
     fn get_trait_ints(&self) -> Vec<i32>{
         vec![self.contact.to_int(),self.defense.to_int(),self.power.to_int(),self.speed.to_int(),self.toughness.to_int()]
     }
