@@ -44,19 +44,25 @@ fn above_average(b_trait: impl PlayerTrait) -> bool {
 
 impl BTraits {
     /// Returns a vector of traits converted to integer. This is useful in calculating how many positive or negative traits there are.
-    fn get_trait_ints(&self) -> Vec<i32>{
-        vec![self.contact.to_int(),self.defense.to_int(),self.power.to_int(),self.speed.to_int(),self.toughness.to_int()]
+    fn get_trait_ints(&self) -> Vec<i32> {
+        vec![
+            self.contact.to_int(),
+            self.defense.to_int(),
+            self.power.to_int(),
+            self.speed.to_int(),
+            self.toughness.to_int(),
+        ]
     }
     /// Counts how many positive traits are in the struct.
-    fn positive_traits(&self) -> usize{
+    fn positive_traits(&self) -> usize {
         self.get_trait_ints().iter().filter(|x| **x > 0).count()
     }
     /// Counts how many negative traits are in the struct.
-    fn negative_traits(&self) -> usize{
+    fn negative_traits(&self) -> usize {
         self.get_trait_ints().iter().filter(|x| **x < 0).count()
     }
     /// Returns the sum of all traits converted to an integer.
-    fn trait_score(&self) -> i32{
+    fn trait_score(&self) -> i32 {
         self.get_trait_ints().iter().sum()
     }
     /// Takes a string, and creates a BTrait struct via the string.
