@@ -15,7 +15,10 @@ pub trait PlayerTrait {
 
     fn from_int(&self, num: i32) -> Option<Box<Self>>;
 
-    fn upgrade_b_traits(&self, original_b_traits: BTraits) -> Option<BTraits> {
+    fn upgrade_b_traits(&self, original_b_traits: &BTraits) -> Option<BTraits> {
+        if self.is_max() {
+            return None;
+        };
         let base = self.to_int();
         let upgrade_int = base + 1;
         match self.from_int(upgrade_int) {
@@ -28,8 +31,11 @@ pub trait PlayerTrait {
     }
 
     fn downgrade(&self, original_b_traits: &BTraits) -> Option<BTraits> {
+        if self.is_min() {
+            return None;
+        };
         let base = self.to_int();
-        let downgrade_int = base + 1;
+        let downgrade_int = base - 1;
         match self.from_int(downgrade_int) {
             Some(boxed) => {
                 let new_traits = boxed.add_to_b_traits(&original_b_traits);
@@ -38,6 +44,12 @@ pub trait PlayerTrait {
             None => None,
         }
     }
+    // Return true if a trait is maxed out.
+    fn is_max(&self) -> bool;
+
+    // Returns true if a trait is at the minimal level
+    fn is_min(&self) -> bool;
+
     // Returns a copy of a Btraits, but with the original replaced by this one.
     fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits;
 }
@@ -50,7 +62,7 @@ pub fn player_trait_option<T: PlayerTrait>(player_trait: &T) -> Option<&T> {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Power {
     #[serde(rename = "P++")]
     P2,
@@ -103,6 +115,14 @@ impl PlayerTrait for Power {
     fn get_rbi_score(&self) -> i32 {
         self.to_int() * 3
     }
+
+    fn is_max(&self) -> bool {
+        return *self == Self::P2;
+    }
+
+    fn is_min(&self) -> bool {
+        return *self == Self::PM2;
+    }
 }
 
 impl Default for Power {
@@ -131,7 +151,7 @@ impl UpdatePlayerDb for Power {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Speed {
     #[serde(rename = "S++")]
     S2,
@@ -171,6 +191,14 @@ impl PlayerTrait for Speed {
             ..*b_traits
         }
     }
+
+    fn is_max(&self) -> bool {
+        return *self == Self::S2;
+    }
+
+    fn is_min(&self) -> bool {
+        return *self == Self::SM1;
+    }
 }
 
 impl Default for Speed {
@@ -198,7 +226,7 @@ impl UpdatePlayerDb for Speed {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Contact {
     #[serde(rename = "C+")]
     C1,
@@ -237,6 +265,14 @@ impl PlayerTrait for Contact {
             ..*b_traits
         }
     }
+
+    fn is_max(&self) -> bool {
+        *self == Self::C1
+    }
+
+    fn is_min(&self) -> bool {
+        *self == Self::CM1
+    }
 }
 
 impl Default for Contact {
@@ -257,7 +293,7 @@ impl fmt::Display for Contact {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Defense {
     #[serde(rename = "D+")]
     D1,
@@ -293,6 +329,13 @@ impl PlayerTrait for Defense {
             ..*b_traits
         }
     }
+    fn is_max(&self) -> bool {
+        *self == Self::D1
+    }
+
+    fn is_min(&self) -> bool {
+        *self == Self::DM1
+    }
 }
 
 impl Default for Defense {
@@ -319,7 +362,7 @@ impl UpdatePlayerDb for Defense {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 
 pub enum Toughness {
     #[serde(rename = "T+")]
@@ -351,6 +394,14 @@ impl PlayerTrait for Toughness {
             toughness: *self,
             ..*b_traits
         }
+    }
+
+    fn is_max(&self) -> bool {
+        *self == Self::T1
+    }
+
+    fn is_min(&self) -> bool {
+        *self == Self::T0
     }
 }
 
@@ -404,6 +455,14 @@ impl PlayerTrait for PitcherTrait {
 
     fn from_int(&self, num: i32) -> Option<Box<Self>> {
         None
+    }
+
+    fn is_max(&self) -> bool {
+        true
+    }
+
+    fn is_min(&self) -> bool {
+        true
     }
 }
 

@@ -217,36 +217,36 @@ impl BTraits {
 
     fn get_non_max_batter_traits(&self) -> Vec<UpgradableTraits> {
         let mut result = vec![];
-        match self.contact {
-            Contact::C1 => (),
-            _ => result.push(UpgradableTraits::Contact),
-        };
-        match self.power {
-            Power::P2 => (),
-            _ => result.push(UpgradableTraits::Power),
-        };
+        if self.contact.is_max() {
+            result.push(UpgradableTraits::Contact);
+        }
+        if self.power.is_max() {
+            result.push(UpgradableTraits::Power);
+        }
 
-        match self.speed {
-            Speed::S2 => (),
-            _ => result.push(UpgradableTraits::Speed),
-        };
+        if self.speed.is_max() {
+            result.push(UpgradableTraits::Speed)
+        }
 
-        match self.toughness {
-            Toughness::T1 => (),
-            _ => result.push(UpgradableTraits::Toughness),
+        if self.toughness.is_max() {
+            result.push(UpgradableTraits::Toughness);
+        }
+
+        if self.defense.is_max() {
+            result.push(UpgradableTraits::Defense)
         }
         result
     }
 
-    fn upgradable_from_trait(&self, up_trait: UpgradableTraits) -> BTraits {
+    fn upgradable_from_trait(self, up_trait: UpgradableTraits) -> BTraits {
         let upgrade_option = match up_trait {
-            UpgradableTraits::Contact => self.contact.upgrade_b_traits(*self),
-            UpgradableTraits::Defense => self.defense.upgrade_b_traits(*self),
-            UpgradableTraits::Power => self.power.upgrade_b_traits(*self),
-            UpgradableTraits::Speed => self.speed.upgrade_b_traits(*self),
-            UpgradableTraits::Toughness => self.toughness.upgrade_b_traits(*self),
+            UpgradableTraits::Contact => self.contact.upgrade_b_traits(&self),
+            UpgradableTraits::Defense => self.defense.upgrade_b_traits(&self),
+            UpgradableTraits::Power => self.power.upgrade_b_traits(&self),
+            UpgradableTraits::Speed => self.speed.upgrade_b_traits(&self),
+            UpgradableTraits::Toughness => self.toughness.upgrade_b_traits(&self),
         };
-        upgrade_option.unwrap_or(*self)
+        upgrade_option.unwrap_or(self)
     }
     // Upgrades a random player trait. Returns self if all traits are maxed out.
     pub fn upgrade_random_traits(self, thread: &mut ThreadRng) -> BTraits {
