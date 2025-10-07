@@ -623,8 +623,11 @@ mod tests {
         let speed_check = WorsePlayerTrait(Speed::SM1, Speed::S0);
         assert_eq!(speed_check, Speed::SM1);
         let power_check_b = WorsePlayerTrait(Power::PM2, Power::PM1);
-        assert_eq!(power_check_b, Power::PM2)
-    
-}
-    
+        assert_eq!(power_check_b, Power::PM2);
+        let test_traits = BTraits::default();
+        let powered_up = test_traits.upgradable_from_trait(b_traits::UpgradableTraits::Power);
+        assert_eq!(powered_up.power,Power::P1);
+        let powered_up_b = powered_up.upgradable_from_trait(b_traits::UpgradableTraits::Power);
+        assert_eq!(powered_up_b.power, Power::P2)
+    }    
 }

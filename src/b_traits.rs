@@ -1,4 +1,5 @@
 use crate::traits::BetterPlayerTrait;
+
 use crate::traits::PlayerTrait;
 use crate::traits::WorsePlayerTrait;
 use crate::Contact;
@@ -21,7 +22,7 @@ pub struct LineupInts {
 }
 // To keep track of upgradable traits for batters, we make an enum for each kind that can be upgraded
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
-enum UpgradableTraits {
+pub enum UpgradableTraits {
     Power,
     Speed,
     Defense,
@@ -240,7 +241,7 @@ impl BTraits {
         result
     }
 
-    fn upgradable_from_trait(self, up_trait: UpgradableTraits) -> BTraits {
+    pub fn upgradable_from_trait(self, up_trait: UpgradableTraits) -> BTraits {
         let upgrade_option = match up_trait {
             UpgradableTraits::Contact => self.contact.upgrade_b_traits(&self),
             UpgradableTraits::Defense => self.defense.upgrade_b_traits(&self),
@@ -260,6 +261,10 @@ impl BTraits {
                 self.upgradable_from_trait(*picked_trait)
             }
         }
+    }
+
+    pub fn maxed_out() -> Self{
+        BTraits { contact: Contact::C1, defense: Defense::D1, power: Power::P2, speed: Speed::S2, toughness: Toughness::T1 }
     }
 
     /*
