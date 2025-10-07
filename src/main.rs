@@ -397,6 +397,8 @@ mod tests {
         name: String,
         id: i64,
     }
+    use crate::traits::{BetterPlayerTrait, WorsePlayerTrait};
+
     use super::*;
 
     #[test]
@@ -614,4 +616,15 @@ mod tests {
         );
         schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();*/
     }
+    #[test]
+    fn trait_logic(){
+        let power_check = BetterPlayerTrait(Power::P2, Power::P1);
+        assert_eq!(power_check,Power::P2);
+        let speed_check = WorsePlayerTrait(Speed::SM1, Speed::S0);
+        assert_eq!(speed_check, Speed::SM1);
+        let power_check_b = WorsePlayerTrait(Power::PM2, Power::PM1);
+        assert_eq!(power_check_b, Power::PM2)
+    
+}
+    
 }

@@ -1,4 +1,6 @@
+use crate::traits::BetterPlayerTrait;
 use crate::traits::PlayerTrait;
+use crate::traits::WorsePlayerTrait;
 use crate::Contact;
 use crate::Defense;
 use crate::Deserialize;
@@ -290,16 +292,14 @@ impl fmt::Display for BTraits {
 }
 /// Takes a original trait and a new trait. If the new trait is a valid upgrade or downgrade, the new trait is returned.
 fn trait_stack<T: PlayerTrait>(original: T, new: T) -> T {
+    // To start, first we get the int for the original player int.
     let original_num = original.to_int();
-    let new_num = new.to_int();
-
-    let tup = (
-        (original_num == 0) & (new_num != 0),
-        (original_num > 0) & (new_num > original_num),
-        (original_num < 0) & (new_num < original_num),
-    );
-    match tup {
-        (false, false, false) => original,
-        _ => new,
+    match original_num {
+        // If the value of the int is >0, then the original trait is a negative trait, and we want to pick the worse of the 2 traits
+        (..0) => WorsePlayerTrait(original, new),
+        // If the value of the int is  0, the new trait replaces the old trait.
+        0 => new,
+        // If the int is >= 1, then we pick the better of the 2 traits.
+        (1..) => BetterPlayerTrait(original, new),
     }
 }
