@@ -1,4 +1,3 @@
-use crate::b_traits;
 use crate::b_traits::BTraits;
 use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
@@ -52,8 +51,6 @@ pub trait PlayerTrait {
 
     // Returns a copy of a Btraits, but with the original replaced by this one.
     fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits;
-
-
 }
 
 // Takes a plert trait. If the result of converting the trait to an int is 0, None is returned, else an option with hte trait is returned.
@@ -62,10 +59,7 @@ pub fn player_trait_option<T: PlayerTrait>(player_trait: &T) -> Option<&T> {
         0 => None,
         _ => Some(player_trait),
     }
-
 }
-
-
 
 #[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum Power {
@@ -128,8 +122,6 @@ impl PlayerTrait for Power {
     fn is_min(&self) -> bool {
         return *self == Self::PM2;
     }
-
-    
 }
 
 impl Default for Power {
@@ -137,8 +129,6 @@ impl Default for Power {
         Self::P0
     }
 }
-
-
 
 impl fmt::Display for Power {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

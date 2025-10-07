@@ -263,8 +263,14 @@ impl BTraits {
         }
     }
 
-    pub fn maxed_out() -> Self{
-        BTraits { contact: Contact::C1, defense: Defense::D1, power: Power::P2, speed: Speed::S2, toughness: Toughness::T1 }
+    pub fn maxed_out() -> Self {
+        BTraits {
+            contact: Contact::C1,
+            defense: Defense::D1,
+            power: Power::P2,
+            speed: Speed::S2,
+            toughness: Toughness::T1,
+        }
     }
 
     /*

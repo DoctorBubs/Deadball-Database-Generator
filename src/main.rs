@@ -386,8 +386,8 @@ mod tests {
     use std::fs;
 
     use b_traits::BTraits;
-    use chrono::{format::format, Datelike, Local, Timelike};
-    use glob::glob_with;
+    use chrono::{Datelike, Local, Timelike};
+
     use league::{get_all_leagues_from_db, load_teams_from_sql};
     use league_template::{load_league_templates, new_league_from_template};
     use position::{PlayerPosition, TwoWayInfo};
@@ -617,17 +617,18 @@ mod tests {
         schedule_to_sql(&mut test_conn, &current_league, test_sched).unwrap();*/
     }
     #[test]
-    fn trait_logic(){
+    fn trait_logic() {
+        assert_ne!(Power::P0,Power::P1);
         let power_check = BetterPlayerTrait(Power::P2, Power::P1);
-        assert_eq!(power_check,Power::P2);
+        assert_eq!(power_check, Power::P2);
         let speed_check = WorsePlayerTrait(Speed::SM1, Speed::S0);
         assert_eq!(speed_check, Speed::SM1);
         let power_check_b = WorsePlayerTrait(Power::PM2, Power::PM1);
         assert_eq!(power_check_b, Power::PM2);
         let test_traits = BTraits::default();
         let powered_up = test_traits.upgradable_from_trait(b_traits::UpgradableTraits::Power);
-        assert_eq!(powered_up.power,Power::P1);
+        assert_eq!(powered_up.power, Power::P1);
         let powered_up_b = powered_up.upgradable_from_trait(b_traits::UpgradableTraits::Power);
         assert_eq!(powered_up_b.power, Power::P2)
-    }    
+    }
 }

@@ -1,6 +1,5 @@
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
-use crate::edit_league_error;
 use crate::edit_league_error::handle_serde_error;
 use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
