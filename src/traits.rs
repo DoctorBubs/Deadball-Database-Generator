@@ -479,3 +479,19 @@ impl fmt::Display for PitcherTrait {
         write!(f, "{}", chars)
     }
 }
+
+// Takes 2 player traits, returns the strong trait
+pub fn BetterPlayerTrait<T: PlayerTrait>(original: T, new: T) -> T {
+    match original.to_int() > new.to_int() {
+        true => original,
+        false => new,
+    }
+}
+
+// Takes 2 player traits, returns the weaker trait
+pub fn WorsePlayerTrait<T: PlayerTrait>(original: T, new: T) -> T {
+    match original.to_int() > new.to_int() {
+        true => new,
+        false => original,
+    }
+}
