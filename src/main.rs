@@ -510,6 +510,16 @@ mod tests {
                 ],
             )
             .unwrap();
+        // Next we check the random trait upgrader.
+        let second_batter = first_team.lineup.get_mut(1).unwrap();
+        second_batter
+            .upgrade_random_batter_trait(
+                &mut test_conn,
+                first_team_id,
+                team::TeamSpot::StartingLineup,
+                &mut r_thread,
+            )
+            .unwrap();
         // Next, we check to make sure that a league will not allow the addition of a team with the same name as an existin team.
         let double_name_check = current_league.new_team(
             &"NY".to_string(),

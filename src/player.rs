@@ -1,5 +1,6 @@
 use crate::b_traits::BTraitAboveAverage;
 use crate::b_traits::BTraits;
+use crate::edit_league_error;
 use crate::edit_league_error::handle_serde_error;
 use crate::edit_league_error::handle_sql_error;
 use crate::edit_league_error::EditLeagueError;
@@ -366,6 +367,22 @@ impl Player {
         self.player_id = new_player_id;
         Ok(())
     }
+    pub fn upgrade_random_batter_trait(
+        &mut self,
+        conn: &mut Connection,
+        team_id: i64,
+        team_spot: TeamSpot,
+        thread: &mut ThreadRng,
+    ) -> Result<(), EditLeagueError> {
+        match self.is_pitcher() {
+            false => {
+                self.b_traits = self.b_traits.upgrade_random_traits(thread);
+                self.save_sql(conn, team_id, team_spot)
+            }
+            true => Ok(()),
+        }
+    }
+
     // Used to rank pitchers.
     pub fn get_pitcher_rank_info(&self) -> PitcherRankInfo {
         let pd_num = self.get_base_pd().to_int();

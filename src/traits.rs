@@ -1,3 +1,5 @@
+use crate::b_traits;
+use crate::b_traits::BTraits;
 use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
 
@@ -10,6 +12,34 @@ pub trait PlayerTrait {
     fn get_rbi_score(&self) -> i32 {
         0
     }
+
+    fn from_int(&self, num: i32) -> Option<Box<Self>>;
+
+    fn upgrade_b_traits(&self, original_b_traits: BTraits) -> Option<BTraits> {
+        let base = self.to_int();
+        let upgrade_int = base + 1;
+        match self.from_int(upgrade_int) {
+            Some(boxed) => {
+                let new_traits = boxed.add_to_b_traits(&original_b_traits);
+                Some(new_traits)
+            }
+            None => None,
+        }
+    }
+
+    fn downgrade(&self, original_b_traits: &BTraits) -> Option<BTraits> {
+        let base = self.to_int();
+        let downgrade_int = base + 1;
+        match self.from_int(downgrade_int) {
+            Some(boxed) => {
+                let new_traits = boxed.add_to_b_traits(&original_b_traits);
+                Some(new_traits)
+            }
+            None => None,
+        }
+    }
+    // Returns a copy of a Btraits, but with the original replaced by this one.
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits;
 }
 
 // Takes a plert trait. If the result of converting the trait to an int is 0, None is returned, else an option with hte trait is returned.
@@ -51,7 +81,25 @@ impl PlayerTrait for Power {
             Self::PM2 => -2,
         }
     }
+    fn from_int(&self, num: i32) -> Option<Box<Self>> {
+        let result = match num {
+            -2 => Self::PM2,
+            -1 => Self::PM1,
+            0 => Self::P0,
+            1 => Self::P1,
+            2 => Self::P2,
+            _ => return None,
+        };
+        let boxed = Box::new(result);
+        Some(boxed)
+    }
 
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            power: *self,
+            ..*b_traits
+        }
+    }
     fn get_rbi_score(&self) -> i32 {
         self.to_int() * 3
     }
@@ -104,6 +152,25 @@ impl PlayerTrait for Speed {
             Self::SM1 => -1,
         }
     }
+
+    fn from_int(&self, num: i32) -> Option<Box<Self>> {
+        let result = match num {
+            2 => Self::S2,
+            1 => Self::S1,
+            0 => Self::S0,
+            -1 => Self::SM1,
+            _ => return None,
+        };
+        let boxed = Box::new(result);
+        Some(boxed)
+    }
+
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            speed: *self,
+            ..*b_traits
+        }
+    }
 }
 
 impl Default for Speed {
@@ -150,8 +217,25 @@ impl PlayerTrait for Contact {
         }
     }
 
+    fn from_int(&self, num: i32) -> Option<Box<Self>> {
+        let result = match num {
+            1 => Self::C1,
+            0 => Self::C0,
+            -1 => Self::CM1,
+            _ => return None,
+        };
+        let boxed = Box::new(result);
+        Some(boxed)
+    }
     fn get_rbi_score(&self) -> i32 {
         self.to_int() * 2
+    }
+
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            contact: *self,
+            ..*b_traits
+        }
     }
 }
 
@@ -189,6 +273,24 @@ impl PlayerTrait for Defense {
             Self::D1 => 1,
             Self::D0 => 0,
             Self::DM1 => -1,
+        }
+    }
+
+    fn from_int(&self, num: i32) -> Option<Box<Self>> {
+        let result = match num {
+            1 => Self::D1,
+            0 => Self::D0,
+            -1 => Self::DM1,
+            _ => return None,
+        };
+        let boxed = Box::new(result);
+        Some(boxed)
+    }
+
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            defense: *self,
+            ..*b_traits
         }
     }
 }
@@ -231,6 +333,23 @@ impl PlayerTrait for Toughness {
         match self {
             Self::T1 => 1,
             Self::T0 => 0,
+        }
+    }
+
+    fn from_int(&self, num: i32) -> Option<Box<Self>> {
+        let result = match num {
+            1 => Self::T1,
+            0 => Self::T0,
+            _ => return None,
+        };
+        let boxed = Box::new(result);
+        Some(boxed)
+    }
+
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            toughness: *self,
+            ..*b_traits
         }
     }
 }
@@ -278,6 +397,13 @@ impl PlayerTrait for PitcherTrait {
             PitcherTrait::CNM => -1,
             _ => 1,
         }
+    }
+    fn add_to_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        *b_traits
+    }
+
+    fn from_int(&self, num: i32) -> Option<Box<Self>> {
+        None
     }
 }
 
