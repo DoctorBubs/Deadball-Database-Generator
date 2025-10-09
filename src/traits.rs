@@ -1,4 +1,5 @@
 use crate::b_traits::BTraits;
+use crate::player::Player;
 use crate::update_player_db::UpdatePlayerDb;
 use crate::Deserialize;
 
@@ -13,6 +14,20 @@ pub trait PlayerTrait {
     }
 
     fn from_int(&self, num: i32) -> Option<Box<Self>>;
+
+    fn is_pitcher_trait(&self) -> bool {
+        false
+    }
+    // Returns a copy of a BTrait with this trait.
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits;
+    // Returns a copy of a player with this trait added on.
+    fn force_on_player(&self, player: &Player) -> Player {
+        let new_b_traits = self.force_b_traits(&player.b_traits);
+        Player {
+            b_traits: new_b_traits,
+            ..player.clone()
+        }
+    }
 
     fn upgrade_b_traits(&self, original_b_traits: &BTraits) -> Option<BTraits> {
         if self.is_max() {
@@ -122,6 +137,13 @@ impl PlayerTrait for Power {
     fn is_min(&self) -> bool {
         return *self == Self::PM2;
     }
+
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            power: *self,
+            ..*b_traits
+        }
+    }
 }
 
 impl Default for Power {
@@ -198,6 +220,13 @@ impl PlayerTrait for Speed {
     fn is_min(&self) -> bool {
         return *self == Self::SM1;
     }
+
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            speed: *self,
+            ..*b_traits
+        }
+    }
 }
 
 impl Default for Speed {
@@ -272,6 +301,13 @@ impl PlayerTrait for Contact {
     fn is_min(&self) -> bool {
         *self == Self::CM1
     }
+
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            contact: *self,
+            ..*b_traits
+        }
+    }
 }
 
 impl Default for Contact {
@@ -334,6 +370,13 @@ impl PlayerTrait for Defense {
 
     fn is_min(&self) -> bool {
         *self == Self::DM1
+    }
+
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            defense: *self,
+            ..*b_traits
+        }
     }
 }
 
@@ -402,6 +445,13 @@ impl PlayerTrait for Toughness {
     fn is_min(&self) -> bool {
         *self == Self::T0
     }
+
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        BTraits {
+            toughness: *self,
+            ..*b_traits
+        }
+    }
 }
 
 impl Default for Toughness {
@@ -427,7 +477,7 @@ impl UpdatePlayerDb for Toughness {
     }
 }
 
-#[derive(Copy, Clone, Serialize, Deserialize, Debug)]
+#[derive(Copy, Clone, Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub enum PitcherTrait {
     #[serde(rename = "CN-")]
     CNM,
@@ -462,6 +512,17 @@ impl PlayerTrait for PitcherTrait {
 
     fn is_min(&self) -> bool {
         true
+    }
+    // This returns a copy of the input BTraits, since pitcher traits are handled differently.
+    fn force_b_traits(&self, b_traits: &BTraits) -> BTraits {
+        *b_traits
+    }
+
+    fn force_on_player(&self, player: &Player) -> Player {
+        Player {
+            pitcher_trait: Some(*self),
+            ..player.clone()
+        }
     }
 }
 

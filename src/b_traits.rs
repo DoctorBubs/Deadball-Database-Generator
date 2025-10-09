@@ -31,7 +31,7 @@ pub enum UpgradableTraits {
 }
 
 // BTraits is a struct that contains an instance of all traits that are related to batting, and it represents what batting traits a player has.
-#[derive(Serialize, Deserialize, Debug, Default, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, Default, Copy, Clone, PartialEq, Eq)]
 pub struct BTraits {
     pub contact: Contact,
     pub defense: Defense,

@@ -179,7 +179,7 @@ fn get_greater<T: Eq + std::cmp::PartialOrd>(target: T, actual: T) -> Option<T> 
         false => Some(actual),
     }
 }
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Player {
     pub name: String,
     pub age: i32,

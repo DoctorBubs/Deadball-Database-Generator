@@ -397,7 +397,7 @@ mod tests {
         name: String,
         id: i64,
     }
-    use crate::traits::{BetterPlayerTrait, WorsePlayerTrait};
+    use crate::traits::{BetterPlayerTrait, PitcherTrait, PlayerTrait, WorsePlayerTrait};
 
     use super::*;
 
@@ -618,7 +618,7 @@ mod tests {
     }
     #[test]
     fn trait_logic() {
-        assert_ne!(Power::P0,Power::P1);
+        assert_ne!(Power::P0, Power::P1);
         let power_check = BetterPlayerTrait(Power::P2, Power::P1);
         assert_eq!(power_check, Power::P2);
         let speed_check = WorsePlayerTrait(Speed::SM1, Speed::S0);
@@ -629,6 +629,21 @@ mod tests {
         let powered_up = test_traits.upgradable_from_trait(b_traits::UpgradableTraits::Power);
         assert_eq!(powered_up.power, Power::P1);
         let powered_up_b = powered_up.upgradable_from_trait(b_traits::UpgradableTraits::Power);
-        assert_eq!(powered_up_b.power, Power::P2)
+        assert_eq!(powered_up_b.power, Power::P2);
+        let neg_power = Power::PM2;
+        let test_player = Player::default();
+        assert_eq!(test_player.b_traits.power, Power::P0);
+        let lowered_test_player = neg_power.force_on_player(&test_player);
+        assert_eq!(lowered_test_player.b_traits.power, neg_power);
+        assert_ne!(
+            lowered_test_player.b_traits.power,
+            test_player.b_traits.power
+        );
+        let strike_out = PitcherTrait::K;
+        let k_player = strike_out.force_on_player(&lowered_test_player);
+        assert_eq!(k_player.pitcher_trait, Some(strike_out));
+        let def_b_traits = BTraits::default();
+        let k_b_traits = strike_out.force_b_traits(&def_b_traits);
+        assert_eq!(k_b_traits, def_b_traits)
     }
 }
