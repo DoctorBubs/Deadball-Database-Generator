@@ -315,7 +315,7 @@ impl Player {
             _ => Some(result),
         }
     }
-    /// Serializeze the player into a data struct that can be used to create a row in the database.
+    /// Serializes the player into a data struct that can be used to create a row in the database.
     pub fn get_row(&mut self, team_spot: TeamSpot) -> Result<PlayerRow, serde_json::Error> {
         //  self.team_id = team_id;
         let BTraits {
