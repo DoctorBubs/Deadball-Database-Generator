@@ -479,6 +479,13 @@ mod tests {
         // Next, we select the first team.
         let first_team = current_league.teams.get_mut(0).unwrap();
         let first_team_id = first_team.team_id;
+        
+        // We check that the league lookup hashmaps are working.
+        let id_lookup = current_league.team_id_hash.get(&first_team_id).unwrap();
+        assert_eq!(*id_lookup,0);
+
+        let abrv_lookup = current_league.team_abrv_hash.get(&first_team.abrv).unwrap();
+        assert_eq!(*abrv_lookup,0);
         //Next we check the team's player pools to make sure they have all the players we expect.
         assert_eq!(first_team.lineup.len(), 8);
         // And then check that the player structs data matches what we expect.
