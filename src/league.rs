@@ -133,6 +133,8 @@ pub struct League {
     pub era: Era,
     pub league_id: i64, //bench_quality:BatterQuality,
     pub note: Note,
+    pub team_id_hash: HashMap<i64,usize>,
+    pub team_abrv_hash: HashMap<String,usize>
 }
 
 impl Notable for League {
@@ -185,9 +187,24 @@ impl League {
             era,
             league_id,
             note: None,
+            team_id_hash: HashMap::new(),
+            team_abrv_hash: HashMap::new()
         }
     }
 
+    // Adds a created team into the leagues team vector and lookup hash maps.
+    pub fn add_team(&mut self, new_team: Team){
+
+        let team_id = new_team.team_id;
+        let team_abrv = new_team.abrv.clone();
+        // And add the team to the league's teams vector.
+        self.teams.push(new_team);
+        // We calculate where in the vector the team has been loaded by subtracting 1 from the length.
+        let teams_index = self.teams.len() - 1;
+        self.team_id_hash.insert(team_id,teams_index);
+        self.team_abrv_hash.insert(team_abrv,teams_index);
+
+    }
     /*pub fn get_new_schedule(&self, series_length: i32,series_per_matchup:i32) ->  Result<Vec<Round>, ScheduleGenError>{
         new_schedule(&self.teams,  series_length, series_per_matchup)
 
@@ -723,8 +740,9 @@ impl League {
         //If all has gone well, we save the players that have been generated into the database
 
         new_team.save_players_sql(conn, new_team_id)?;
-        // And we insert the team struct into the league's team vector.
-        self.teams.push(new_team);
+        // And we load the new team into the league
+        self.add_team(new_team);
+        
         Ok(())
     }
 
@@ -1054,9 +1072,7 @@ pub fn load_teams_from_sql(
         let team = handle_sql_error(entry)?;
         // We load the team from the database in the form of a Rust struct.
         let loaded_team = load_team(conn, team, league.era)?;
-
-        // And add the team to the league's teams vector.
-        league.teams.push(loaded_team);
+        league.add_team(loaded_team);
     }
 
     Ok(())
@@ -1133,6 +1149,8 @@ pub fn get_all_leagues_from_db(
                     note: serde_json::from_value(row.get(4)?).unwrap(),
                     league_id: row.get(0)?,
                     teams: Vec::new(),
+                    team_abrv_hash: HashMap::new(),
+                    team_id_hash: HashMap::new()
                 },
             })
         })?
@@ -1196,6 +1214,11 @@ pub fn save_league_to_folders(league: &League) -> std::io::Result<()> {
         let mut file = File::create(file_path)?;
         file.write_all(team.to_string().as_bytes())?;
     }
+    // We also save the whole league in a json file
+    let league_string = serde_json::to_string(&league)?;
+    let league_file_path = folder_path.join("LEAGUE_JSON.txt".to_string());
+    let mut league_file = File::create(league_file_path)?;
+    league_file.write_all(league_string.as_bytes())?;
     Ok(())
 }
 
