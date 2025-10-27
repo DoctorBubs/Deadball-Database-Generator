@@ -732,7 +732,9 @@ impl League {
         );
         // We save the team ID, so that we we generate the new players they can be saved in the database with the league id as the foreign key.
         let new_team_id = conn.last_insert_rowid();
-        //new_team.team_id = team_id as i32;
+        // And we set the new teams ID to it.
+        new_team.team_id = new_team_id;
+     
         match team_enter_result {
             Ok(_) => (),
             Err(message) => return Err(EditLeagueError::DatabaseError(message)),
